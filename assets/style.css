@@ -1,0 +1,28 @@
+:root{--bg:#fff;--fg:#1b1b1f;--muted:#5f6368;--accent:#b8860b;--accent-dark:#8a6508;--surface:#f6f4ee;--border:#e4e0d4;--max:1080px}
+@media(prefers-color-scheme:dark){:root{--bg:#121214;--fg:#f1efe8;--muted:#a3a39b;--accent:#d4a72c;--accent-dark:#e6bd4a;--surface:#1b1b1e;--border:#2c2c30}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+img{max-width:100%}
+a{color:var(--accent-dark)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+header.site{border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;min-height:64px;flex-wrap:wrap;gap:8px}
+.brand{font-weight:700;font-size:1.25rem;letter-spacing:.04em;color:var(--fg);text-decoration:none}
+.brand span{color:var(--accent)}
+nav a{margin-left:20px;color:var(--fg);text-decoration:none;font-weight:500}
+nav a:hover,nav a[aria-current]{color:var(--accent-dark);text-decoration:underline}
+.hero{background:var(--surface);padding:96px 0;text-align:center}
+.hero h1{font-size:clamp(2rem,5vw,3.25rem);margin:0 0 16px;line-height:1.15}
+.hero p{max-width:600px;margin:0 auto 28px;color:var(--muted);font-size:1.1rem}
+.btn{display:inline-block;background:var(--accent);color:#111;padding:12px 28px;border-radius:6px;font-weight:600;text-decoration:none;border:0;cursor:pointer;font-size:1rem}
+.btn:hover{background:var(--accent-dark)}
+section.block{padding:64px 0}
+h2{font-size:1.75rem;margin:0 0 24px}
+.grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px}
+.card h3{margin-top:0}
+.thumb{aspect-ratio:4/3;background:linear-gradient(135deg,var(--border),var(--surface));border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);margin-bottom:12px}
+form{display:grid;gap:16px;max-width:520px}
+label{display:grid;gap:6px;font-weight:500}
+input,textarea{font:inherit;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--fg)}
+footer.site{border-top:1px solid var(--border);padding:32px 0;color:var(--muted);text-align:center;font-size:.9rem}
