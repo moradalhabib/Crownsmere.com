@@ -9,8 +9,8 @@
  * Build: cd tools/crest && npm install && npm run build
  */
 import {
-  ACESFilmicToneMapping, AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Color,
-  DirectionalLight, ExtrudeGeometry, Group, MathUtils, Mesh, MeshPhysicalMaterial, PMREMGenerator,
+  ACESFilmicToneMapping, BufferAttribute, BufferGeometry, CanvasTexture, Color,
+  DirectionalLight, ExtrudeGeometry, Group, MathUtils, Mesh, MeshPhysicalMaterial, NormalBlending, PMREMGenerator,
   PerspectiveCamera, PointLight, Points, PointsMaterial, Scene, Shape, Vector2, WebGLRenderer, SRGBColorSpace,
 } from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
@@ -32,9 +32,9 @@ function dustTexture() {
   c.width = c.height = 64;
   const g = c.getContext("2d");
   const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grd.addColorStop(0, "rgba(255,236,190,1)");
-  grd.addColorStop(0.35, "rgba(232,196,128,0.55)");
-  grd.addColorStop(1, "rgba(232,196,128,0)");
+  grd.addColorStop(0, "rgba(196,158,92,1)");
+  grd.addColorStop(0.4, "rgba(176,141,87,0.5)");
+  grd.addColorStop(1, "rgba(176,141,87,0)");
   g.fillStyle = grd;
   g.fillRect(0, 0, 64, 64);
   const t = new CanvasTexture(c);
@@ -86,16 +86,16 @@ export function mountCrest(canvas, host) {
   rig.add(crest);
   scene.add(rig);
 
-  // Lights: warm key, cool rim, and a moving glint
+  // Lights: warm key, soft cream rim, and a moving glint
   const key = new DirectionalLight(0xfff1d6, 1.8);
   key.position.set(3, 4, 6);
-  const rim = new DirectionalLight(0x9fb4d8, 1.4);
+  const rim = new DirectionalLight(0xffe2b8, 1.2);
   rim.position.set(-5, -1, -3);
   const glint = new PointLight(0xffd99a, 9, 9, 1.6);
   glint.position.set(-3, 2, 3);
   scene.add(key, rim, glint);
 
-  // Gold dust, drifting very slowly
+  // Gold dust on cream, drifting very slowly
   const N = touch ? 140 : 260;
   const pos = new Float32Array(N * 3);
   const seed = new Float32Array(N);
@@ -108,8 +108,8 @@ export function mountCrest(canvas, host) {
   const dustGeo = new BufferGeometry();
   dustGeo.setAttribute("position", new BufferAttribute(pos, 3));
   const dust = new Points(dustGeo, new PointsMaterial({
-    size: 0.045, map: dustTexture(), transparent: true, opacity: 0.55,
-    depthWrite: false, blending: AdditiveBlending, sizeAttenuation: true,
+    size: 0.05, map: dustTexture(), transparent: true, opacity: 0.42,
+    depthWrite: false, blending: NormalBlending, sizeAttenuation: true,
   }));
   scene.add(dust);
 

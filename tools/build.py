@@ -88,7 +88,7 @@ def head(title, desc, path, extra_ld=None):
 <meta name="format-detection" content="telephone=no">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<meta name="theme-color" content="#0e1b2e">
+<meta name="theme-color" content="#f6f0e4">
 <link rel="canonical" href="{canonical}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{BRAND}">
@@ -366,7 +366,7 @@ def invite(heading="Tell me what <em>you are looking for.</em>"):
 
 def band(text, cite="Discretion &middot; Expertise &middot; Results"):
     return f'''
-<section class="band" data-dark>
+<section class="band">
   <img class="ghost" src="assets/img/monogram.png" alt="" width="330" height="518" loading="lazy" decoding="async">
   <blockquote>
     <p class="display">{text}</p>
@@ -387,7 +387,7 @@ process_cards = "".join(
 )
 
 index_body = f'''
-<section class="hero3d" data-dark aria-label="Crownsmere Estate">
+<section class="hero3d" aria-label="Crownsmere Estate">
   <div class="hero3d-stage" aria-hidden="true">
     <img class="crest-fallback" src="assets/img/monogram.png" alt="" width="330" height="518">
     <canvas class="crest-canvas"></canvas>
@@ -397,13 +397,13 @@ index_body = f'''
     <h1><span class="line"><span>The right home,</span></span><span class="line"><span><em>found for you.</em></span></span></h1>
     <div class="hero3d-side">
       <p>A private, by-request property service in prime London. You share your brief; I search discreetly, on and off the market, and bring you only what is genuinely right.</p>
-      <a class="btn btn-light caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
+      <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
   <a class="scroll-cue caps" href="#reveal"><span>Discover</span><i aria-hidden="true"></i></a>
 </section>
 
-<section class="arch" id="reveal" data-dark aria-label="A more personal London">
+<section class="arch" id="reveal" aria-label="A more personal London">
   <div class="arch-pin">
     <div class="arch-window">{pic("townhouse", "A white stucco London townhouse with a black front door and columned porch", 1055, 687)}</div>
     <div class="arch-copy">
@@ -832,7 +832,7 @@ open(os.path.join(OUT, "sitemap.xml"), "w").write(sitemap)
 open(os.path.join(OUT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 manifest = {
     "name": BRAND, "short_name": "Crownsmere", "description": "Private property search in prime London.",
-    "start_url": "/", "display": "browser", "background_color": "#f6f2ea", "theme_color": "#0e1b2e",
+    "start_url": "/", "display": "browser", "background_color": "#f6f0e4", "theme_color": "#f6f0e4",
     "icons": [{"src": "/assets/img/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"},
               {"src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png"}],
 }
