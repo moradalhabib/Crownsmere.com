@@ -24,6 +24,8 @@ The monogram intro plays once per browser session. Open a new tab or window to s
 The site makes no requests to any other website except FormSubmit when a brief is sent, and sets no cookies.
 
 ## Contact requests
+No telephone number is published on the site: Alaa shares it personally once a brief is received. Visitors reach Crownsmere through the brief form or hello@crownsmere.com.
+
 `contact.html` guides visitors through three steps (request, brief, details). Without JavaScript it shows as one form. It collects the request (buy a home, rent a home, sell privately, let a property, invest, seek advice), the brief, preferred areas, budget or value, timeframe, name, email, telephone, preferred contact method, best time and consent.
 
 - Submissions are posted with JavaScript to [FormSubmit](https://formsubmit.co) (`data-endpoint` on the `<form>`), which emails them to **hello@crownsmere.com**.

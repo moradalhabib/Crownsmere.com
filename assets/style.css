@@ -989,3 +989,4 @@ picture { display: contents; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; text-overflow: ellipsis; }
 .field-row > * { min-width: 0; }
 @media (max-width: 480px) { .steps-nav { gap: 8px; } .steps-nav li { letter-spacing: 0.16em; font-size: 10px; } }
+#brief { scroll-margin-top: 90px; }

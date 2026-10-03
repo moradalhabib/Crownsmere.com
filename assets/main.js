@@ -300,7 +300,7 @@
       delete data._honey;
 
       var endpoint = form.getAttribute("data-endpoint");
-      if (!endpoint) { say("Online enquiries open shortly. Kindly email hello@crownsmere.com or call +44 7384 190760.", true); return; }
+      if (!endpoint) { say("Online enquiries open shortly. Kindly email hello@crownsmere.com.", true); return; }
 
       sending = true;
       say("Sending your brief\u2026");

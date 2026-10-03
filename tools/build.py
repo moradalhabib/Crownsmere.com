@@ -10,8 +10,7 @@ import re
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://crownsmere.com"
 BRAND = "Crownsmere Estate"
-PHONE = "+44 7384 190760"
-PHONE_TEL = "+447384190760"
+# No telephone number is published: Alaa shares it personally once a brief is received.
 EMAIL = "hello@crownsmere.com"
 UPDATED = "3 October 2026"
 UPDATED_ISO = "2026-10-03"
@@ -54,7 +53,7 @@ ORG = {
     "@context": "https://schema.org", "@type": "RealEstateAgent", "@id": f"{SITE}/#business",
     "name": BRAND,
     "description": "A private, by-request property search and consultancy service in prime London: clients share a brief and Alaa Qadir finds the right property, on and off the market.",
-    "url": f"{SITE}/", "telephone": PHONE, "email": EMAIL,
+    "url": f"{SITE}/", "email": EMAIL,
     "image": f"{SITE}/assets/img/townhouse.jpg", "logo": f"{SITE}/assets/img/monogram.png",
     "areaServed": {"@type": "City", "name": "London"},
     "address": {"@type": "PostalAddress", "addressLocality": "London", "addressCountry": "GB"},
@@ -122,7 +121,7 @@ def header(current):
 {items}
   </ol>
   <aside>
-    <div><div class="caps">Telephone</div><a href="tel:{PHONE_TEL}">{PHONE}</a></div>
+    <div><div class="caps">Your brief</div><a href="contact.html">Share it in confidence</a></div>
     <div><div class="caps">Email</div><a href="mailto:{EMAIL}">{EMAIL}</a></div>
   </aside>
 </nav>'''
@@ -130,8 +129,8 @@ def header(current):
 def footer(current):
     explore = "".join(f'<li><a href="{h}">{t}</a></li>' for h, t in NAV)
     services = "".join(f'<li><a href="services.html#{s.lower()}">{s}</a></li>' for s in ["Buy", "Sell", "Let", "Invest", "Advisory"])
-    second = (f'<a href="mailto:{EMAIL}">{ic("mail")}<span>Email</span></a>' if current == "contact.html"
-              else f'<a href="contact.html">{ic("document")}<span>Share your brief</span></a>')
+    brief_href = "#brief" if current == "contact.html" else "contact.html"
+    second = f'<a href="{brief_href}">{ic("document")}<span>Share your brief</span></a>'
     return f'''
 <div class="skyline-wrap">{pic("skyline", "", 1055, 181, cls="skyline")}</div>
 <footer class="ft">
@@ -143,13 +142,13 @@ def footer(current):
       </div>
       <div><h4 class="caps">Explore</h4><ul>{explore}</ul></div>
       <div><h4 class="caps">Services</h4><ul>{services}</ul></div>
-      <div><h4 class="caps">Contact</h4><ul><li><a href="tel:{PHONE_TEL}">{PHONE}</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li>London, United Kingdom</li></ul></div>
+      <div><h4 class="caps">Contact</h4><ul><li><a href="contact.html">Share your brief</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li>London, United Kingdom</li></ul></div>
     </div>
     <div class="ft-motto" aria-hidden="true">DISCRETION &middot; EXPERTISE &middot; RESULTS</div>
     <div class="ft-bottom caps"><span>&copy; <span data-year>2026</span> {BRAND}</span><a href="privacy.html">Privacy notice</a><span>People &middot; Property &middot; Perspective</span><a href="#main">Back to top &uarr;</a></div>
   </div>
 </footer>
-<nav class="actionbar caps" aria-label="Quick contact"><a href="tel:{PHONE_TEL}">{ic("phone")}<span>Call</span></a>{second}</nav>
+<nav class="actionbar caps" aria-label="Quick contact"><a href="mailto:{EMAIL}">{ic("mail")}<span>Email</span></a>{second}</nav>
 <script src="assets/main.js"></script>
 </body>
 </html>
@@ -207,7 +206,7 @@ AREAS = [
 
 FAQ = [
     ("How does it work?",
-     "You share your brief, by telephone, email or the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."),
+     "You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."),
     ("Why are there no properties listed on this website?",
      "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."),
     ("What does &ldquo;off-market&rdquo; mean?",
@@ -272,9 +271,9 @@ def invite(heading="Tell me what <em>you are looking for.</em>"):
     <p class="lede" data-reveal>Whether you are searching for a home, an investment, or a discreet buyer for your own property, every engagement begins with a private conversation.</p>
     <div class="btn-row" data-reveal>
       <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
-      <a class="btn caps" href="tel:{PHONE_TEL}">Call {PHONE}</a>
+      <a class="btn caps" href="mailto:{EMAIL}">Email {EMAIL}</a>
     </div>
-    <div class="contact-line" data-reveal><a href="mailto:{EMAIL}">{EMAIL}</a><span>London, United Kingdom</span></div>
+    <div class="contact-line" data-reveal><span>By appointment</span><span>London, United Kingdom</span></div>
   </div>
 </section>'''
 
@@ -318,7 +317,7 @@ index_body = f'''
       <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
       <a class="btn caps" href="#process">How it works</a>
     </div>
-    <div class="hero-meta caps"><a href="tel:{PHONE_TEL}">{PHONE}</a><span>London, United Kingdom</span></div>
+    <div class="hero-meta caps"><span>By request &amp; appointment</span><span>London, United Kingdom</span></div>
   </div>
   <div class="hero-media">
     <div class="px">{pic("townhouse", "A white stucco London townhouse with a black front door and columned porch", 1055, 687, lazy=False, priority=True)}</div>
@@ -554,16 +553,16 @@ contact_body = f'''
 <section class="section tight">
   <div class="wrap letter-wrap">
     <div class="details">
-      <p class="lede" style="font-size:clamp(22px,2vw,30px);color:var(--ink-soft)">Tell me what you are looking for, in as much or as little detail as you like. I will be in touch personally, by telephone or email, in complete confidence.</p>
+      <p class="lede" style="font-size:clamp(22px,2vw,30px);color:var(--ink-soft)">Tell me what you are looking for, in as much or as little detail as you like. I will be in touch personally, in complete confidence, by telephone or email as you prefer.</p>
       <dl>
-        <div><dt class="caps">Telephone</dt><dd><a href="tel:{PHONE_TEL}">{PHONE}</a></dd></div>
+        <div><dt class="caps">Telephone</dt><dd>Shared personally<br><em>once your brief is received.</em></dd></div>
         <div><dt class="caps">Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
         <div><dt class="caps">Location</dt><dd>London, United Kingdom</dd></div>
         <div><dt class="caps">Consultations</dt><dd>By appointment</dd></div>
       </dl>
     </div>
 
-    <div class="letter" data-reveal>
+    <div class="letter" id="brief" data-reveal>
       <div class="letter-head">
         {LOGO()}
         <div class="caps">{BRAND} &nbsp;&middot;&nbsp; London</div>
@@ -653,7 +652,7 @@ privacy_body = f'''
     <p class="caps updated">Last updated {UPDATED}</p>
 
     <h2>Who I am</h2>
-    <p>{BRAND} is an independent property consultancy run by Alaa Qadir in London, United Kingdom. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact me about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a> or on <a href="tel:{PHONE_TEL}">{PHONE}</a>.</p>
+    <p>{BRAND} is an independent property consultancy run by Alaa Qadir in London, United Kingdom. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact me about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 
     <h2>What I collect</h2>
     <p>Only what you choose to share: your name, email address and telephone number, how and when you prefer to be contacted, and the details of your request (for example the kind of property you are looking for, preferred areas, budget and timeframe). If you write to me or call, I also keep that correspondence.</p>
