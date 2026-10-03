@@ -3,7 +3,7 @@
 Website of **Crownsmere Estate**, a private, by-request property service in prime London (Alaa Qadir, Senior Property Consultant): clients share a brief and Crownsmere finds the right property, on and off the market. There are deliberately no property listings. Plain HTML, CSS and JavaScript with no build step, hosted on GitHub Pages at crownsmere.com.
 
 ## Structure
-- `index.html`: home page: a real-time 3D gold crest hero, an arched-window photo reveal, the approach (words light up as you read), services, how it works, briefs I take on (cards that turn over), where I search (neighbourhood matcher and map), why Crownsmere, questions, share your brief
+- `index.html`: home page: a real-time 3D gold crest inside an engraved, slowly turning seal, an arched-window photo reveal, the approach (words light up as you read), services, how it works, briefs I take on (cards that turn over), where I search (neighbourhood matcher and map), why Crownsmere, questions, share your brief
 - `services.html`: buy, sell privately, let, invest and advisory (with a sticky section menu); how it works
 - `about.html`: why Crownsmere, Alaa Qadir, what you can expect
 - `contact.html`: the brief composer: a three-step form whose answers are composed, live, into a letter to Alaa on Crownsmere stationery, sealed when sent
@@ -21,10 +21,15 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 ## Design
 A light palette of cream, sand and champagne, with gold accents and navy lettering (no dark sections). The colour tokens are at the top of `assets/style.css`; the comments there note which text colours meet the contrast standard on which backgrounds.
 
+Royal details (the "Royal edition" section at the end of `assets/style.css`):
+- **Gold leaf:** the italic words in headings are lettered in gold leaf, with a light that passes across them once. The leaf tones are deep enough to stay readable on cream.
+- **The seal:** an engraved ring (an SVG in the hero, `SEAL` in `tools/build.py`) around the 3D crest; the crest positions and tilts it.
+- **Maison header:** on wider screens the crest and name sit in the centre with the links either side. On the home page the name appears once you scroll past the great crest.
+- **Crown ornaments** (`orn()` in `tools/build.py`) between sections, **gallery mounts** with a gilt fillet around photographs, gilt edges and double rules, and gilded buttons.
+- **Monogram canvas:** `assets/img/monogram-canvas.webp`, a tone-on-tone repeat of the crest, behind the quote band, the footer and the mobile menu.
+
 ## Preview locally
 `python3 -m http.server 8000`, then open http://localhost:8000
-
-The monogram intro plays once per browser session. Open a new tab or window to see it again.
 
 The site sets no cookies. The only outside requests are the OpenStreetMap map tiles on the home page (loaded only when the map scrolls into view) and FormSubmit when a brief is sent.
 

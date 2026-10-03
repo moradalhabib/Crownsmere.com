@@ -119,9 +119,9 @@ def head(title, desc, path, extra_ld=None):
 <div class="progress" aria-hidden="true"></div>'''
 
 def header(current):
-    nav = "".join(
-        '<a class="nl caps" href="%s"%s>%s</a>' % (h, ' aria-current="page"' if h == current else "", t) for h, t in NAV
-    )
+    link = lambda h, t: '<a class="nl caps" href="%s"%s>%s</a>' % (h, ' aria-current="page"' if h == current else "", t)
+    left = "".join(link(h, t) for h, t in NAV[:3])
+    right = link(*NAV[3])
     items = "\n".join(
         '<li><a href="%s"%s><small>%02d</small>%s</a></li>' % (h, ' aria-current="page"' if h == current else "", i + 1, t)
         for i, (h, t) in enumerate(NAV)
@@ -132,7 +132,7 @@ def header(current):
     {LOGO()}
     <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Private Property Consultancy</span></small></span>
   </a>
-  <nav class="hd-nav" aria-label="Main">{nav}<a class="btn btn-gold caps" href="contact.html">Enquire <span aria-hidden="true">&rarr;</span></a></nav>
+  <nav class="hd-nav" aria-label="Main"><div class="hd-l">{left}</div><div class="hd-r">{right}<a class="btn btn-gold caps" href="contact.html">Enquire <span aria-hidden="true">&rarr;</span></a></div></nav>
   <button class="hd-menu caps" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
 </header>
 <nav class="menu" id="menu" aria-label="Mobile">
@@ -144,6 +144,15 @@ def header(current):
     <div><div class="caps">Email</div><a href="mailto:{EMAIL}">{EMAIL}</a></div>
   </aside>
 </nav>'''
+
+CROWN = ('<svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false">'
+         '<path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>'
+         '<path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/>'
+         '<circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/>'
+         '<path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg>')
+
+def orn(cls=""):
+    return f'<div class="orn{" " + cls if cls else ""}" aria-hidden="true" data-reveal><i></i>{CROWN}<i></i></div>'
 
 def footer(current):
     explore = "".join(f'<li><a href="{h}">{t}</a></li>' for h, t in NAV)
@@ -163,6 +172,7 @@ def footer(current):
       <div><h2 class="caps">Services</h2><ul>{services}</ul></div>
       <div><h2 class="caps">Contact</h2><ul><li><a href="contact.html">Share your brief</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li>London, United Kingdom</li></ul></div>
     </div>
+    {orn("orn-ft")}
     <div class="ft-motto" aria-hidden="true">DISCRETION &middot; EXPERTISE &middot; RESULTS</div>
     <div class="ft-bottom caps"><span>&copy; <span data-year>2026</span> {BRAND}</span><a href="privacy.html">Privacy notice</a><span>People &middot; Property &middot; Perspective</span><a href="#main">Back to top &uarr;</a></div>
   </div>
@@ -302,7 +312,7 @@ def pillars(quote="The finest homes rarely need to be advertised.", media=True):
     return f'''<div class="pillars-wrap">
       <div class="pillars">{items}</div>
       <figure class="pillars-media reveal-img" data-reveal>
-        <div class="frame">{pic("colonnade", "White stucco townhouses on a leafy London street", 563, 398)}</div>
+        <div class="mat"><div class="frame">{pic("colonnade", "White stucco townhouses on a leafy London street", 563, 398)}</div></div>
         <blockquote>{quote}</blockquote>
       </figure>
     </div>'''
@@ -353,6 +363,7 @@ def invite(heading="Tell me what <em>you are looking for.</em>"):
     return f'''
 <section class="section invite">
   <div class="wrap">
+    {orn()}
     <div class="eyebrow caps" data-reveal>By request</div>
     <h2 class="display" data-reveal>{heading}</h2>
     <p class="lede" data-reveal>Whether you are searching for a home, an investment, or a discreet buyer for your own property, every engagement begins with a private conversation.</p>
@@ -369,6 +380,7 @@ def band(text, cite="Discretion &middot; Expertise &middot; Results"):
 <section class="band">
   <img class="ghost" src="assets/img/monogram.png" alt="" width="330" height="518" loading="lazy" decoding="async">
   <blockquote>
+    {orn()}
     <p class="display">{text}</p>
     <cite class="caps">{cite}</cite>
   </blockquote>
@@ -376,11 +388,26 @@ def band(text, cite="Discretion &middot; Expertise &middot; Results"):
 
 def statement_figure(caption, photo=("door", "A black-lacquered front door with brass fittings beside white columns", 433, 610)):
     name, alt, w, h = photo
-    return (f'<figure class="reveal-img" data-reveal><div class="frame">'
+    return (f'<figure class="reveal-img" data-reveal><div class="mat"><div class="frame">'
             f'{pic(name, alt, w, h)}'
-            f'</div><figcaption class="caps">{caption}</figcaption></figure>')
+            f'</div></div><figcaption class="caps">{caption}</figcaption></figure>')
 
 # ---------------------------------------------------------------- home
+# The engraved seal around the 3D crest: a legend on a circle, beading and fine rules, like a coin
+SEAL = ('<svg viewBox="0 0 600 600" focusable="false">'
+        '<defs><linearGradient id="seal-gilt" x1="0" y1="0" x2="1" y2="1">'
+        '<stop offset="0" stop-color="#b8955a"/><stop offset=".35" stop-color="#8a6a35"/><stop offset=".5" stop-color="#c9a76a"/>'
+        '<stop offset=".7" stop-color="#7f6030"/><stop offset="1" stop-color="#a8844a"/></linearGradient>'
+        '<path id="seal-path" d="M300 300m-262 0a262 262 0 1 1 524 0a262 262 0 1 1-524 0"/></defs>'
+        '<g class="seal-spin">'
+        '<circle class="seal-rule" cx="300" cy="300" r="297" pathLength="1"/>'
+        '<circle class="seal-rule thin" cx="300" cy="300" r="291" pathLength="1"/>'
+        '<text class="seal-text"><textPath href="#seal-path" textLength="1640" lengthAdjust="spacing">'
+        'CROWNSMERE ESTATE &#183; PRIVATE PROPERTY CONSULTANCY &#183; LONDON &#183; BY APPOINTMENT &#183;</textPath></text>'
+        '<circle class="seal-beads" cx="300" cy="300" r="243"/>'
+        '<circle class="seal-rule thin" cx="300" cy="300" r="234" pathLength="1"/>'
+        '</g></svg>')
+
 process_cards = "".join(
     f'<article class="step-card"><span class="n">{i + 1:02d}</span><div>{ic(icn)}</div><div><h3>{t}</h3><p>{d}</p></div></article>'
     for i, (icn, t, d) in enumerate(PROCESS)
@@ -389,6 +416,7 @@ process_cards = "".join(
 index_body = f'''
 <section class="hero3d" aria-label="Crownsmere Estate">
   <div class="hero3d-stage" aria-hidden="true">
+    <div class="seal">{SEAL}</div>
     <img class="crest-fallback" src="assets/img/monogram.png" alt="" width="330" height="518">
     <canvas class="crest-canvas"></canvas>
   </div>
@@ -440,6 +468,7 @@ index_body = f'''
 
 <section class="section tight" id="services">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>II.</b>How I Can Help</div>
       <h2 data-reveal data-split>Whatever you are looking for, <em>found personally.</em></h2>
@@ -488,6 +517,7 @@ index_body = f'''
 
 <section class="section tight" id="why">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>VI.</b>Why Crownsmere</div>
       <h2 data-reveal data-split>Discretion. Expertise. <em>Results.</em></h2>
@@ -498,6 +528,7 @@ index_body = f'''
 
 <section class="section tight" id="questions">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>VII.</b>Questions</div>
       <h2 data-reveal data-split>Good questions, <em>plainly answered.</em></h2>
@@ -548,12 +579,13 @@ services_body = f'''
 
 <section class="section tight" id="process">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>How It Works</div>
       <div><h2 data-reveal data-split>From your brief <em>to the keys.</em></h2><p class="lede" data-reveal>A private, unhurried process, shaped entirely around you.</p></div>
     </div>
     <figure class="market-media reveal-img" data-reveal>
-      <div class="frame">{pic("interior", "An elegant London drawing room with a marble fireplace and tall windows", 826, 463)}</div>
+      <div class="mat"><div class="frame">{pic("interior", "An elegant London drawing room with a marble fireplace and tall windows", 826, 463)}</div></div>
       <figcaption>Only what fits your brief.</figcaption>
     </figure>
     <div class="market-steps three">{process_grid}</div>
@@ -598,6 +630,7 @@ about_body = f'''
 
 <section class="section tight">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>The Crownsmere Difference</div>
       <h2 data-reveal data-split>A more personal approach. <em>Better guided decisions.</em></h2>
@@ -608,6 +641,7 @@ about_body = f'''
 
 <section class="section tight">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>What You Can Expect</div>
       <h2 data-reveal data-split>Four promises, <em>kept every time.</em></h2>
@@ -732,6 +766,7 @@ contact_body = f'''
 
 <section class="section tight" id="questions">
   <div class="wrap">
+    {orn("orn-sec")}
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>Questions</div>
       <h2 data-reveal data-split>Before you <em>get in touch.</em></h2>

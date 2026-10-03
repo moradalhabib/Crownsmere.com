@@ -5,13 +5,15 @@
  * extruded and bevelled, finished in polished gold with studio reflections, and
  * lit by a slow light sweep. It tilts towards the pointer (or the phone's
  * orientation), sways gently, and turns away as the hero scrolls out of view.
+ * It also places the engraved seal (an SVG ring in the page) around itself, and
+ * tilts it with the crest.
  *
  * Build: cd tools/crest && npm install && npm run build
  */
 import {
   ACESFilmicToneMapping, BufferAttribute, BufferGeometry, CanvasTexture, Color,
   DirectionalLight, ExtrudeGeometry, Group, MathUtils, Mesh, MeshPhysicalMaterial, NormalBlending, PMREMGenerator,
-  PerspectiveCamera, PointLight, Points, PointsMaterial, Scene, Shape, Vector2, WebGLRenderer, SRGBColorSpace,
+  PerspectiveCamera, PointLight, Points, PointsMaterial, Scene, Shape, Vector2, Vector3, WebGLRenderer, SRGBColorSpace,
 } from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import SHAPES from "./crest-shape.json";
@@ -81,6 +83,8 @@ export function mountCrest(canvas, host) {
     curveSegments: 4,
   });
   geo.center();
+  geo.computeBoundingBox();
+  const crestH = geo.boundingBox.max.y - geo.boundingBox.min.y;
   const crest = new Mesh(geo, gold);
   const rig = new Group();
   rig.add(crest);
@@ -119,25 +123,44 @@ export function mountCrest(canvas, host) {
   let scrollP = 0;
   let visible = true;
   let start = performance.now();
+  const seal = host.querySelector(".seal");
+  let sealRing = 1.24;
+  let sealLast = "";
 
+  const T = Math.tan(MathUtils.degToRad(camera.fov / 2));
   function size() {
-    const w = host.clientWidth;
-    const h = host.clientHeight;
+    const box = canvas.parentElement;   // the stage: the whole hero, or on phones a space above the text
+    const w = box.clientWidth;
+    const h = box.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     // keep the crest a comfortable size on any screen
     const ratio = w / h;
-    if (ratio < 0.62) {            // phones (portrait)
-      camera.position.z = 12.6;
-      rig.position.y = 1.15;
+    if (h < host.clientHeight - 2) {  // phones: fill the space, with the seal just inside it
+      sealRing = 1.16;
+      const px = (Math.min(w, h) * 0.94) / sealRing;
+      camera.position.z = (crestH * h) / (2 * T * px);
+      rig.position.y = 0;
     } else if (ratio < 1.05) {     // tablets (portrait) and square windows
       camera.position.z = 10.2;
       rig.position.y = 0.95;
+      sealRing = 1.24;
     } else {
-      camera.position.z = 7.6;
-      rig.position.y = 0.42;
+      camera.position.z = 8.3;
+      rig.position.y = 0.5;
+      sealRing = 1.24;
     }
     camera.updateProjectionMatrix();
+    camera.updateMatrixWorld();
+    // centre the engraved seal on the crest, a little larger than it
+    if (seal) {
+      const c = new Vector3(0, rig.position.y, 0).project(camera);
+      const top = new Vector3(0, rig.position.y + (crestH * sealRing) / 2, 0).project(camera);
+      const cy = ((1 - c.y) / 2) * h;
+      const ty = ((1 - top.y) / 2) * h;
+      seal.style.setProperty("--seal-y", cy.toFixed(1) + "px");
+      seal.style.setProperty("--seal-d", (2 * (cy - ty)).toFixed(1) + "px");
+    }
   }
 
   function onPointer(e) {
@@ -171,6 +194,17 @@ export function mountCrest(canvas, host) {
     const g = reduce ? 0.3 : (t * 0.11) % 1;
     glint.position.set(MathUtils.lerp(-4, 4, g), 2.2 - g * 1.2, 3);
     glint.intensity = 9 * Math.sin(Math.PI * g) + 1.5;
+    // the seal leans with the crest, and fades as the hero scrolls away
+    if (seal) {
+      const v = (-cur.y * 8).toFixed(2) + "," + (cur.x * 12).toFixed(2) + "," + Math.max(0, 1 - scrollP * 2.2).toFixed(2);
+      if (v !== sealLast) {
+        sealLast = v;
+        const [rx, ry, o] = v.split(",");
+        seal.style.setProperty("--seal-rx", rx + "deg");
+        seal.style.setProperty("--seal-ry", ry + "deg");
+        seal.style.opacity = o;
+      }
+    }
     // dust drift
     if (!reduce) {
       const a = dustGeo.attributes.position.array;
