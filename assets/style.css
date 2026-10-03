@@ -735,3 +735,50 @@ figcaption .caps { color: var(--ink-mute); padding-top: 8px; }
 }
 
 .crest .spin { transform-box: view-box; transform-origin: 50% 50%; }
+
+/* ---------- Request form controls ---------- */
+
+.hp { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.opt { text-transform: none; letter-spacing: 0.04em; font-family: var(--body); font-style: italic; font-size: 13px; }
+
+.field select {
+  cursor: pointer;
+  padding-right: 28px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23a88a55' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat right 4px center;
+}
+
+.choices { border: 0; padding: 0; margin: 0 0 34px; min-width: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+.choices legend { color: var(--ink-mute); padding: 0; margin-bottom: 14px; float: left; width: 100%; }
+.choice { position: relative; cursor: pointer; }
+.choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.choice span {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: var(--display);
+  font-size: 21px;
+  line-height: 1.2;
+  transition: background 0.5s var(--ease), color 0.5s var(--ease), border-color 0.5s;
+}
+.choice:hover span { border-color: var(--gold); }
+.choice input:checked + span { background: var(--green); border-color: var(--green); color: var(--ivory); font-style: italic; }
+.choice input:focus-visible + span { outline: 1px solid var(--gold); outline-offset: 3px; }
+
+.consent { display: grid; grid-template-columns: 22px 1fr; gap: 14px; align-items: start; margin: 6px 0 22px; cursor: pointer; color: var(--ink-soft); font-size: 0.88em; line-height: 1.55; }
+.consent input {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px; margin: 3px 0 0;
+  border: 1px solid var(--gold);
+  background: transparent;
+  display: grid; place-content: center;
+  cursor: pointer;
+}
+.consent input::before { content: ""; width: 10px; height: 10px; background: var(--green); transform: scale(0); transition: transform 0.4s var(--ease); }
+.consent input:checked::before { transform: scale(1); }
+
+.field.invalid input, .field.invalid select { border-bottom-color: var(--oxblood); }
+.choices.invalid legend, .consent.invalid { color: var(--oxblood); }
+.form-status.error { color: var(--oxblood); }
+.details dd a { text-decoration: none; border-bottom: 1px solid var(--gold); }
+.details dd a:hover { font-style: italic; }

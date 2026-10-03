@@ -168,33 +168,78 @@
     });
   }
 
-  /* ---------- Correspondence form ----------
-     Set data-endpoint on the form (e.g. a Formspree URL) to deliver letters. */
+  /* ---------- Request-to-be-contacted form ----------
+     Submissions are delivered to the address in data-endpoint (hello@crownsmere.com). */
   var form = document.querySelector("form.letter-form");
   if (form) {
     var status = form.querySelector(".form-status");
     var letter = form.closest(".letter");
+    var tel = form.querySelector('input[type="tel"]');
+    var sending = false;
+
+    var say = function (msg, isError) {
+      status.textContent = msg;
+      status.classList.toggle("error", !!isError);
+    };
+
+    var checkPhone = function () {
+      if (!tel) return;
+      var digits = tel.value.replace(/[^0-9]/g, "");
+      var ok = !tel.value || (/^[0-9+()\-. ]+$/.test(tel.value) && digits.length >= 7 && digits.length <= 15);
+      tel.setCustomValidity(ok ? "" : "Kindly enter a valid telephone number, including the country code if outside the UK.");
+    };
+    if (tel) tel.addEventListener("input", checkPhone);
+
+    var markInvalid = function () {
+      form.querySelectorAll(".field, .choices, .consent").forEach(function (el) {
+        var bad = el.querySelector("input:invalid, select:invalid, textarea:invalid");
+        el.classList.toggle("invalid", !!bad);
+      });
+    };
+    form.addEventListener("input", function () { if (form.querySelector(".invalid")) markInvalid(); });
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!form.reportValidity()) return;
-      var endpoint = form.getAttribute("data-endpoint");
+      if (sending) return;
+      checkPhone();
+      markInvalid();
+      if (!form.checkValidity()) {
+        say("Kindly complete the marked fields.", true);
+        form.reportValidity();
+        return;
+      }
+
       letter.classList.remove("sealed");
       void letter.offsetWidth;
       letter.classList.add("sealed");
-      if (!endpoint) {
-        status.textContent = "Our correspondence desk opens shortly. Kindly write again soon.";
-        return;
-      }
-      status.textContent = "Sealing your letter…";
-      fetch(endpoint, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } })
-        .then(function (r) {
-          if (!r.ok) throw new Error(r.status);
+
+      var data = {};
+      new FormData(form).forEach(function (v, k) { data[k] = typeof v === "string" ? v.trim() : v; });
+
+      // Honeypot: bots fill hidden fields. Pretend all is well and send nothing.
+      if (data._honey) { form.reset(); say("Thank you. Your request has been received."); return; }
+      delete data._honey;
+
+      var endpoint = form.getAttribute("data-endpoint");
+      if (!endpoint) { say("Our correspondence desk opens shortly. Kindly write to hello@crownsmere.com.", true); return; }
+
+      sending = true;
+      say("Sealing your request\u2026");
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(data)
+      })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (!res.ok || String(res.j.success) === "false") throw new Error(res.j.message || "failed");
           form.reset();
-          status.textContent = "Your letter has been sealed and sent. We shall reply in due course.";
+          say("Thank you. Your request has been received, and a member of the house will be in touch personally.");
         })
         .catch(function () {
-          status.textContent = "The post appears delayed. Kindly try again presently.";
-        });
+          say("The post appears delayed. Kindly try again presently, or write to hello@crownsmere.com.", true);
+        })
+        .then(function () { sending = false; });
     });
   }
 })();
