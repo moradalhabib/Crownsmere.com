@@ -68,13 +68,13 @@ jobs:
           if curl -skS --max-time 20 "https://$SITE/" | grep -q 'http-equiv="Content-Security-Policy"'; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
 
           echo "== Pages"
-          for p in / /services.html /about.html /contact.html /privacy.html /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /assets/vendor/leaflet/leaflet.js; do
+          for p in / /services.html /about.html /contact.html /privacy.html /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /assets/vendor/leaflet/leaflet.js /assets/vendor/crest.min.js /assets/vendor/lenis.min.js; do
             code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 200 ]; then ok "$p ($code)"; else bad "$p returned $code"; fi
           done
           code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE/no-such-page")
           if [ "$code" = 404 ]; then ok "missing pages return 404"; else bad "missing page returned $code"; fi
-          for p in /mail-filter/filter.php /tools/build.py /README.md; do
+          for p in /mail-filter/filter.php /mail-filter/config.php /tools/build.py /tools/crest/crest.js /README.md; do
             code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 404 ]; then ok "$p is not published"; else bad "$p is publicly reachable ($code)"; fi
           done

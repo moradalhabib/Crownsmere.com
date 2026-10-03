@@ -11,7 +11,9 @@ return [
     'model' => 'claude-opus-5-5',
 
     // Where genuine mail goes, and who it appears to come from.
-    'forward_to' => 'Alaa.Q@crownsmere.com',
+    // Alaa's private inbox. Fill this in on the server only: never commit the real address,
+    // because this repository is public.
+    'forward_to' => 'PRIVATE-ADDRESS@crownsmere.com',
     'forward_from' => 'hello@crownsmere.com',
     'forward_from_name' => 'Crownsmere Inbox',
 

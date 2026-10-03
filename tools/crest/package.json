@@ -1,0 +1,13 @@
+{
+  "name": "crownsmere-crest",
+  "private": true,
+  "description": "Builds assets/vendor/crest.min.js (the 3D gold crest on the home page) and copies Lenis",
+  "scripts": {
+    "build": "esbuild crest.js --bundle --format=esm --minify --target=es2020 --legal-comments=eof --outfile=../../assets/vendor/crest.min.js && cp node_modules/lenis/dist/lenis.min.js ../../assets/vendor/lenis.min.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "lenis": "1.3.26",
+    "three": "0.186.1"
+  }
+}

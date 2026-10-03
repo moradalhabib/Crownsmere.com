@@ -76,8 +76,7 @@ def head(title, desc, path, extra_ld=None):
     if path == "index.html":
         ld.append({"@context": "https://schema.org", "@type": "WebSite", "name": BRAND, "url": f"{SITE}/",
                    "inLanguage": "en-GB", "publisher": {"@id": f"{SITE}/#business"}})
-    hero_preload = ('<link rel="preload" as="image" href="assets/img/townhouse.webp" type="image/webp" fetchpriority="high">\n'
-                    if path == "index.html" else "")
+    hero_preload = ""
     return f'''<!doctype html>
 <html lang="en-GB" class="no-js">
 <head>
@@ -252,6 +251,35 @@ AREA_COORDS = [(-0.1470, 51.5100), (-0.1530, 51.4975), (-0.1650, 51.4995), (-0.1
 def area_slug(name):
     return "".join(ch for ch in name.lower().replace("\u2019", "") if ch.isalnum() or ch == " ").replace(" ", "-")
 
+# Illustrative briefs (clearly labelled as examples on the site; every real search is confidential)
+BRIEFS = [
+    ("Buy", "Kensington or Holland Park",
+     "A family house with a garden, within walking distance of good schools, for a family relocating in the summer.",
+     "Map the school catchments first, then approach owners on the quieter garden squares directly, including those who have not yet thought of selling."),
+    ("Buy", "Near Hyde Park",
+     "A lateral apartment with a lift and porter, viewed first by video, for a client living overseas.",
+     "A shortlist filmed and checked in person before you travel, so that a single visit to London is enough to decide."),
+    ("Sell privately", "Belgravia",
+     "A quiet sale of a stucco townhouse, without a public listing or a board outside.",
+     "Introductions only to qualified, discreet buyers from my network, with every viewing strictly by appointment."),
+    ("Let", "Chelsea",
+     "A furnished family home for a two-year let, close to the river and the King&rsquo;s Road.",
+     "Homes that fit the brief, including those not yet on the rental market, with the terms negotiated on your behalf."),
+    ("Invest", "Marylebone or Mayfair",
+     "A pied-&agrave;-terre that holds its value, ready to move into, with steady rental demand.",
+     "Every option weighed on fundamentals, from street-level demand to the building&rsquo;s history, with an honest view on each."),
+]
+
+# What each neighbourhood is known for (drives the "What matters to you?" matcher)
+TAGS = [("green", "Green space"), ("park", "Near Hyde Park"), ("village", "Village feel"), ("family", "Family houses"),
+        ("stucco", "Classic stucco"), ("dining", "Shops &amp; dining"), ("river", "By the river"), ("quiet", "Quiet streets")]
+AREA_TAGS = {
+    "Mayfair": "dining park", "Belgravia": "stucco park quiet", "Knightsbridge": "park dining stucco",
+    "Chelsea": "river dining family", "Kensington": "family green stucco", "Holland Park": "family green quiet stucco",
+    "Notting Hill": "village dining stucco family", "Marylebone": "village dining green",
+    "St John&rsquo;s Wood": "family green quiet", "Hampstead": "village green family quiet",
+}
+
 def strip_tags(s):
     return re.sub(r"<[^>]+>", "", s).replace("&ldquo;", "“").replace("&rdquo;", "”").replace("&rsquo;", "’")
 
@@ -262,7 +290,7 @@ FAQ_LD = {
 
 def ledger():
     rows = "".join(
-        f'<li data-reveal><a href="services.html#{a}"><span class="num">{n}</span><h3>{t}</h3><p>{d}</p><span class="go" aria-hidden="true">&rarr;</span></a></li>'
+        f'<li data-reveal><a href="services.html#{a}" data-cursor="Explore"><span class="num">{n}</span><h3>{t}</h3><p>{d}</p><span class="go" aria-hidden="true">&rarr;</span></a></li>'
         for n, t, a, d in SERVICES
     )
     return f'<ol class="ledger">{rows}</ol>'
@@ -281,17 +309,38 @@ def pillars(quote="The finest homes rarely need to be advertised.", media=True):
 
 def areas():
     items = "".join(
-        f'<li class="area" data-area="{area_slug(strip_tags(n))}" data-reveal><button type="button" class="area-btn" aria-label="Show {strip_tags(n)} on the map"><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></button></li>'
+        f'<li class="area" data-area="{area_slug(strip_tags(n))}" data-tags="{AREA_TAGS[n]}" data-reveal><button type="button" class="area-btn" aria-label="Show {strip_tags(n)} on the map"><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></button></li>'
         for i, (n, d) in enumerate(AREAS)
     )
     pins = [{"slug": area_slug(strip_tags(n)), "name": strip_tags(n), "n": f"{i + 1:02d}",
              "lat": a[1], "lng": a[0]} for i, ((n, d), a) in enumerate(zip(AREAS, AREA_COORDS))]
     data = json.dumps(pins, ensure_ascii=False).replace('"', "&quot;")
-    return (f'<div class="areas-wrap"><figure class="map-fig" data-reveal>'
+    chips = "".join(f'<button type="button" class="chip" data-tag="{k}" aria-pressed="false">{v}</button>' for k, v in TAGS)
+    matcher = (f'<div class="matcher" data-reveal><div class="matcher-head"><span class="caps">What matters to you?</span>'
+               f'<button type="button" class="matcher-clear caps" hidden>Clear</button></div>'
+               f'<div class="chips" role="group" aria-label="What matters to you?">{chips}</div>'
+               f'<p class="matcher-out" aria-live="polite">Choose what matters to you, and the neighbourhoods that suit you will light up on the map.</p></div>')
+    return (matcher + f'<div class="areas-wrap"><figure class="map-fig" data-reveal>'
             f'<div class="map" id="map" data-pins="{data}" role="region" aria-label="Map of the prime London neighbourhoods searched">'
             f'<a class="map-fallback caps" href="https://www.openstreetmap.org/#map=13/51.5070/-0.1650" rel="noopener">View prime London on OpenStreetMap</a></div>'
             f'<figcaption class="caps">Hover a neighbourhood to find it on the map</figcaption></figure>'
             f'<ul class="areas">{items}</ul></div>')
+
+def briefs():
+    cards = []
+    for i, (tag, area, text, how) in enumerate(BRIEFS):
+        cards.append(
+            f'<li class="brief" data-reveal><div class="brief-inner">'
+            f'<div class="brief-face brief-front">'
+            f'<div class="brief-top caps"><span>{tag}</span><span>No. {i + 1:02d}</span></div>'
+            f'<h3>{area}</h3><p>{text}</p>'
+            f'<button type="button" class="brief-flip caps" data-flip>How I would approach it <span aria-hidden="true">&#8635;</span></button></div>'
+            f'<div class="brief-face brief-back" aria-hidden="true">'
+            f'<div class="brief-top caps"><span>How I would approach it</span><span>No. {i + 1:02d}</span></div>'
+            f'<p>{how}</p>'
+            f'<button type="button" class="brief-flip caps" data-flip tabindex="-1">Back to the brief <span aria-hidden="true">&#8634;</span></button></div>'
+            f'</div></li>')
+    return f'<ul class="briefs" data-cursor="Flip">{"".join(cards)}</ul>'
 
 def faq(items=FAQ):
     rows = "".join(
@@ -317,7 +366,7 @@ def invite(heading="Tell me what <em>you are looking for.</em>"):
 
 def band(text, cite="Discretion &middot; Expertise &middot; Results"):
     return f'''
-<section class="band">
+<section class="band" data-dark>
   <img class="ghost" src="assets/img/monogram.png" alt="" width="330" height="518" loading="lazy" decoding="async">
   <blockquote>
     <p class="display">{text}</p>
@@ -332,50 +381,48 @@ def statement_figure(caption, photo=("door", "A black-lacquered front door with 
             f'</div><figcaption class="caps">{caption}</figcaption></figure>')
 
 # ---------------------------------------------------------------- home
-INTRO = '''
-<div class="intro" aria-hidden="true">
-  <div class="mono"><img src="assets/img/monogram.png" alt="" width="330" height="518"><span class="shine"></span></div>
-  <div class="wm">CROWNSMERE</div>
-  <div class="sub caps">Estate</div>
-</div>'''
-
-marquee = "".join(f"<span>{w}</span>" for w in ["By request", "Off-market", "Discretion", "One-to-one", "Prime London", "Expertise", "Results"])
-
 process_cards = "".join(
     f'<article class="step-card"><span class="n">{i + 1:02d}</span><div>{ic(icn)}</div><div><h3>{t}</h3><p>{d}</p></div></article>'
     for i, (icn, t, d) in enumerate(PROCESS)
 )
 
 index_body = f'''
-<section class="hero">
-  <div class="hero-copy">
-    <div class="eyebrow caps">Private Property Search &nbsp;&middot;&nbsp; Prime London</div>
+<section class="hero3d" data-dark aria-label="Crownsmere Estate">
+  <div class="hero3d-stage" aria-hidden="true">
+    <img class="crest-fallback" src="assets/img/monogram.png" alt="" width="330" height="518">
+    <canvas class="crest-canvas"></canvas>
+  </div>
+  <div class="hero3d-corners caps" aria-hidden="true"><span>Private Property Search</span><span>51&deg;30&prime;N &middot; 0&deg;09&prime;W</span></div>
+  <div class="hero3d-copy wrap">
     <h1><span class="line"><span>The right home,</span></span><span class="line"><span><em>found for you.</em></span></span></h1>
-    <p class="sub">A private, by-request property service. You share your brief; I search discreetly, on and off the market, and bring you only what is genuinely right.</p>
-    <div class="btn-row">
-      <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
-      <a class="btn caps" href="#process">How it works</a>
+    <div class="hero3d-side">
+      <p>A private, by-request property service in prime London. You share your brief; I search discreetly, on and off the market, and bring you only what is genuinely right.</p>
+      <a class="btn btn-light caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
     </div>
-    <div class="hero-meta caps"><span>By request &amp; appointment</span><span>London, United Kingdom</span></div>
   </div>
-  <div class="hero-media">
-    <div class="px">{pic("townhouse", "A white stucco London townhouse with a black front door and columned porch", 1055, 687, lazy=False, priority=True)}</div>
-    <div class="hero-tag"><span class="caps">People<br>Property<br>Perspective</span><p>A more personal London.</p></div>
-  </div>
+  <a class="scroll-cue caps" href="#reveal"><span>Discover</span><i aria-hidden="true"></i></a>
 </section>
 
-<div class="marquee" aria-hidden="true"><div class="marquee-track">{marquee}{marquee}</div></div>
+<section class="arch" id="reveal" data-dark aria-label="A more personal London">
+  <div class="arch-pin">
+    <div class="arch-window">{pic("townhouse", "A white stucco London townhouse with a black front door and columned porch", 1055, 687)}</div>
+    <div class="arch-copy">
+      <span class="caps">People &middot; Property &middot; Perspective</span>
+      <p class="display">A more personal <em>London.</em></p>
+    </div>
+  </div>
+</section>
 
 <section class="section" id="approach">
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>I.</b>The Approach</div>
-      <h2 data-reveal>No shop window. <em>No listings.</em> Just your brief.</h2>
+      <h2 data-reveal data-split>No shop window. <em>No listings.</em> Just your brief.</h2>
     </div>
     <div class="statement">
       {statement_figure("Prime London")}
       <div class="copy">
-        <p class="lede dropcap" data-reveal>Crownsmere Estate is not a typical estate agency. Rather than selling whatever happens to be on the books, I work from your brief, searching personally to find what is genuinely right for you.</p>
+        <p class="lede dropcap" data-highlight>Crownsmere Estate is not a typical estate agency. Rather than selling whatever happens to be on the books, I work from your brief, searching personally to find what is genuinely right for you.</p>
         <div class="cols" data-reveal>
           <p>Each client is taken on individually, and each search is shaped around their life, their timing and their priorities. You deal with me directly, from the first conversation to the day you collect the keys.</p>
           <p>Many of London&rsquo;s finest homes change hands quietly, without ever being advertised. Through a discreet network of owners, agents and advisers, I can open doors that never appear online.</p>
@@ -395,7 +442,7 @@ index_body = f'''
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>II.</b>How I Can Help</div>
-      <h2 data-reveal>Whatever you are looking for, <em>found personally.</em></h2>
+      <h2 data-reveal data-split>Whatever you are looking for, <em>found personally.</em></h2>
     </div>
     {ledger()}
   </div>
@@ -416,13 +463,24 @@ index_body = f'''
   </div>
 </section>
 
+<section class="section briefs-sec" id="briefs">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-mark caps"><b>IV.</b>Briefs I Take On</div>
+      <div><h2 data-reveal data-split>Every search begins <em>with a brief.</em></h2><p class="lede" data-reveal>A few examples of the kinds of briefs I take on. Turn a card to see how I would approach it.</p></div>
+    </div>
+    {briefs()}
+    <p class="briefs-note caps" data-reveal>Illustrative examples &middot; Every real search is confidential</p>
+  </div>
+</section>
+
 {band("You share the brief. <em>I find the property.</em>")}
 
 <section class="section" id="areas">
   <div class="wrap">
     <div class="section-head">
-      <div class="section-mark caps"><b>IV.</b>Where I Search</div>
-      <div><h2 data-reveal>Prime London, <em>street by street.</em></h2><p class="lede" data-reveal>Not sure which neighbourhood suits you? Helping you choose is part of the search.</p></div>
+      <div class="section-mark caps"><b>V.</b>Where I Search</div>
+      <div><h2 data-reveal data-split>Prime London, <em>street by street.</em></h2><p class="lede" data-reveal>Not sure which neighbourhood suits you? Helping you choose is part of the search.</p></div>
     </div>
     {areas()}
   </div>
@@ -431,8 +489,8 @@ index_body = f'''
 <section class="section tight" id="why">
   <div class="wrap">
     <div class="section-head">
-      <div class="section-mark caps"><b>V.</b>Why Crownsmere</div>
-      <h2 data-reveal>Discretion. Expertise. <em>Results.</em></h2>
+      <div class="section-mark caps"><b>VI.</b>Why Crownsmere</div>
+      <h2 data-reveal data-split>Discretion. Expertise. <em>Results.</em></h2>
     </div>
     {pillars()}
   </div>
@@ -441,8 +499,8 @@ index_body = f'''
 <section class="section tight" id="questions">
   <div class="wrap">
     <div class="section-head">
-      <div class="section-mark caps"><b>VI.</b>Questions</div>
-      <h2 data-reveal>Good questions, <em>plainly answered.</em></h2>
+      <div class="section-mark caps"><b>VII.</b>Questions</div>
+      <h2 data-reveal data-split>Good questions, <em>plainly answered.</em></h2>
     </div>
     {faq()}
   </div>
@@ -451,7 +509,7 @@ index_body = f'''
 
 page("index.html", f"{BRAND} | Private Property Search in Prime London",
      "Private property search in prime London. Share your brief and we find the right home, on and off the market, in Mayfair, Belgravia, Chelsea and beyond.",
-     index_body, INTRO, extra_ld=[FAQ_LD])
+     index_body, extra_ld=[FAQ_LD])
 
 # ---------------------------------------------------------------- services
 def svc(num, title, anchor, lede, points):
@@ -492,7 +550,7 @@ services_body = f'''
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>How It Works</div>
-      <div><h2 data-reveal>From your brief <em>to the keys.</em></h2><p class="lede" data-reveal>A private, unhurried process, shaped entirely around you.</p></div>
+      <div><h2 data-reveal data-split>From your brief <em>to the keys.</em></h2><p class="lede" data-reveal>A private, unhurried process, shaped entirely around you.</p></div>
     </div>
     <figure class="market-media reveal-img" data-reveal>
       <div class="frame">{pic("interior", "An elegant London drawing room with a marble fireplace and tall windows", 826, 463)}</div>
@@ -527,7 +585,7 @@ about_body = f'''
     <div class="statement">
       {statement_figure("Westminster", ("westminster", "View through tall French windows across a wrought-iron balcony to Big Ben and the Palace of Westminster", 420, 480))}
       <div class="copy">
-        <p class="lede dropcap" data-reveal>As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
+        <p class="lede dropcap" data-highlight>As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
         <div class="cols" data-reveal>
           <p>Property is about people, not just buildings. I take on a small number of clients so that each one receives my full attention, honest advice and a search shaped entirely around them.</p>
           <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to the final signature, you deal directly with me, in complete confidence.</p>
@@ -542,7 +600,7 @@ about_body = f'''
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>The Crownsmere Difference</div>
-      <h2 data-reveal>A more personal approach. <em>Better guided decisions.</em></h2>
+      <h2 data-reveal data-split>A more personal approach. <em>Better guided decisions.</em></h2>
     </div>
     {pillars(media=False)}
   </div>
@@ -552,7 +610,7 @@ about_body = f'''
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>What You Can Expect</div>
-      <h2 data-reveal>Four promises, <em>kept every time.</em></h2>
+      <h2 data-reveal data-split>Four promises, <em>kept every time.</em></h2>
     </div>
     <div class="rules">{expect}</div>
   </div>
@@ -590,17 +648,16 @@ contact_body = f'''
 </section>
 
 <section class="section tight">
-  <div class="wrap letter-wrap">
-    <div class="details">
-      <p class="lede lede-sm">Tell me what you are looking for, in as much or as little detail as you like. I will be in touch personally, in complete confidence, by telephone or email as you prefer.</p>
+  <div class="wrap">
+    <div class="contact-intro" data-reveal>
+      <p class="lede lede-sm">Tell me what you are looking for, in as much or as little detail as you like. As you answer, your brief is composed into a letter, exactly as I will read it. I will be in touch personally, in complete confidence.</p>
       <dl>
-        <div><dt class="caps">Telephone</dt><dd>Shared personally<br><em>once your brief is received.</em></dd></div>
+        <div><dt class="caps">Telephone</dt><dd>Shared personally, <em>once your brief is received</em></dd></div>
         <div><dt class="caps">Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
-        <div><dt class="caps">Location</dt><dd>London, United Kingdom</dd></div>
-        <div><dt class="caps">Consultations</dt><dd>By appointment</dd></div>
+        <div><dt class="caps">Consultations</dt><dd>By appointment, London</dd></div>
       </dl>
     </div>
-
+    <div class="composer">
     <div class="letter" id="brief" data-reveal>
       <div class="letter-head">
         {LOGO()}
@@ -659,6 +716,17 @@ contact_body = f'''
         <p class="form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
+    <aside class="preview" aria-label="Your letter, as it will be read">
+      <div class="paper">
+        <div class="paper-head">{LOGO(lazy=True)}<div><span class="caps">{BRAND}</span><span class="caps pv-date" data-pv-date></span></div></div>
+        <p class="pv-salute">Dear Alaa,</p>
+        <div class="pv-body" data-pv-body><p class="pv-empty">Your letter will compose itself here as you answer.</p></div>
+        <p class="pv-close">With kind regards,<br><span class="pv-name" data-pv-name>&nbsp;</span></p>
+        <div class="pv-seal" aria-hidden="true">{pic("monogram-sm", "", 165, 259, ext="png")}</div>
+      </div>
+      <p class="pv-note caps">Composed as you go &middot; Sent in confidence</p>
+    </aside>
+    </div>
   </div>
 </section>
 
@@ -666,7 +734,7 @@ contact_body = f'''
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>Questions</div>
-      <h2 data-reveal>Before you <em>get in touch.</em></h2>
+      <h2 data-reveal data-split>Before you <em>get in touch.</em></h2>
     </div>
     {faq([FAQ[0], FAQ[7], FAQ[6], FAQ[8]])}
   </div>
