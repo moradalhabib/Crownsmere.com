@@ -23,6 +23,7 @@ jobs:
       - name: Check the live site
         shell: bash
         run: |
+          set +e   # keep going after a failed check, so every problem is reported
           set -u
           SITE=crownsmere.com
           fail=0
@@ -41,43 +42,44 @@ jobs:
           if curl -sS -o /dev/null --max-time 20 "https://$SITE/"; then
             ok "HTTPS works with a valid, trusted certificate"
           else
-            bad "HTTPS failed: the certificate is missing, invalid or not yet issued"
+            bad "HTTPS failed: no valid certificate for $SITE yet. In Settings > Pages, re-save the custom domain and wait for GitHub to issue the certificate, then tick Enforce HTTPS"
           fi
           end=$(echo | openssl s_client -servername $SITE -connect $SITE:443 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
           if [ -n "$end" ]; then
             days=$(( ( $(date -d "$end" +%s) - $(date +%s) ) / 86400 ))
             subj=$(echo | openssl s_client -servername $SITE -connect $SITE:443 2>/dev/null | openssl x509 -noout -ext subjectAltName 2>/dev/null | tail -1)
             echo "      certificate covers: $subj"
+            if echo "$subj" | grep -q "DNS:$SITE"; then ok "certificate is issued for $SITE"; else bad "certificate is not for $SITE (GitHub is serving its default certificate)"; fi
             if [ "$days" -gt 14 ]; then ok "certificate valid for $days more days"; else bad "certificate expires in $days days"; fi
           fi
 
           echo "== Redirects"
           for u in "http://$SITE/" "http://www.$SITE/" "https://www.$SITE/"; do
-            loc=$(curl -s -o /dev/null --max-time 20 -w '%{http_code} %{redirect_url}' "$u")
+            loc=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code} %{redirect_url}' "$u")
             code=${loc%% *}; to=${loc#* }
             if [[ "$code" =~ ^30[1278]$ && "$to" == https://$SITE/* ]]; then ok "$u -> $to ($code)"
             else bad "$u should redirect to https://$SITE/ but returned: $loc  (turn on 'Enforce HTTPS' in Settings > Pages)"; fi
           done
 
           echo "== Security headers (https://$SITE/)"
-          headers=$(curl -sSI --max-time 20 "https://$SITE/" | tr -d '\r')
+          headers=$(curl -skSI --max-time 20 "https://$SITE/" | tr -d '\r')
           echo "$headers" | grep -iE '^(strict-transport-security|content-security-policy|x-content-type-options|x-frame-options|referrer-policy|server):' | sed 's/^/      /'
           if echo "$headers" | grep -qi '^strict-transport-security:'; then ok "HSTS header present"; else note "no HSTS header (GitHub Pages adds it once 'Enforce HTTPS' is on)"; fi
-          if curl -sS --max-time 20 "https://$SITE/" | grep -q 'http-equiv="Content-Security-Policy"'; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
+          if curl -skS --max-time 20 "https://$SITE/" | grep -q 'http-equiv="Content-Security-Policy"'; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
 
           echo "== Pages"
           for p in / /services.html /about.html /contact.html /privacy.html /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /assets/vendor/leaflet/leaflet.js; do
-            code=$(curl -s -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
+            code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 200 ]; then ok "$p ($code)"; else bad "$p returned $code"; fi
           done
-          code=$(curl -s -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE/no-such-page")
+          code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE/no-such-page")
           if [ "$code" = 404 ]; then ok "missing pages return 404"; else bad "missing page returned $code"; fi
           for p in /mail-filter/filter.php /tools/build.py /README.md; do
-            code=$(curl -s -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
+            code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 404 ]; then ok "$p is not published"; else bad "$p is publicly reachable ($code)"; fi
           done
 
           echo "== Mixed content"
-          if curl -sS --max-time 20 "https://$SITE/" | grep -Eo '(src|href)="http://[^"]+' ; then bad "page references insecure http:// resources"; else ok "no insecure http:// resources"; fi
+          if curl -skS --max-time 20 "https://$SITE/" | grep -Eo '(src|href)="http://[^"]+' ; then bad "page references insecure http:// resources"; else ok "no insecure http:// resources"; fi
 
           exit $fail
