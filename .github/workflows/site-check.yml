@@ -64,8 +64,9 @@ jobs:
           echo "== Security headers (https://$SITE/)"
           headers=$(curl -skSI --max-time 20 "https://$SITE/" | tr -d '\r')
           echo "$headers" | grep -iE '^(strict-transport-security|content-security-policy|x-content-type-options|x-frame-options|referrer-policy|server):' | sed 's/^/      /'
-          if echo "$headers" | grep -qi '^strict-transport-security:'; then ok "HSTS header present"; else note "no HSTS header (GitHub Pages adds it once 'Enforce HTTPS' is on)"; fi
-          if curl -skS --max-time 20 "https://$SITE/" | grep -q 'http-equiv="Content-Security-Policy"'; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
+          if echo "$headers" | grep -qi '^strict-transport-security:'; then ok "HSTS header present"; else note "no HSTS header: GitHub Pages does not let sites add response headers; HTTPS is still enforced by the redirects above"; fi
+          home=$(curl -skS --max-time 20 "https://$SITE/")   # read the whole page first (grep -q on a pipe can cut curl off)
+          if grep -q 'http-equiv="Content-Security-Policy"' <<<"$home"; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
 
           echo "== Pages"
           for p in / /services.html /about.html /contact.html /privacy.html /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /assets/vendor/leaflet/leaflet.js /assets/vendor/crest.min.js /assets/vendor/lenis.min.js; do
@@ -80,6 +81,6 @@ jobs:
           done
 
           echo "== Mixed content"
-          if curl -skS --max-time 20 "https://$SITE/" | grep -Eo '(src|href)="http://[^"]+' ; then bad "page references insecure http:// resources"; else ok "no insecure http:// resources"; fi
+          if grep -Eo '(src|href)="http://[^"]+' <<<"$home"; then bad "page references insecure http:// resources"; else ok "no insecure http:// resources"; fi
 
           exit $fail
