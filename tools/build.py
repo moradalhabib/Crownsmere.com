@@ -140,9 +140,9 @@ def footer(current):
         <div class="mk">{LOGO(lazy=True)}<div><b>CROWNSMERE</b><small>Estate &middot; Individual Property Consultant</small></div></div>
         <p>A more personal London.</p>
       </div>
-      <div><h4 class="caps">Explore</h4><ul>{explore}</ul></div>
-      <div><h4 class="caps">Services</h4><ul>{services}</ul></div>
-      <div><h4 class="caps">Contact</h4><ul><li><a href="contact.html">Share your brief</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li>London, United Kingdom</li></ul></div>
+      <div><h2 class="caps">Explore</h2><ul>{explore}</ul></div>
+      <div><h2 class="caps">Services</h2><ul>{services}</ul></div>
+      <div><h2 class="caps">Contact</h2><ul><li><a href="contact.html">Share your brief</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li>London, United Kingdom</li></ul></div>
     </div>
     <div class="ft-motto" aria-hidden="true">DISCRETION &middot; EXPERTISE &middot; RESULTS</div>
     <div class="ft-bottom caps"><span>&copy; <span data-year>2026</span> {BRAND}</span><a href="privacy.html">Privacy notice</a><span>People &middot; Property &middot; Perspective</span><a href="#main">Back to top &uarr;</a></div>
@@ -579,7 +579,7 @@ contact_body = f'''
         <p class="step-count caps" aria-live="polite"></p>
 
         <div class="step" data-step="1">
-          <h3 class="step-title" tabindex="-1">What can I help you with?</h3>
+          <h2 class="step-title" tabindex="-1">What can I help you with?</h2>
           <fieldset class="field choices">
             <legend class="caps">I am looking to</legend>
             {choice("request", "Buy a home", required=True)}{choice("request", "Rent a home")}{choice("request", "Sell privately")}{choice("request", "Let my property")}{choice("request", "Invest")}{choice("request", "Seek advice")}
@@ -589,7 +589,7 @@ contact_body = f'''
         </div>
 
         <div class="step" data-step="2">
-          <h3 class="step-title" tabindex="-1">Tell me about it.</h3>
+          <h2 class="step-title" tabindex="-1">Tell me about it.</h2>
           <div class="field"><label class="caps" for="f-brief">Your brief <span class="opt">(optional)</span></label><textarea id="f-brief" name="brief" rows="4" maxlength="3000" placeholder="The kind of property, size, must-haves, anything that matters to you"></textarea></div>
           <div class="field-row">
             <div class="field"><label class="caps" for="f-area">Preferred areas <span class="opt">(optional)</span></label><input id="f-area" name="areas" placeholder="e.g. Belgravia, Chelsea"></div>
@@ -599,7 +599,7 @@ contact_body = f'''
         </div>
 
         <div class="step" data-step="3">
-          <h3 class="step-title" tabindex="-1">How may I reach you?</h3>
+          <h2 class="step-title" tabindex="-1">How may I reach you?</h2>
           <div class="field"><label class="caps" for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name" required></div>
           <div class="field-row">
             <div class="field"><label class="caps" for="f-email">Email address</label><input id="f-email" type="email" name="email" autocomplete="email" inputmode="email" required></div>
