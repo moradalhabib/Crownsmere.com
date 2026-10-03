@@ -16,7 +16,7 @@ declare(strict_types=1);
 $dryRun = in_array('--dry-run', $argv ?? [], true);
 $config = require __DIR__ . '/config.php';
 
-if (empty($config['daily_digest'])) {
+if (empty($config['daily_digest']) || str_contains($config['forward_to'], 'PRIVATE-ADDRESS')) {
     exit(0);
 }
 

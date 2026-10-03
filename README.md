@@ -3,16 +3,18 @@
 Website of **Crownsmere Estate**, a private, by-request property service in prime London (Alaa Qadir, Senior Property Consultant): clients share a brief and Crownsmere finds the right property, on and off the market. There are deliberately no property listings. Plain HTML, CSS and JavaScript with no build step, hosted on GitHub Pages at crownsmere.com.
 
 ## Structure
-- `index.html`: home page (monogram intro, hero, approach, services, how it works, where I search, why Crownsmere, questions, share your brief)
+- `index.html`: home page: a real-time 3D gold crest hero, an arched-window photo reveal, the approach (words light up as you read), services, how it works, briefs I take on (cards that turn over), where I search (neighbourhood matcher and map), why Crownsmere, questions, share your brief
 - `services.html`: buy, sell privately, let, invest and advisory (with a sticky section menu); how it works
 - `about.html`: why Crownsmere, Alaa Qadir, what you can expect
-- `contact.html`: three-step "Share your brief" form and common questions
+- `contact.html`: the brief composer: a three-step form whose answers are composed, live, into a letter to Alaa on Crownsmere stationery, sealed when sent
 - `privacy.html`: UK GDPR privacy notice (linked from the footer and the form)
 - `404.html`: "This page has gone off-market" (GitHub Pages serves it for any missing address)
 - `sitemap.xml`, `robots.txt`, `site.webmanifest`: search engine and home-screen metadata
 - `assets/style.css`, `assets/main.js`
 - `assets/fonts/`: Cinzel, Cormorant Garamond and EB Garamond, self-hosted so no visitor data goes to Google
 - `assets/img/`: monogram (transparent gold), photography and skyline taken from the brand materials (WebP with JPEG fallbacks), icons
+- `tools/crest/`: source of the 3D crest (`crest.js`, the traced logo outline in `crest-shape.json`). Rebuild with `cd tools/crest && npm install && npm run build`, which writes `assets/vendor/crest.min.js` and copies `lenis.min.js`
+- `assets/vendor/`: self-hosted libraries (three.js inside the crest bundle, Lenis smooth scrolling, Leaflet), licences in `LICENSES.txt`
 - `tools/build.py`: generates all the HTML pages. Edit the content there and run `python3 tools/build.py` (excluded from the website)
 - `mail-filter/`: AI filter for the hello@ inbox, run on cPanel (see `mail-filter/README.md`; excluded from the website by `_config.yml`)
 
@@ -31,11 +33,18 @@ The site sets no cookies. The only outside requests are the OpenStreetMap map ti
 - `mail-filter/`, `tools/` and this README are excluded from the published site.
 - `.github/workflows/site-check.yml` checks the live site after every deploy and weekly: certificate validity and expiry, HTTP to HTTPS redirects, security headers, every page, and that private folders are not published.
 
+## Interactive features
+- **3D crest:** WebGL (three.js), loaded only on the home page and only if the device supports it and Data Saver is off. It tilts towards the pointer (or the phone's orientation), pauses when off screen, and falls back to the flat gold monogram. Reduced-motion visitors see a still render.
+- **Smooth scrolling:** Lenis, desktop only, off for reduced motion.
+- **Neighbourhood matcher:** the tags behind it are in `tools/build.py` (`TAGS`, `AREA_TAGS`).
+- **Briefs I take on:** clearly labelled illustrative examples (`BRIEFS` in `tools/build.py`); replace them with real, anonymised briefs when available.
+- **Brief composer:** the composed letter is also sent with the enquiry (field `letter`), so it reaches the inbox exactly as the client saw it.
+
 ## Map
 The Where I Search map uses [Leaflet](https://leafletjs.com) with [OpenStreetMap](https://www.openstreetmap.org) tiles (attribution shown on the map, as the licence requires). Neighbourhood coordinates live in `tools/build.py` (`AREA_COORDS`).
 
 ## Contact requests
-No telephone number is published on the site: Alaa shares it personally once a brief is received. Visitors reach Crownsmere through the brief form or hello@crownsmere.com.
+No telephone number is published on the site: Alaa shares it personally once a brief is received. Visitors reach Crownsmere through the brief form or hello@crownsmere.com. Alaa's own address is never shown on the site, and it must never be committed to this repository (it is public): it lives only in the mail filter's `config.php` on the server.
 
 `contact.html` guides visitors through three steps (request, brief, details). Without JavaScript it shows as one form. It collects the request (buy a home, rent a home, sell privately, let a property, invest, seek advice), the brief, preferred areas, budget or value, timeframe, name, email, telephone, preferred contact method, best time and consent.
 

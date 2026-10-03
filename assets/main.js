@@ -10,35 +10,47 @@
     el.textContent = new Date().getFullYear();
   });
 
-  /* ---------- Intro: monogram reveal (home page, once per visit) ---------- */
-  var intro = document.querySelector(".intro");
   function ready() { root.classList.add("ready"); }
-  if (intro) {
-    var seen = false;
-    try { seen = sessionStorage.getItem("crownsmere-intro") === "1"; } catch (e) {}
-    if (seen || reduce) {
-      intro.classList.add("done");
-      ready();
-    } else {
-      document.body.style.overflow = "hidden";
-      intro.classList.add("play");
-      var finish = function () {
-        if (intro.classList.contains("done")) return;
-        intro.classList.add("done");
-        document.body.style.overflow = "";
-        try { sessionStorage.setItem("crownsmere-intro", "1"); } catch (e) {}
-      };
-      setTimeout(ready, 2700);
-      setTimeout(finish, 3700);
-      intro.addEventListener("click", function () { ready(); finish(); });
+  ready();
+
+  /* ---------- 3D gold crest (home hero). Falls back to the flat monogram without WebGL ---------- */
+  var crestCanvas = document.querySelector(".crest-canvas");
+  if (crestCanvas) {
+    var hero = crestCanvas.closest(".hero3d");
+    var gl = null;
+    try { gl = document.createElement("canvas").getContext("webgl2") || document.createElement("canvas").getContext("webgl"); } catch (e) {}
+    var saveData = navigator.connection && navigator.connection.saveData;
+    if (gl && !saveData) {
+      import("./vendor/crest.min.js").then(function (m) {
+        if (m.mountCrest(crestCanvas, hero)) requestAnimationFrame(function () { hero.classList.add("crest-on"); });
+      }).catch(function () {});
     }
-  } else {
-    ready();
+  }
+
+  /* ---------- Smooth, weighted scrolling (desktop only; off for reduced motion) ---------- */
+  var lenis = null;
+  if (!reduce && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var ls = document.createElement("script");
+    ls.src = (document.currentScript ? document.currentScript.src.replace(/main\.js.*$/, "") : "assets/") + "vendor/lenis.min.js";
+    ls.onload = function () {
+      if (!window.Lenis) return;
+      lenis = new window.Lenis({ duration: 1.15, smoothWheel: true, anchors: { offset: -90 } });
+      var raf = function (t) { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    };
+    document.head.appendChild(ls);
   }
 
   /* ---------- Header state ---------- */
   var hd = document.querySelector(".hd");
-  function onScrollHeader() { hd && hd.classList.toggle("is-scrolled", window.scrollY > 40); }
+  var darkZones = document.querySelectorAll("[data-dark]");
+  function onScrollHeader() {
+    if (!hd) return;
+    hd.classList.toggle("is-scrolled", window.scrollY > 40);
+    var y = hd.offsetHeight / 2, dark = false;
+    darkZones.forEach(function (z) { var r = z.getBoundingClientRect(); if (r.top <= y && r.bottom >= y) dark = true; });
+    hd.classList.toggle("on-dark", dark);
+  }
   window.addEventListener("scroll", onScrollHeader, { passive: true });
   onScrollHeader();
 
@@ -65,6 +77,56 @@
     });
   }
 
+  /* ---------- Split headings into words (they rise in, one after another) ---------- */
+  var splitWords = function (el) {
+    var n = 0;
+    var walk = function (node) {
+      Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+        if (child.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach(function (part) {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(" ")); return; }
+            var outer = document.createElement("span");
+            outer.className = "sw";
+            var inner = document.createElement("span");
+            inner.textContent = part;
+            inner.style.setProperty("--i", n++);
+            outer.appendChild(inner);
+            frag.appendChild(outer);
+          });
+          node.replaceChild(frag, child);
+        } else if (child.nodeType === 1) {
+          walk(child);
+        }
+      });
+    };
+    walk(el);
+  };
+  if (!reduce) document.querySelectorAll("[data-split]").forEach(splitWords);
+
+  /* ---------- Scroll-lit statement: words light up as you read ---------- */
+  var lit = [];
+  document.querySelectorAll("[data-highlight]").forEach(function (el) {
+    if (reduce) return;
+    var words = [];
+    Array.prototype.slice.call(el.childNodes).forEach(function (child) {
+      if (child.nodeType !== 3) return;
+      var frag = document.createDocumentFragment();
+      child.textContent.split(/(\s+)/).forEach(function (part) {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(" ")); return; }
+        var w = document.createElement("span");
+        w.className = "hw";
+        w.textContent = part;
+        words.push(w);
+        frag.appendChild(w);
+      });
+      el.replaceChild(frag, child);
+    });
+    lit.push({ el: el, words: words });
+  });
+
   /* ---------- Reveal on scroll ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
   if ("IntersectionObserver" in window && !reduce) {
@@ -79,7 +141,8 @@
   }
 
   /* ---------- Scroll-driven details ---------- */
-  var heroPx = document.querySelector(".hero-media .px");
+  var arch = document.querySelector(".arch");
+  if (arch && reduce) arch.classList.add("static");
   var progress = document.querySelector(".progress");
   var journey = document.querySelector(".journey");
   var track = journey && journey.querySelector(".journey-track");
@@ -104,7 +167,20 @@
         var total = document.documentElement.scrollHeight - window.innerHeight;
         progress.style.transform = "scaleX(" + (total > 0 ? Math.min(1, y / total) : 0) + ")";
       }
-      if (heroPx && !reduce && y < window.innerHeight * 1.2) heroPx.style.transform = "translate3d(0," + (y * -0.12) + "px,0)";
+      var vh = window.innerHeight;
+      if (arch && !reduce) {
+        var ar = arch.getBoundingClientRect();
+        var ap = Math.min(1, Math.max(0, -ar.top / Math.max(1, arch.offsetHeight - vh) * 1.15));
+        arch.style.setProperty("--p", ap.toFixed(4));
+      }
+      lit.forEach(function (o) {
+        var r = o.el.getBoundingClientRect();
+        var prog = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
+        var upto = Math.round(prog * o.words.length);
+        // words stay lit once read
+        for (var k = o.done || 0; k < upto; k++) o.words[k].classList.add("lit");
+        o.done = Math.max(o.done || 0, upto);
+      });
       if (journey && wide.matches && !reduce) {
         var rect = journey.getBoundingClientRect();
         var max = journey.offsetHeight - window.innerHeight;
@@ -142,8 +218,14 @@
       if (!running) { running = true; requestAnimationFrame(loop); }
     });
     document.addEventListener("mouseleave", function () { c.classList.remove("on"); });
+    var lab = document.createElement("b");
+    c.appendChild(lab);
     document.addEventListener("mouseover", function (e) {
-      c.classList.toggle("hover", !!e.target.closest("a, button, .plate, input, textarea, select"));
+      var labelled = e.target.closest("[data-cursor]");
+      var text = labelled && !e.target.closest(".brief-flip, .leaflet-control") ? labelled.getAttribute("data-cursor") : "";
+      lab.textContent = text;
+      c.classList.toggle("label", !!text);
+      c.classList.toggle("hover", !text && !!e.target.closest("a, button, input, textarea, select, .chip"));
     });
   }
 
@@ -197,7 +279,7 @@
       }).addTo(map);
       var bounds = [];
       pins.forEach(function (p) {
-        var icon = L.divIcon({ className: "pin", html: "<span>" + p.n + "</span>", iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -16] });
+        var icon = L.divIcon({ className: "pin pin-" + p.slug, html: "<span>" + p.n + "</span>", iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -16] });
         var m = L.marker([p.lat, p.lng], { icon: icon, title: p.name, alt: p.name, keyboard: true, riseOnHover: true }).addTo(map);
         var content = document.createElement("div");
         content.textContent = p.name;
@@ -213,6 +295,7 @@
         bounds.push([p.lat, p.lng]);
       });
       if (bounds.length) map.fitBounds(bounds, { padding: [36, 36] });
+      document.dispatchEvent(new CustomEvent("crownsmere:map"));
       window.addEventListener("resize", function () { map.invalidateSize(); });
 
       document.querySelectorAll(".area[data-area]").forEach(function (li) {
@@ -246,6 +329,84 @@
       loadLeaflet();
     }
   }
+
+  /* ---------- Neighbourhood matcher: "What matters to you?" ---------- */
+  var chips = document.querySelectorAll(".chip[data-tag]");
+  if (chips.length) {
+    var areaList = document.querySelector(".areas");
+    var out = document.querySelector(".matcher-out");
+    var clearBtn = document.querySelector(".matcher-clear");
+    var defaultMsg = out ? out.textContent : "";
+    var applyMatch = function () {
+      var chosen = [];
+      chips.forEach(function (ch) { if (ch.getAttribute("aria-pressed") === "true") chosen.push(ch.getAttribute("data-tag")); });
+      var items = Array.prototype.slice.call(document.querySelectorAll(".area[data-tags]"));
+      var scored = items.map(function (li) {
+        var tags = li.getAttribute("data-tags").split(" ");
+        return { li: li, slug: li.getAttribute("data-area"), name: li.querySelector(".an").textContent, score: chosen.filter(function (t) { return tags.indexOf(t) > -1; }).length };
+      });
+      var best = Math.max.apply(null, scored.map(function (x) { return x.score; }).concat([0]));
+      var filtering = chosen.length > 0;
+      if (areaList) areaList.classList.toggle("filtering", filtering);
+      if (mapEl) mapEl.classList.toggle("filtering", filtering);
+      var winners = [];
+      scored.forEach(function (x) {
+        var hit = filtering && best > 0 && x.score === best;
+        x.li.classList.toggle("match", hit);
+        document.querySelectorAll(".pin-" + x.slug).forEach(function (pin) { pin.classList.toggle("match", hit); });
+        if (hit) winners.push(x.name);
+      });
+      if (clearBtn) clearBtn.hidden = !filtering;
+      if (!out) return;
+      if (!filtering) { out.textContent = defaultMsg; return; }
+      if (!winners.length) { out.textContent = "No single neighbourhood has all of that, which is exactly when a personal search helps."; return; }
+      out.innerHTML = "";
+      out.appendChild(document.createTextNode(winners.length === 1 ? "Your best match: " : "Your best matches: "));
+      var b = document.createElement("b");
+      b.textContent = winners.length > 1 ? winners.slice(0, -1).join(", ") + " and " + winners[winners.length - 1] : winners[0];
+      out.appendChild(b);
+      out.appendChild(document.createTextNode("."));
+    };
+    chips.forEach(function (ch) {
+      ch.addEventListener("click", function () {
+        ch.setAttribute("aria-pressed", ch.getAttribute("aria-pressed") === "true" ? "false" : "true");
+        applyMatch();
+      });
+    });
+    if (clearBtn) clearBtn.addEventListener("click", function () {
+      chips.forEach(function (ch) { ch.setAttribute("aria-pressed", "false"); });
+      applyMatch();
+    });
+    document.addEventListener("crownsmere:map", applyMatch);
+  }
+
+  /* ---------- Briefs: cards turn over, and lean towards the pointer ---------- */
+  document.querySelectorAll(".brief").forEach(function (card) {
+    var inner = card.querySelector(".brief-inner");
+    var front = card.querySelector(".brief-front");
+    var back = card.querySelector(".brief-back");
+    var flip = function (focusNext) {
+      var on = !card.classList.contains("flipped");
+      card.classList.toggle("flipped", on);
+      front.setAttribute("aria-hidden", on ? "true" : "false");
+      back.setAttribute("aria-hidden", on ? "false" : "true");
+      front.querySelector("[data-flip]").tabIndex = on ? -1 : 0;
+      back.querySelector("[data-flip]").tabIndex = on ? 0 : -1;
+      if (focusNext) (on ? back : front).querySelector("[data-flip]").focus({ preventScroll: true });
+    };
+    card.querySelectorAll("[data-flip]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) { e.stopPropagation(); flip(true); });
+    });
+    card.addEventListener("click", function () { flip(false); });
+    if (!reduce && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      card.addEventListener("mousemove", function (e) {
+        var r = card.getBoundingClientRect();
+        inner.style.setProperty("--ry", (((e.clientX - r.left) / r.width) - 0.5) * 14 + "deg");
+        inner.style.setProperty("--rx", (0.5 - ((e.clientY - r.top) / r.height)) * 10 + "deg");
+      });
+      card.addEventListener("mouseleave", function () { inner.style.setProperty("--rx", "0deg"); inner.style.setProperty("--ry", "0deg"); });
+    }
+  });
 
   /* ---------- Magnetic primary buttons (desktop) ---------- */
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce) {
@@ -348,6 +509,67 @@
       });
     }
 
+    /* The brief, composed into a letter as the visitor answers */
+    var pvBody = document.querySelector("[data-pv-body]");
+    var pvName = document.querySelector("[data-pv-name]");
+    var pvDate = document.querySelector("[data-pv-date]");
+    var preview = document.querySelector(".preview");
+    if (pvDate) {
+      try { pvDate.textContent = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }); } catch (e) {}
+    }
+    var val = function (name) {
+      var el = form.querySelector('[name="' + name + '"]:checked') || form.querySelector('[name="' + name + '"]:not([type="radio"])');
+      return el ? String(el.value || "").trim() : "";
+    };
+    var OPEN = {
+      "Buy a home": "I am looking to buy a home", "Rent a home": "I am looking for a home to rent",
+      "Sell privately": "I would like to sell my property privately", "Let my property": "I would like to let my property",
+      "Invest": "I am looking to invest in property", "Seek advice": "I would value your independent advice on a property matter"
+    };
+    var WHEN = {
+      "As soon as possible": "as soon as possible", "Within 3 months": "within the next three months",
+      "3 to 6 months": "in the next three to six months", "6 to 12 months": "within the year",
+      "When the right property appears": "whenever the right property appears"
+    };
+    var compose = function () {
+      if (!pvBody) return "";
+      var req = val("request"), areas = val("areas"), budget = val("budget_or_value"), when = val("timeframe");
+      var brief = val("brief"), name = val("name"), how = val("preferred_contact"), time = val("best_time");
+      var paras = [];
+      if (req) {
+        var line = OPEN[req] || req;
+        if (areas) line += (req === "Sell privately" || req === "Let my property" ? ", in " : " in ") + areas;
+        if (budget && budget !== "Prefer not to say") {
+          if (budget.indexOf("Monthly") === 0) line += ", on a monthly rent";
+          else line += (req === "Sell privately" || req === "Let my property" ? ", valued at " : ", with a budget of ") + budget.replace(/^(Under|Over) /, function (m) { return m.toLowerCase(); });
+        }
+        if (WHEN[when]) line += ", " + WHEN[when];
+        paras.push(line + ".");
+      }
+      if (brief) paras.push(brief);
+      if (name || how) {
+        var c = how && how !== "Either" ? "Please contact me by " + how.toLowerCase() : "Please contact me by telephone or email";
+        if (time && time !== "Any time" && how !== "Email") c += ", ideally in the " + time.toLowerCase();
+        paras.push(c + ".");
+      }
+      pvBody.innerHTML = "";
+      if (!paras.length) {
+        var empty = document.createElement("p");
+        empty.className = "pv-empty";
+        empty.textContent = "Your letter will compose itself here as you answer.";
+        pvBody.appendChild(empty);
+      } else {
+        paras.forEach(function (t) { var p = document.createElement("p"); p.textContent = t; pvBody.appendChild(p); });
+      }
+      if (pvName) pvName.textContent = name || "\u00a0";
+      return "Dear Alaa,\n\n" + paras.join("\n\n") + "\n\nWith kind regards,\n" + name;
+    };
+    var composeTimer = 0;
+    var queueCompose = function () { clearTimeout(composeTimer); composeTimer = setTimeout(compose, 120); };
+    form.addEventListener("input", queueCompose);
+    form.addEventListener("change", queueCompose);
+    compose();
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (sending) return;
@@ -367,8 +589,10 @@
 
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = typeof v === "string" ? v.trim() : v; });
+      data.letter = compose();
 
       var done = function () {
+        if (preview) preview.classList.add("sealed");
         form.reset();
         form.classList.add("sent");
         say("Your brief has been received. Alaa will be in touch with you personally.");

@@ -2,7 +2,7 @@
 
 Every email sent to **hello@crownsmere.com** is read by Claude, which decides whether it deserves Alaa's attention:
 
-- **Genuine** (client enquiries, website form leads, solicitors, brokers, official business mail): forwarded to **Alaa.Q@crownsmere.com** with a one-line summary on top and the original attached. Pressing Reply answers the original sender.
+- **Genuine** (client enquiries, website form leads, solicitors, brokers, official business mail): forwarded to **Alaa's private inbox** with a one-line summary on top and the original attached. Pressing Reply answers the original sender.
 - **Junk** (spam, phishing, cold sales pitches, newsletters, unrelated mail): logged and not forwarded.
 
 Nothing is ever deleted. The hello@ mailbox keeps a copy of everything, so a wrongly filtered email can always be found there.
@@ -23,12 +23,12 @@ Nothing is ever deleted. The hello@ mailbox keeps a copy of everything, so a wro
 
 You need: Namecheap cPanel hosting, an Anthropic API key, and about 20 minutes.
 
-### 1. Create the two mailboxes
+### 1. The two mailboxes
 
 cPanel, **Email Accounts**, **Create**:
 
 - `hello@crownsmere.com` (the public address on the website and in the contact form)
-- `alaa.q@crownsmere.com` (Alaa's private inbox, never published)
+- Alaa's private inbox (already created). It is never shown on the website, and it should never be written into any file in this repository either, because the repository is public. It goes only in `config.php` on the server (step 4).
 
 Then open **Email Deliverability** and click **Repair** on any record that shows a problem, so the SPF and DKIM records are valid. Mail forwarded by the filter is far less likely to land in spam.
 
@@ -63,7 +63,12 @@ chmod 755 filter.php digest.php
 chmod 600 config.php
 ```
 
-Edit `config.php` (File Manager, **Edit**) and paste your API key into `anthropic_api_key`. The other settings are already filled in for Crownsmere.
+Edit `config.php` (File Manager, **Edit**):
+
+- paste your API key into `anthropic_api_key`
+- put Alaa's private address into `forward_to`
+
+`config.php` stays on the server only: it is git-ignored and must never be committed, so the private address never becomes public.
 
 ### 5. Dry run (sends nothing)
 
@@ -86,7 +91,7 @@ Save. cPanel now delivers each email to the hello@ mailbox *and* to the filter.
 
 ### 7. Test for real
 
-From a personal email account, send two emails to hello@crownsmere.com: one that reads like a client enquiry, and one that reads like a sales pitch. Within a minute or so, only the first should arrive at Alaa.Q@crownsmere.com, with the filter's summary on top. Both are recorded in `filter.log`.
+From a personal email account, send two emails to hello@crownsmere.com: one that reads like a client enquiry, and one that reads like a sales pitch. Within a minute or so, only the first should arrive in Alaa's private inbox, with the filter's summary on top. Both are recorded in `filter.log`.
 
 ### 8. Daily digest (recommended)
 

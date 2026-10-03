@@ -299,6 +299,9 @@ function buildForward(array $config, string $raw, array $mail, array $decision):
 
 function sendMail(array $config, string $message): void
 {
+    if (str_contains($config['forward_to'], 'PRIVATE-ADDRESS') || !filter_var($config['forward_to'], FILTER_VALIDATE_EMAIL)) {
+        throw new RuntimeException('forward_to is not set in config.php: message left in the hello@ mailbox');
+    }
     $cmd = escapeshellcmd($config['sendmail_path']) . ' -t -i -f ' . escapeshellarg($config['forward_from']);
     $pipe = popen($cmd, 'w');
     if ($pipe === false) {
