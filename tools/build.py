@@ -59,9 +59,12 @@ ORG = {
     "description": "A private, by-request property search and consultancy service in prime London: clients share a brief and Alaa Qadir finds the right property, on and off the market.",
     "url": f"{SITE}/", "email": EMAIL,
     "image": f"{SITE}/assets/img/townhouse.jpg", "logo": f"{SITE}/assets/img/monogram.png",
-    "areaServed": {"@type": "City", "name": "London"},
+    "areaServed": [{"@type": "City", "name": "London"}] + [{"@type": "Place", "name": n} for n in
+                   ["Mayfair", "Belgravia", "Knightsbridge", "Chelsea", "Kensington", "Holland Park",
+                    "Notting Hill", "Marylebone", "St John’s Wood", "Hampstead"]],
     "address": {"@type": "PostalAddress", "addressLocality": "London", "addressCountry": "GB"},
-    "founder": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Individual Property Consultant"},
+    "employee": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant", "worksFor": {"@id": f"{SITE}/#business"}},
+    "slogan": "A more personal London.",
     "knowsAbout": ["Prime London property", "Property search", "Off-market property", "Private property sales", "Lettings", "Property investment"],
 }
 
@@ -69,6 +72,14 @@ def head(title, desc, path, extra_ld=None):
     body_cls = ' class="home"' if path == "index.html" else ""
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = [ORG] + (extra_ld or [])
+    names = {"services.html": "Services", "about.html": "About", "contact.html": "Contact", "privacy.html": "Privacy notice"}
+    if path in names:
+        ld.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE}/"},
+            {"@type": "ListItem", "position": 2, "name": names[path], "item": canonical}]})
+    if path == "index.html":
+        ld.append({"@context": "https://schema.org", "@type": "WebSite", "name": BRAND, "url": f"{SITE}/",
+                   "inLanguage": "en-GB", "publisher": {"@id": f"{SITE}/#business"}})
     hero_preload = ('<link rel="preload" as="image" href="assets/img/townhouse.webp" type="image/webp" fetchpriority="high">\n'
                     if path == "index.html" else "")
     return f'''<!doctype html>
@@ -76,6 +87,10 @@ def head(title, desc, path, extra_ld=None):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="format-detection" content="telephone=no">
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#0e1b2e">
@@ -86,9 +101,13 @@ def head(title, desc, path, extra_ld=None):
 <meta property="og:url" content="{canonical}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
-<meta property="og:image" content="{SITE}/assets/img/townhouse.jpg">
-<meta property="og:image:width" content="1055">
-<meta property="og:image:height" content="687">
+<meta property="og:image" content="{SITE}/assets/img/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Crownsmere Estate: private property search in prime London">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="{SITE}/assets/img/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -97,6 +116,7 @@ def head(title, desc, path, extra_ld=None):
 <link rel="preload" href="assets/fonts/eb-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
 {hero_preload}<link rel="stylesheet" href="assets/style.css">
+{'<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">' if path == "index.html" else ""}
 <script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
 </head>
 <body{body_cls}>
@@ -115,7 +135,7 @@ def header(current):
 <header class="hd">
   <a class="hd-mark" href="index.html" aria-label="{BRAND}, home">
     {LOGO()}
-    <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Individual Property Consultant</span></small></span>
+    <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Private Property Consultancy</span></small></span>
   </a>
   <nav class="hd-nav" aria-label="Main">{nav}<a class="btn btn-gold caps" href="contact.html">Enquire <span aria-hidden="true">&rarr;</span></a></nav>
   <button class="hd-menu caps" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
@@ -141,7 +161,7 @@ def footer(current):
   <div class="wrap">
     <div class="ft-top">
       <div class="ft-brand">
-        <div class="mk">{LOGO(lazy=True)}<div><b>CROWNSMERE</b><small>Estate &middot; Individual Property Consultant</small></div></div>
+        <div class="mk">{LOGO(lazy=True)}<div><b>CROWNSMERE</b><small>Estate &middot; Private Property Consultancy</small></div></div>
         <p>A more personal London.</p>
       </div>
       <div><h2 class="caps">Explore</h2><ul>{explore}</ul></div>
@@ -213,6 +233,8 @@ FAQ = [
      "You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."),
     ("Why are there no properties listed on this website?",
      "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."),
+    ("Are you a buying agent?",
+     "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give independent advice."),
     ("What does &ldquo;off-market&rdquo; mean?",
      "A property whose owner prefers to sell or let quietly, without public advertising. These homes are reached through a discreet network of owners, agents and advisers rather than through property portals."),
     ("Can you help me sell or let my own property?",
@@ -256,10 +278,16 @@ def pillars(quote="The finest homes rarely need to be advertised.", media=True):
 
 def areas():
     items = "".join(
-        f'<li class="area" data-area="{art.area_slug(strip_tags(n))}" data-reveal><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></li>'
+        f'<li class="area" data-area="{art.area_slug(strip_tags(n))}" data-reveal><button type="button" class="area-btn" aria-label="Show {strip_tags(n)} on the map"><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></button></li>'
         for i, (n, d) in enumerate(AREAS)
     )
-    return (f'<div class="areas-wrap"><figure class="art-wrap map-fig" data-reveal>{art.london_map()}</figure>'
+    pins = [{"slug": art.area_slug(strip_tags(n)), "name": strip_tags(n), "n": f"{i + 1:02d}",
+             "lat": a[2], "lng": a[1]} for i, ((n, d), a) in enumerate(zip(AREAS, art.AREAS))]
+    data = json.dumps(pins, ensure_ascii=False).replace('"', "&quot;")
+    return (f'<div class="areas-wrap"><figure class="map-fig" data-reveal>'
+            f'<div class="map" id="map" data-pins="{data}" role="region" aria-label="Map of the prime London neighbourhoods searched">'
+            f'<a class="map-fallback caps" href="https://www.openstreetmap.org/#map=13/51.5070/-0.1650" rel="noopener">View prime London on OpenStreetMap</a></div>'
+            f'<figcaption class="caps">Hover a neighbourhood to find it on the map</figcaption></figure>'
             f'<ul class="areas">{items}</ul></div>')
 
 def faq(items=FAQ):
@@ -351,7 +379,7 @@ index_body = f'''
           <p>Each client is taken on individually, and each search is shaped around their life, their timing and their priorities. You deal with me directly, from the first conversation to the day you collect the keys.</p>
           <p>Many of London&rsquo;s finest homes change hands quietly, without ever being advertised. Through a discreet network of owners, agents and advisers, I can open doors that never appear online.</p>
         </div>
-        <div class="signature" data-reveal><b>Alaa Qadir</b><span class="caps">Individual Property Consultant</span></div>
+        <div class="signature" data-reveal><b>Alaa Qadir</b><span class="caps">Senior Property Consultant</span></div>
       </div>
     </div>
     <div class="facts" data-reveal>
@@ -420,8 +448,8 @@ index_body = f'''
 </section>
 {invite()}'''
 
-page("index.html", f"{BRAND} — Private Property Search in Prime London",
-     "Crownsmere Estate is a private, by-request property service in prime London. Share your brief and Alaa Qadir searches personally, on and off the market.",
+page("index.html", f"{BRAND} | Private Property Search in Prime London",
+     "Private property search in prime London. Share your brief and we find the right home, on and off the market, in Mayfair, Belgravia, Chelsea and beyond.",
      index_body, INTRO, extra_ld=[FAQ_LD])
 
 # ---------------------------------------------------------------- services
@@ -474,8 +502,8 @@ services_body = f'''
 </section>
 {invite("Shall we <em>begin?</em>")}'''
 
-page("services.html", f"Services — {BRAND}",
-     "A personal, by-request service for buying, selling privately, letting, investing and independent advice in prime London.",
+page("services.html", f"Property Search, Private Sales & Lettings | {BRAND}",
+     "Buying, private sales, lettings, investment and independent property advice in prime London, delivered personally and discreetly by Crownsmere Estate.",
      services_body)
 
 # ---------------------------------------------------------------- about
@@ -498,12 +526,12 @@ about_body = f'''
     <div class="statement">
       {drawing(art.door(), "Drawing &middot; A Belgravia front door", "door-fig")}
       <div class="copy">
-        <p class="lede dropcap" data-reveal>As an independent consultant, I work exclusively for you. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
+        <p class="lede dropcap" data-reveal>As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
         <div class="cols" data-reveal>
           <p>Property is about people, not just buildings. I take on a small number of clients so that each one receives my full attention, honest advice and a search shaped entirely around them.</p>
           <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to the final signature, you deal directly with me, in complete confidence.</p>
         </div>
-        <div class="signature" data-reveal><b>Alaa Qadir</b><span class="caps">Founder &middot; {BRAND}</span></div>
+        <div class="signature" data-reveal><b>Alaa Qadir</b><span class="caps">Senior Property Consultant &middot; {BRAND}</span></div>
       </div>
     </div>
   </div>
@@ -538,8 +566,8 @@ about_body = f'''
 {band("People. Property. <em>Perspective.</em>", "A more personal London")}
 {invite()}'''
 
-page("about.html", f"About — {BRAND}",
-     "Why Crownsmere: a personal, by-request property service in prime London. Personal representation, off-market access and skilled negotiation from Alaa Qadir.",
+page("about.html", "About Crownsmere Estate | Prime London Property Consultancy",
+     "A personal, discreet property consultancy for prime London. Meet Alaa Qadir, Senior Property Consultant: off-market access and skilled negotiation.",
      about_body)
 
 # ---------------------------------------------------------------- contact
@@ -569,7 +597,7 @@ contact_body = f'''
 <section class="section tight">
   <div class="wrap letter-wrap">
     <div class="details">
-      <p class="lede" style="font-size:clamp(22px,2vw,30px);color:var(--ink-soft)">Tell me what you are looking for, in as much or as little detail as you like. I will be in touch personally, in complete confidence, by telephone or email as you prefer.</p>
+      <p class="lede lede-sm">Tell me what you are looking for, in as much or as little detail as you like. I will be in touch personally, in complete confidence, by telephone or email as you prefer.</p>
       <dl>
         <div><dt class="caps">Telephone</dt><dd>Shared personally<br><em>once your brief is received.</em></dd></div>
         <div><dt class="caps">Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
@@ -582,7 +610,7 @@ contact_body = f'''
       <div class="letter-head">
         {LOGO()}
         <div class="caps">{BRAND} &nbsp;&middot;&nbsp; London</div>
-        <p class="display" style="margin:0">A private brief</p>
+        <p class="display m0">A private brief</p>
       </div>
       <form class="letter-form" data-endpoint="https://formsubmit.co/ajax/{EMAIL}" novalidate>
         <input type="hidden" name="_subject" value="[Crownsmere Enquiry] New client brief from the website">
@@ -645,11 +673,11 @@ contact_body = f'''
       <div class="section-mark caps"><b>&mdash;</b>Questions</div>
       <h2 data-reveal>Before you <em>get in touch.</em></h2>
     </div>
-    {faq([FAQ[0], FAQ[6], FAQ[5], FAQ[7]])}
+    {faq([FAQ[0], FAQ[7], FAQ[6], FAQ[8]])}
   </div>
 </section>'''
 
-page("contact.html", f"Contact — {BRAND}",
+page("contact.html", f"Share Your Property Brief | {BRAND}",
      "Share your property brief with Crownsmere Estate. A private, by-request search for buying, renting, selling privately and investing in prime London.",
      contact_body)
 
@@ -659,7 +687,7 @@ privacy_body = f'''
   <div class="wrap">
     <div class="eyebrow caps">Privacy notice</div>
     <h1><span class="line"><span>Your privacy,</span></span><span class="line"><span><em>respected.</em></span></span></h1>
-    <p class="lede" data-reveal>Discretion is at the heart of what I do. This notice explains, plainly, what happens to the information you share with {BRAND}.</p>
+    <p class="lede" data-reveal>Discretion is at the heart of what we do. This notice explains, plainly, what happens to the information you share with {BRAND}.</p>
   </div>
 </section>
 
@@ -667,45 +695,49 @@ privacy_body = f'''
   <div class="wrap prose">
     <p class="caps updated">Last updated {UPDATED}</p>
 
-    <h2>Who I am</h2>
-    <p>{BRAND} is an independent property consultancy run by Alaa Qadir in London, United Kingdom. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact me about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+    <h2>Who we are</h2>
+    <p>{BRAND} is a private property consultancy based in London, United Kingdom. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact us about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 
-    <h2>What I collect</h2>
-    <p>Only what you choose to share: your name, email address and telephone number, how and when you prefer to be contacted, and the details of your request (for example the kind of property you are looking for, preferred areas, budget and timeframe). If you write to me or call, I also keep that correspondence.</p>
+    <h2>What we collect</h2>
+    <p>Only what you choose to share: your name, email address and telephone number, how and when you prefer to be contacted, and the details of your request (for example the kind of property you are looking for, preferred areas, budget and timeframe). If you write to us or call, we also keep that correspondence.</p>
 
-    <h2>How I use it</h2>
+    <h2>How we use it</h2>
     <ul>
       <li>To reply to your enquiry and discuss your brief.</li>
-      <li>To carry out the search or other services you ask me to provide.</li>
+      <li>To carry out the search or other services you ask us to provide.</li>
       <li>To keep a record of our correspondence.</li>
     </ul>
-    <p>I rely on your request for me to act before any agreement is made, my legitimate interest in responding to enquiries, and, where you give it on the contact form, your consent to be contacted. I never use your details for unrelated marketing, and I never sell them.</p>
+    <p>We rely on your request for us to act before any agreement is made, our legitimate interest in responding to enquiries, and, where you give it on the contact form, your consent to be contacted. We never use your details for unrelated marketing, and we never sell them.</p>
 
-    <h2>Who helps me</h2>
-    <p>A small number of trusted service providers process information on my behalf, only to provide their service:</p>
+    <h2>Who helps us</h2>
+    <p>A small number of trusted service providers process information on our behalf, only to provide their service:</p>
     <ul>
-      <li><strong>FormSubmit</strong> delivers messages sent through the contact form to my inbox.</li>
-      <li><strong>My email hosting provider</strong> stores the emails you send me.</li>
-      <li><strong>Anthropic</strong> provides the AI service that screens emails sent to {EMAIL}, so that spam is filtered out and genuine enquiries reach me promptly. Emails are processed for this purpose only.</li>
+      <li><strong>FormSubmit</strong> delivers messages sent through the contact form to our inbox.</li>
+      <li><strong>Our email hosting provider</strong> stores the emails you send us.</li>
+      <li><strong>Anthropic</strong> provides the AI service that screens emails sent to {EMAIL}, so that spam is filtered out and genuine enquiries reach us promptly. Emails are processed for this purpose only.</li>
+      <li><strong>OpenStreetMap</strong> supplies the map images on our home page. When the map loads, your browser requests these images from the OpenStreetMap Foundation&rsquo;s servers, which receive your IP address as part of that request.</li>
     </ul>
-    <p>Some of these providers are based outside the UK, including in the United States. Where that is the case, information is transferred with appropriate safeguards in place. With your agreement, I may also share relevant details with others involved in your matter, such as solicitors or agents, when that is needed to help you.</p>
+    <p>Some of these providers are based outside the UK, including in the United States. Where that is the case, information is transferred with appropriate safeguards in place. With your agreement, we may also share relevant details with others involved in your matter, such as solicitors or agents, when that is needed to help you.</p>
 
-    <h2>How long I keep it</h2>
-    <p>I keep your information only for as long as it is needed for the purposes above, including any legal, accounting or regulatory requirements, and then delete it securely.</p>
+    <h2>How long we keep it</h2>
+    <p>We keep your information only for as long as it is needed for the purposes above, including any legal, accounting or regulatory requirements, and then delete it securely.</p>
 
     <h2>Your rights</h2>
-    <p>You can ask to see the information I hold about you, to correct it, to delete it, to restrict or object to its use, or to receive a copy of it. Where I rely on your consent, you can withdraw it at any time. Just email <a href="mailto:{EMAIL}">{EMAIL}</a>. If you are unhappy with how your information has been handled, you can complain to the Information Commissioner&rsquo;s Office at <a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>.</p>
+    <p>You can ask to see the information we hold about you, to correct it, to delete it, to restrict or object to its use, or to receive a copy of it. Where we rely on your consent, you can withdraw it at any time. Just email <a href="mailto:{EMAIL}">{EMAIL}</a>. If you are unhappy with how your information has been handled, you can complain to the Information Commissioner&rsquo;s Office at <a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>.</p>
 
     <h2>Cookies</h2>
-    <p>This website does not use cookies, analytics or advertising trackers. It remembers, for the length of your visit only, that you have seen the opening animation, so that it does not play on every page. Fonts and images are served from this website itself.</p>
+    <p>This website does not use cookies, analytics or advertising trackers. It remembers, for the length of your visit only, that you have seen the opening animation, so that it does not play on every page. Fonts, images and scripts are served from this website itself; the only exception is the map images described above.</p>
+
+    <h2>Security</h2>
+    <p>This website is served only over an encrypted (HTTPS) connection and uses a strict content security policy. To report a security concern, please email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 
     <h2>Changes</h2>
     <p>If this notice changes, the updated version will be published on this page with a new date.</p>
   </div>
 </section>'''
 
-page("privacy.html", f"Privacy Notice — {BRAND}",
-     "How Crownsmere Estate collects, uses and protects the information you share.",
+page("privacy.html", f"Privacy Notice | {BRAND}",
+     "How Crownsmere Estate collects, uses and protects the personal information you share with us, and the rights you have over it.",
      privacy_body)
 
 # ---------------------------------------------------------------- 404
@@ -715,7 +747,7 @@ notfound_body = f'''
     <div class="eyebrow caps">Page not found</div>
     <h1><span class="line"><span>This page has gone</span></span><span class="line"><span><em>off-market.</em></span></span></h1>
     <p class="lede" data-reveal>The page you were looking for is not here, but the right property may well be. Let me help you find it.</p>
-    <div class="btn-row" data-reveal style="margin-top:44px">
+    <div class="btn-row mt-44" data-reveal>
       <a class="btn btn-gold caps" href="index.html">Return home <span aria-hidden="true">&rarr;</span></a>
       <a class="btn caps" href="contact.html">Share your brief</a>
     </div>
