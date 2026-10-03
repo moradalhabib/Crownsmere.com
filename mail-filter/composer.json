@@ -1,0 +1,14 @@
+{
+    "name": "crownsmere/mail-filter",
+    "description": "AI inbox filter for hello@crownsmere.com",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "anthropic-ai/sdk": "^0.54",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
