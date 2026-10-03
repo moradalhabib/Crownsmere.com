@@ -6,6 +6,10 @@ All page content lives in this file. Edit it, then run:  python3 tools/build.py
 import json
 import os
 import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import art  # noqa: E402  original line illustrations
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://crownsmere.com"
@@ -238,8 +242,10 @@ def ledger():
     )
     return f'<ol class="ledger">{rows}</ol>'
 
-def pillars(quote="The finest homes rarely need to be advertised."):
+def pillars(quote="The finest homes rarely need to be advertised.", media=True):
     items = "".join(f'<div class="pillar" data-reveal>{ic(i)}<h3>{t}</h3><p>{d}</p></div>' for i, t, d in PILLARS)
+    if not media:
+        return f'<div class="pillars pillars-4">{items}</div>'
     return f'''<div class="pillars-wrap">
       <div class="pillars">{items}</div>
       <figure class="pillars-media reveal-img" data-reveal>
@@ -250,10 +256,11 @@ def pillars(quote="The finest homes rarely need to be advertised."):
 
 def areas():
     items = "".join(
-        f'<li class="area" data-reveal><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></li>'
+        f'<li class="area" data-area="{art.area_slug(strip_tags(n))}" data-reveal><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></li>'
         for i, (n, d) in enumerate(AREAS)
     )
-    return f'<ul class="areas">{items}</ul>'
+    return (f'<div class="areas-wrap"><figure class="art-wrap map-fig" data-reveal>{art.london_map()}</figure>'
+            f'<ul class="areas">{items}</ul></div>')
 
 def faq(items=FAQ):
     rows = "".join(
@@ -286,6 +293,9 @@ def band(text, cite="Discretion &middot; Expertise &middot; Results"):
     <cite class="caps">{cite}</cite>
   </blockquote>
 </section>'''
+
+def drawing(svg, caption, cls=""):
+    return f'<figure class="art-wrap drawing {cls}" data-reveal>{svg}<figcaption class="caps">{caption}</figcaption></figure>'
 
 def statement_figure(caption):
     return (f'<figure class="reveal-img" data-reveal><div class="frame">'
@@ -486,7 +496,7 @@ about_body = f'''
 <section class="section tight">
   <div class="wrap">
     <div class="statement">
-      {statement_figure("Alaa Qadir &middot; Individual Property Consultant")}
+      {drawing(art.door(), "Drawing &middot; A Belgravia front door", "door-fig")}
       <div class="copy">
         <p class="lede dropcap" data-reveal>As an independent consultant, I work exclusively for you. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
         <div class="cols" data-reveal>
@@ -499,13 +509,19 @@ about_body = f'''
   </div>
 </section>
 
+<section class="section tight elevation-sec">
+  <div class="wrap">
+    {drawing(art.elevation(), "Elevation study &middot; A Belgravia terrace", "elev-fig")}
+  </div>
+</section>
+
 <section class="section tight">
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>&mdash;</b>The Crownsmere Difference</div>
       <h2 data-reveal>A more personal approach. <em>Better guided decisions.</em></h2>
     </div>
-    {pillars()}
+    {pillars(media=False)}
   </div>
 </section>
 
