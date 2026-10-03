@@ -27,6 +27,9 @@ return [
         // 'spammy-seo-agency.com',
     ],
 
+    // Email Alaa a short daily list of what was held back (needs the cron job in README).
+    'daily_digest' => true,
+
     // Usually correct on cPanel. Run `which sendmail` in the cPanel Terminal if unsure.
     'sendmail_path' => '/usr/sbin/sendmail',
 

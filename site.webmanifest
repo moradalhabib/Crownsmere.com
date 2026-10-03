@@ -1,0 +1,21 @@
+{
+  "name": "Crownsmere Estate",
+  "short_name": "Crownsmere",
+  "description": "Private property search in prime London.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f6f2ea",
+  "theme_color": "#0e1b2e",
+  "icons": [
+    {
+      "src": "/assets/img/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ Nothing is ever deleted. The hello@ mailbox keeps a copy of everything, so a wro
 | File | What it is |
 |---|---|
 | `filter.php` | The filter. cPanel pipes each incoming email into it. |
+| `digest.php` | Daily summary of held-back mail, run by a cron job. |
 | `config.sample.php` | Settings template. Copy it to `config.php` and add your API key. |
 | `composer.json` | Installs the official Anthropic PHP SDK. |
 | `tests/*.eml` | Sample emails for a dry run. |
@@ -47,7 +48,7 @@ In **File Manager**, create a folder in your home directory, **not** inside `pub
 /home/YOUR-CPANEL-USERNAME/crownsmere-filter/
 ```
 
-Upload `filter.php`, `composer.json`, `config.sample.php` and the `tests` folder into it.
+Upload `filter.php`, `digest.php`, `composer.json`, `config.sample.php` and the `tests` folder into it.
 
 ### 4. Install and configure (cPanel Terminal)
 
@@ -58,7 +59,7 @@ cd ~/crownsmere-filter
 php -v                      # must be 8.1 or newer (set it in "Select PHP Version" / "MultiPHP Manager")
 composer install --no-dev   # if "composer: command not found", see Troubleshooting
 cp config.sample.php config.php
-chmod 755 filter.php
+chmod 755 filter.php digest.php
 chmod 600 config.php
 ```
 
@@ -86,6 +87,15 @@ Save. cPanel now delivers each email to the hello@ mailbox *and* to the filter.
 ### 7. Test for real
 
 From a personal email account, send two emails to hello@crownsmere.com: one that reads like a client enquiry, and one that reads like a sales pitch. Within a minute or so, only the first should arrive at Alaa.Q@crownsmere.com, with the filter's summary on top. Both are recorded in `filter.log`.
+
+### 8. Daily digest (recommended)
+
+Once a day, Alaa receives a short email listing anything the filter held back, so nothing important is missed. In cPanel, **Cron Jobs**, add:
+
+- **Common settings:** Once Per Day (or choose a time, e.g. minute `0`, hour `8`)
+- **Command:** `/usr/local/bin/php $HOME/crownsmere-filter/digest.php`
+
+No email is sent on days when nothing was filtered. To switch it off, set `'daily_digest' => false` in `config.php`.
 
 ## Everyday use
 
