@@ -1,18 +1,21 @@
 # Crownsmere.com
 
-Static website (plain HTML/CSS/JS, no build step).
+The website of Crownsmere, a private house. Plain HTML, CSS and JavaScript with no build step, hosted on GitHub Pages at crownsmere.com.
 
 ## Structure
-- `index.html`, `about.html`, `services.html`, `portfolio.html`, `contact.html`
-- `assets/style.css`, `assets/main.js`
+- `index.html`: home page (wax-seal intro, crest, the House, the Disciplines, horizontal Archive, motto, invitation)
+- `about.html`: The House (story, Rules of the House, Chronicle)
+- `services.html`: The Disciplines (ledger and manner of engagement)
+- `portfolio.html`: The Archive (gallery of plates)
+- `contact.html`: Correspondence (letter form with wax-seal submit)
+- `assets/style.css`, `assets/main.js`, `assets/favicon.svg`
 
 ## Preview locally
 `python3 -m http.server 8000`, then open http://localhost:8000
 
-## Deploying (domain bought on Namecheap)
-- Namecheap shared hosting: upload these files to `public_html` via cPanel File Manager or FTP.
-- Or use free hosting (GitHub Pages, Netlify, Cloudflare Pages) and point the Namecheap DNS records at it.
+The wax-seal intro plays once per browser session. Open a new tab or window to see it again.
 
-## TODO
-- Replace placeholder text and add a logo and images.
-- Hook the contact form to a form service (Formspree, Netlify Forms) or a backend.
+## Making it yours
+- **Images:** the "plates" in the Archive are styled placeholders. Replace a plate's `<div class="plate …">` with an `<img>`, or set a `background-image` on it.
+- **Copy:** all text is placeholder brand voice. Edit it directly in the HTML.
+- **Contact form:** create a free form endpoint (for example at formspree.io), then put its URL in `data-endpoint=""` on the `<form>` in `contact.html`. Until then, the form politely tells visitors that the correspondence desk is not yet open.
