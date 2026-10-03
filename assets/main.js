@@ -98,6 +98,7 @@
       });
     };
     walk(el);
+    el.classList.add("split");
   };
   if (!reduce) document.querySelectorAll("[data-split]").forEach(splitWords);
 
