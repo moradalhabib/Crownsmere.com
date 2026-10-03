@@ -5,24 +5,17 @@
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   root.classList.remove("no-js");
 
-  /* ---------- Roman numerals ---------- */
-  function roman(n) {
-    var map = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
-      [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
-    var out = "";
-    map.forEach(function (p) { while (n >= p[0]) { out += p[1]; n -= p[0]; } });
-    return out;
-  }
+  /* ---------- Footer year ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) {
-    el.textContent = roman(new Date().getFullYear());
+    el.textContent = new Date().getFullYear();
   });
 
-  /* ---------- Intro: wax seal (home page, once per visit) ---------- */
+  /* ---------- Intro: monogram reveal (home page, once per visit) ---------- */
   var intro = document.querySelector(".intro");
   function ready() { root.classList.add("ready"); }
   if (intro) {
     var seen = false;
-    try { seen = sessionStorage.getItem("crownsmere-sealed") === "1"; } catch (e) {}
+    try { seen = sessionStorage.getItem("crownsmere-intro") === "1"; } catch (e) {}
     if (seen || reduce) {
       intro.classList.add("done");
       ready();
@@ -33,28 +26,14 @@
         if (intro.classList.contains("done")) return;
         intro.classList.add("done");
         document.body.style.overflow = "";
-        try { sessionStorage.setItem("crownsmere-sealed", "1"); } catch (e) {}
+        try { sessionStorage.setItem("crownsmere-intro", "1"); } catch (e) {}
       };
-      setTimeout(ready, 2500);
-      setTimeout(finish, 3300);
+      setTimeout(ready, 2700);
+      setTimeout(finish, 3700);
       intro.addEventListener("click", function () { ready(); finish(); });
     }
   } else {
     ready();
-  }
-
-  /* ---------- London clock ---------- */
-  var clock = document.querySelector("[data-clock]");
-  if (clock) {
-    var fmt;
-    try {
-      fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" });
-    } catch (e) {
-      fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" });
-    }
-    var tick = function () { clock.textContent = fmt.format(new Date()); };
-    tick();
-    setInterval(tick, 15000);
   }
 
   /* ---------- Header state ---------- */
@@ -100,12 +79,11 @@
   }
 
   /* ---------- Scroll-driven details ---------- */
-  var crest = document.querySelector(".hero .crest .spin");
-  var ghost = document.querySelector(".motto .ghost");
-  var archive = document.querySelector(".archive");
-  var track = archive && archive.querySelector(".archive-track");
-  var bar = archive && archive.querySelector(".archive-progress i");
-  var wide = window.matchMedia("(min-width: 801px)");
+  var heroPx = document.querySelector(".hero-media .px");
+  var archive = document.querySelector(".journey");
+  var track = archive && archive.querySelector(".journey-track");
+  var bar = archive && archive.querySelector(".journey-progress i");
+  var wide = window.matchMedia("(min-width: 901px)");
 
   function sizeArchive() {
     if (!archive) return;
@@ -121,11 +99,7 @@
     requestAnimationFrame(function () {
       ticking = false;
       var y = window.scrollY;
-      if (crest && !reduce) crest.style.transform = "rotate(" + (y * 0.04) + "deg)";
-      if (ghost && !reduce) {
-        var r = ghost.getBoundingClientRect();
-        ghost.style.transform = "translate(-50%, -50%) rotate(" + ((r.top - window.innerHeight / 2) * -0.05) + "deg)";
-      }
+      if (heroPx && !reduce && y < window.innerHeight * 1.2) heroPx.style.transform = "translate3d(0," + (y * -0.12) + "px,0)";
       if (archive && wide.matches && !reduce) {
         var rect = archive.getBoundingClientRect();
         var max = archive.offsetHeight - window.innerHeight;
@@ -221,10 +195,10 @@
       delete data._honey;
 
       var endpoint = form.getAttribute("data-endpoint");
-      if (!endpoint) { say("Our correspondence desk opens shortly. Kindly write to hello@crownsmere.com.", true); return; }
+      if (!endpoint) { say("Online enquiries open shortly. Kindly email hello@crownsmere.com or call +44 7384 190760.", true); return; }
 
       sending = true;
-      say("Sealing your request\u2026");
+      say("Sending your request\u2026");
       fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -234,7 +208,7 @@
         .then(function (res) {
           if (!res.ok || String(res.j.success) === "false") throw new Error(res.j.message || "failed");
           form.reset();
-          say("Thank you. Your request has been received, and a member of the house will be in touch personally.");
+          say("Thank you. Your request has been received, and Alaa will be in touch with you personally.");
         })
         .catch(function () {
           say("The post appears delayed. Kindly try again presently, or write to hello@crownsmere.com.", true);
