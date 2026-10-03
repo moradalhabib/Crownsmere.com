@@ -18,6 +18,9 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 - `tools/build.py`: generates all the HTML pages. Edit the content there and run `python3 tools/build.py` (excluded from the website)
 - `mail-filter/`: AI filter for the hello@ inbox, run on cPanel (see `mail-filter/README.md`; excluded from the website by `_config.yml`)
 
+## Design
+A light palette of cream, sand and champagne, with gold accents and navy lettering (no dark sections). The colour tokens are at the top of `assets/style.css`; the comments there note which text colours meet the contrast standard on which backgrounds.
+
 ## Preview locally
 `python3 -m http.server 8000`, then open http://localhost:8000
 

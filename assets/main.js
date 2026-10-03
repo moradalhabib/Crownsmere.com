@@ -43,13 +43,9 @@
 
   /* ---------- Header state ---------- */
   var hd = document.querySelector(".hd");
-  var darkZones = document.querySelectorAll("[data-dark]");
   function onScrollHeader() {
     if (!hd) return;
     hd.classList.toggle("is-scrolled", window.scrollY > 40);
-    var y = hd.offsetHeight / 2, dark = false;
-    darkZones.forEach(function (z) { var r = z.getBoundingClientRect(); if (r.top <= y && r.bottom >= y) dark = true; });
-    hd.classList.toggle("on-dark", dark);
   }
   window.addEventListener("scroll", onScrollHeader, { passive: true });
   onScrollHeader();
