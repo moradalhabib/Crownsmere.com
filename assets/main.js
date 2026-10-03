@@ -166,31 +166,85 @@
     Object.keys(byId).forEach(function (id) { var el = document.getElementById(id); if (el) spy.observe(el); });
   }
 
-  /* ---------- Map: link each neighbourhood in the list to its marker ---------- */
-  var areaItems = document.querySelectorAll(".area[data-area]");
-  if (areaItems.length) {
+  /* ---------- Online map (Leaflet + OpenStreetMap), loaded only when needed ---------- */
+  var mapEl = document.getElementById("map");
+  if (mapEl) {
+    var pins = [];
+    try { pins = JSON.parse(mapEl.getAttribute("data-pins") || "[]"); } catch (e) {}
+    var markers = {};
+
     var pair = function (slug, on) {
-      var mk = document.getElementById("mk-" + slug);
+      var m = markers[slug];
       var li = document.querySelector('.area[data-area="' + slug + '"]');
-      if (mk) mk.classList.toggle("hl", on);
+      if (m && m.getElement()) m.getElement().classList.toggle("hl", on);
       if (li) li.classList.toggle("hl", on);
     };
-    areaItems.forEach(function (li) {
-      var slug = li.getAttribute("data-area");
-      li.addEventListener("mouseenter", function () { pair(slug, true); });
-      li.addEventListener("mouseleave", function () { pair(slug, false); });
-    });
-    document.querySelectorAll(".mk[data-area]").forEach(function (mk) {
-      var slug = mk.getAttribute("data-area");
-      mk.addEventListener("mouseenter", function () { pair(slug, true); });
-      mk.addEventListener("mouseleave", function () { pair(slug, false); });
-      mk.addEventListener("click", function () {
-        var li = document.querySelector('.area[data-area="' + slug + '"]');
-        if (li) li.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
-        pair(slug, true);
-        setTimeout(function () { pair(slug, false); }, 1800);
+
+    var initMap = function () {
+      if (!window.L || mapEl.classList.contains("leaflet-container")) return;
+      var touch = window.matchMedia("(pointer: coarse)").matches;
+      var map = L.map(mapEl, {
+        scrollWheelZoom: false,
+        dragging: !touch,          // keep one-finger page scrolling on phones; pinch still zooms
+        tap: false,
+        zoomSnap: 0.25,
+        attributionControl: true
       });
-    });
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        minZoom: 10,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      var bounds = [];
+      pins.forEach(function (p) {
+        var icon = L.divIcon({ className: "pin", html: "<span>" + p.n + "</span>", iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -16] });
+        var m = L.marker([p.lat, p.lng], { icon: icon, title: p.name, alt: p.name, keyboard: true, riseOnHover: true }).addTo(map);
+        var content = document.createElement("div");
+        content.textContent = p.name;
+        var small = document.createElement("small");
+        small.textContent = "Neighbourhood " + p.n;
+        content.appendChild(small);
+        m.bindPopup(content, { closeButton: true, autoPanPadding: [24, 24] });
+        m.on("mouseover", function () { pair(p.slug, true); });
+        m.on("mouseout", function () { pair(p.slug, false); });
+        m.on("popupopen", function () { pair(p.slug, true); });
+        m.on("popupclose", function () { pair(p.slug, false); });
+        markers[p.slug] = m;
+        bounds.push([p.lat, p.lng]);
+      });
+      if (bounds.length) map.fitBounds(bounds, { padding: [36, 36] });
+      window.addEventListener("resize", function () { map.invalidateSize(); });
+
+      document.querySelectorAll(".area[data-area]").forEach(function (li) {
+        var slug = li.getAttribute("data-area");
+        li.addEventListener("mouseenter", function () { pair(slug, true); });
+        li.addEventListener("mouseleave", function () { pair(slug, false); });
+        li.addEventListener("click", function () {
+          var m = markers[slug];
+          if (!m) return;
+          map.flyTo(m.getLatLng(), Math.max(map.getZoom(), 14), { duration: reduce ? 0 : 0.9 });
+          m.openPopup();
+          if (window.innerWidth < 900) mapEl.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+        });
+      });
+    };
+
+    var loadLeaflet = function () {
+      if (window.L) { initMap(); return; }
+      var sc = document.createElement("script");
+      sc.src = "assets/vendor/leaflet/leaflet.js";
+      sc.onload = initMap;
+      document.head.appendChild(sc);
+    };
+
+    if ("IntersectionObserver" in window) {
+      var mio = new IntersectionObserver(function (entries) {
+        if (entries.some(function (en) { return en.isIntersecting; })) { mio.disconnect(); loadLeaflet(); }
+      }, { rootMargin: "600px 0px" });
+      mio.observe(mapEl);
+    } else {
+      loadLeaflet();
+    }
   }
 
   /* ---------- Magnetic primary buttons (desktop) ---------- */

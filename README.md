@@ -1,6 +1,6 @@
 # Crownsmere.com
 
-Website of **Crownsmere Estate**, Alaa Qadir's private, by-request property service in prime London: clients share a brief and Alaa finds the right property, on and off the market. There are deliberately no property listings. Plain HTML, CSS and JavaScript with no build step, hosted on GitHub Pages at crownsmere.com.
+Website of **Crownsmere Estate**, a private, by-request property service in prime London (Alaa Qadir, Senior Property Consultant): clients share a brief and Crownsmere finds the right property, on and off the market. There are deliberately no property listings. Plain HTML, CSS and JavaScript with no build step, hosted on GitHub Pages at crownsmere.com.
 
 ## Structure
 - `index.html`: home page (monogram intro, hero, approach, services, how it works, where I search, why Crownsmere, questions, share your brief)
@@ -13,7 +13,7 @@ Website of **Crownsmere Estate**, Alaa Qadir's private, by-request property serv
 - `assets/style.css`, `assets/main.js`
 - `assets/fonts/`: Cinzel, Cormorant Garamond and EB Garamond, self-hosted so no visitor data goes to Google
 - `assets/img/`: monogram (transparent gold), photography and skyline taken from the brand materials (WebP with JPEG fallbacks), icons
-- `tools/art.py`: original line illustrations (prime London map, Belgravia terrace elevation, Georgian door), generated as SVG and inlined so they draw themselves on scroll
+- `tools/art.py`: original line illustrations (Belgravia terrace elevation, Georgian door), generated as SVG and inlined so they draw themselves on scroll
 - `tools/build.py`: generates all the HTML pages. Edit the content there and run `python3 tools/build.py` (excluded from the website)
 - `mail-filter/`: AI filter for the hello@ inbox, run on cPanel (see `mail-filter/README.md`; excluded from the website by `_config.yml`)
 
@@ -22,7 +22,18 @@ Website of **Crownsmere Estate**, Alaa Qadir's private, by-request property serv
 
 The monogram intro plays once per browser session. Open a new tab or window to see it again.
 
-The site makes no requests to any other website except FormSubmit when a brief is sent, and sets no cookies.
+The site sets no cookies. The only outside requests are the OpenStreetMap map tiles on the home page (loaded only when the map scrolls into view) and FormSubmit when a brief is sent.
+
+## Security
+- Served over HTTPS only. In the repository's **Settings, Pages**, keep **Enforce HTTPS** ticked; GitHub then redirects all http:// traffic and adds an HSTS header.
+- Every page carries a strict Content Security Policy: scripts, styles and fonts may only come from this site; images also from OpenStreetMap's tile server; form data only to FormSubmit. There is no inline script or style anywhere.
+- Leaflet (the map library) is hosted on the site itself (`assets/vendor/leaflet`, BSD licence) rather than loaded from a CDN.
+- `/.well-known/security.txt` tells researchers how to report a problem.
+- `mail-filter/`, `tools/` and this README are excluded from the published site.
+- `.github/workflows/site-check.yml` checks the live site after every deploy and weekly: certificate validity and expiry, HTTP to HTTPS redirects, security headers, every page, and that private folders are not published.
+
+## Map
+The Where I Search map uses [Leaflet](https://leafletjs.com) with [OpenStreetMap](https://www.openstreetmap.org) tiles (attribution shown on the map, as the licence requires). Neighbourhood coordinates live in `tools/art.py` (`AREAS`).
 
 ## Contact requests
 No telephone number is published on the site: Alaa shares it personally once a brief is received. Visitors reach Crownsmere through the brief form or hello@crownsmere.com.
@@ -35,4 +46,4 @@ No telephone number is published on the site: Alaa shares it personally once a b
 - **One-time activation:** the first real submission triggers an activation email from FormSubmit to hello@crownsmere.com. Click its link, or no enquiries will be delivered. The inbox filter always forwards FormSubmit notices to Alaa.
 
 ## Images
-Each photograph appears once on the site; the About page and the Where I Search map use original line drawings from `tools/art.py`. The photographs were cut from the flyers, so they are fairly low resolution (about 1000px wide). Replacing them with the original high-resolution files, keeping the same names in `assets/img/`, will sharpen the site on large screens.
+Each photograph appears once on the site; the About page uses original line drawings from `tools/art.py`. The photographs were cut from the flyers, so they are fairly low resolution (about 1000px wide). Replacing them with the original high-resolution files, keeping the same names in `assets/img/`, will sharpen the site on large screens.

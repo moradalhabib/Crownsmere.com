@@ -3,11 +3,11 @@
 Three drawings in the house style (navy line, gold accents, ivory paper):
   - elevation(): a Belgravia stucco terrace, as an architectural elevation
   - door():      a Georgian front door study (fanlight, Ionic columns, railings, bay trees)
-  - london_map(): prime London, drawn from real coordinates, with numbered neighbourhoods
+AREAS holds the searched neighbourhoods (used by the online map on the home page).
 
 Every stroked element carries pathLength="1" so the site can "draw" it on scroll.
 Classes: .d (navy line), .dg (gold line), .df (navy fill), .gf (gold fill), .pf (paper fill),
-.t (text). Each group sets --d, the animation delay.
+.t (text). A class wN sets the animation delay to N tenths of a second.
 """
 import math
 
@@ -45,7 +45,7 @@ class Path:
     def svg(self, cls="d", delay=0.0, extra=""):
         if not self.parts:
             return ""
-        return f'<path class="{cls}" style="--d:{delay:.2f}s" pathLength="1" d="{"".join(self.parts)}"{extra}/>'
+        return f'<path class="{cls} w{round(delay * 10)}" pathLength="1" d="{"".join(self.parts)}"{extra}/>'
 
 
 def fill_rect(x, y, w, h, cls):
@@ -361,70 +361,7 @@ def door():
             f'Ionic columns, brass fittings, bay trees in pots and iron railings</title>{body}</svg>')
 
 
-# ==================================================================== map
-LON0, LON1, LAT0, LAT1 = -0.225, -0.095, 51.475, 51.565
-MW, MH = 900, 1000
-
-
-def P_(lon, lat):
-    return ((lon - LON0) / (LON1 - LON0) * MW, (LAT1 - lat) / (LAT1 - LAT0) * MH)
-
-
-def smooth(pts):
-    """Catmull-Rom through points -> cubic Bezier path data."""
-    p = [P_(*q) for q in pts]
-    d = f"M{f(p[0][0])} {f(p[0][1])}"
-    for i in range(len(p) - 1):
-        p0 = p[i - 1] if i > 0 else p[i]
-        p1, p2 = p[i], p[i + 1]
-        p3 = p[i + 2] if i + 2 < len(p) else p2
-        c1 = (p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6)
-        c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
-        d += f"C{f(c1[0])} {f(c1[1])} {f(c2[0])} {f(c2[1])} {f(p2[0])} {f(p2[1])}"
-    return d
-
-
-def closed(pts):
-    p = [P_(*q) for q in pts]
-    return "M" + "L".join(f"{f(x)} {f(y)}" for x, y in p) + "Z"
-
-
-THAMES = [(-0.190, 51.468), (-0.183, 51.4745), (-0.176, 51.479), (-0.170, 51.4815), (-0.1615, 51.4840),
-          (-0.150, 51.4858), (-0.138, 51.4865), (-0.127, 51.4880), (-0.1225, 51.4930), (-0.1215, 51.5005),
-          (-0.1195, 51.5065), (-0.113, 51.5095), (-0.104, 51.5098), (-0.093, 51.5085)]
-
-PARKS = {
-    "Hyde Park": [(-0.1755, 51.5115), (-0.1585, 51.5135), (-0.1530, 51.5035), (-0.1585, 51.5025),
-                  (-0.1755, 51.5050)],
-    "Kensington Gardens": [(-0.1880, 51.5115), (-0.1755, 51.5115), (-0.1755, 51.5050), (-0.1765, 51.5018),
-                           (-0.1880, 51.5022)],
-    "Regent’s Park": "circle",
-    "Green Park": [(-0.1500, 51.5045), (-0.1415, 51.5075), (-0.1395, 51.5035), (-0.1480, 51.5020)],
-    "St James’s Park": [(-0.1395, 51.5035), (-0.1290, 51.5040), (-0.1285, 51.5010), (-0.1385, 51.5005)],
-    "Holland Park": [(-0.2075, 51.5050), (-0.2010, 51.5055), (-0.2005, 51.5005), (-0.2070, 51.5000)],
-    "Battersea Park": [(-0.1655, 51.4810), (-0.1505, 51.4830), (-0.1490, 51.4770), (-0.1640, 51.4755)],
-    "Hampstead Heath": [(-0.1800, 51.5700), (-0.1480, 51.5700), (-0.1480, 51.5600), (-0.1560, 51.5555),
-                        (-0.1680, 51.5545), (-0.1790, 51.5580)],
-}
-
-ROADS = [
-    [(-0.2050, 51.5093), (-0.1880, 51.5118), (-0.1585, 51.5135)],                 # Bayswater Rd
-    [(-0.1585, 51.5135), (-0.1420, 51.5150), (-0.1310, 51.5163)],                 # Oxford St
-    [(-0.1585, 51.5135), (-0.1530, 51.5035)],                                     # Park Lane
-    [(-0.1530, 51.5035), (-0.1420, 51.5070), (-0.1340, 51.5100)],                 # Piccadilly
-    [(-0.1530, 51.5030), (-0.1620, 51.5015), (-0.1800, 51.5015), (-0.1930, 51.5010), (-0.2060, 51.4995)],
-    [(-0.1620, 51.5015), (-0.1690, 51.4960), (-0.1760, 51.4930)],                 # Brompton Rd
-    [(-0.1600, 51.5015), (-0.1575, 51.4925)],                                     # Sloane St
-    [(-0.1575, 51.4925), (-0.1690, 51.4875), (-0.1830, 51.4815)],                 # King's Rd
-    [(-0.1720, 51.5210), (-0.1550, 51.5225), (-0.1350, 51.5250)],                 # Marylebone Rd
-    [(-0.1585, 51.5135), (-0.1720, 51.5250), (-0.1790, 51.5350)],                 # Edgware Rd
-    [(-0.1760, 51.5320), (-0.1800, 51.5480), (-0.1830, 51.5600)],                 # Finchley Rd
-    [(-0.2050, 51.5093), (-0.2180, 51.5050)],                                     # Holland Park Ave
-    [(-0.1415, 51.5180), (-0.1360, 51.5105)],                                     # Regent St
-    [(-0.1530, 51.5030), (-0.1440, 51.4960), (-0.1360, 51.4930)],                 # Grosvenor Pl / Victoria
-    [(-0.1690, 51.4960), (-0.1650, 51.4850)],                                     # Sloane Ave / Oakley
-]
-
+# ==================================================================== neighbourhoods
 # name, lon, lat, label dx, dy, anchor
 AREAS = [
     ("Mayfair", -0.1470, 51.5100, 16, 4, "start"),
@@ -444,91 +381,11 @@ def area_slug(name):
     return "".join(ch for ch in name.lower().replace("’", "") if ch.isalnum() or ch == " ").replace(" ", "-")
 
 
-def london_map():
-    out = []
-    # Faint graticule
-    g = Path()
-    for k in range(1, 9):
-        g.line(k * MW / 9, 0, k * MW / 9, MH)
-    for k in range(1, 10):
-        g.line(0, k * MH / 10, MW, k * MH / 10)
-    out.append(g.svg("grid", 0.0))
-    # Parks
-    parks = []
-    for name, pts in PARKS.items():
-        if pts == "circle":
-            x, y = P_(-0.1530, 51.5290)
-            parks.append(f'<ellipse class="park" cx="{f(x)}" cy="{f(y)}" rx="64" ry="62" pathLength="1" style="--d:0.4s"/>')
-            parks.append(f'<ellipse class="d thin" cx="{f(x)}" cy="{f(y)}" rx="34" ry="32" pathLength="1" style="--d:0.8s"/>')
-        else:
-            parks.append(f'<path class="park" style="--d:0.4s" pathLength="1" d="{closed(pts)}"/>')
-    # Serpentine and Round Pond
-    serp = smooth([(-0.1720, 51.5085), (-0.1660, 51.5068), (-0.1600, 51.5052)])
-    parks.append(f'<path class="water-line" style="--d:0.9s" pathLength="1" d="{serp}"/>')
-    rx, ry = P_(-0.1815, 51.5060)
-    parks.append(f'<ellipse class="water" cx="{f(rx)}" cy="{f(ry)}" rx="9" ry="7"/>')
-    out.append("<g>" + "".join(parks) + "</g>")
-    # Roads
-    out.append("".join(f'<path class="road" style="--d:{0.6 + 0.05 * i:.2f}s" pathLength="1" d="{smooth(r)}"/>'
-                       for i, r in enumerate(ROADS)))
-    # The Thames: dark bank stroke beneath a paler water stroke
-    th = smooth(THAMES)
-    out.append(f'<path class="river-bank" style="--d:0.2s" pathLength="1" d="{th}"/>'
-               f'<path class="river" style="--d:0.3s" pathLength="1" d="{th}"/>')
-    # Park + river labels
-    labels = [("Hyde Park", -0.1665, 51.5095), ("Kensington", -0.1825, 51.5085), ("Gardens", -0.1825, 51.5068),
-              ("Regent’s Park", -0.1530, 51.5270), ("Green Park", -0.1440, 51.5047),
-              ("Battersea Park", -0.1570, 51.4795), ("Hampstead Heath", -0.1640, 51.5620),
-              ("River Thames", -0.1330, 51.4835)]
-    out.append("".join(f'<text class="t park-t" x="{f(P_(lo, la)[0])}" y="{f(P_(lo, la)[1])}" text-anchor="middle">{n}</text>'
-                       for n, lo, la in labels))
-    # Neighbourhood markers
-    marks = []
-    for i, (name, lo, la, dx, dy, anchor) in enumerate(AREAS):
-        x, y = P_(lo, la)
-        slug = area_slug(name)
-        marks.append(
-            f'<g class="mk" id="mk-{slug}" data-area="{slug}" style="--d:{1.4 + 0.08 * i:.2f}s">'
-            f'<circle class="mk-halo" cx="{f(x)}" cy="{f(y)}" r="20"/>'
-            f'<circle class="mk-dot" cx="{f(x)}" cy="{f(y)}" r="11"/>'
-            f'<text class="t mk-n" x="{f(x)}" y="{f(y + 3.6)}" text-anchor="middle">{i + 1:02d}</text>'
-            f'<text class="t mk-l" x="{f(x + dx)}" y="{f(y + dy)}" text-anchor="{anchor}">{name.upper()}</text></g>')
-    out.append("".join(marks))
-    # Compass rose and scale bar
-    cx, cy = 92, 900
-    comp = Path()
-    comp.circle(cx, cy, 34, 40)
-    comp.circle(cx, cy, 28, 40)
-    comp.poly([(cx, cy - 44), (cx + 7, cy), (cx, cy + 44), (cx - 7, cy)], close=True)
-    comp.poly([(cx - 44, cy), (cx, cy - 6), (cx + 44, cy), (cx, cy + 6)], close=True)
-    out.append(comp.svg("dg", 1.6) + f'<text class="t comp-n" x="{cx}" y="{cy - 50}" text-anchor="middle">N</text>')
-    half_mile = 0.5 * 1609.34 / (111320 * math.cos(math.radians(51.5))) / (LON1 - LON0) * MW
-    sb = Path()
-    sx, sy = 640, 950
-    sb.line(sx, sy, sx + half_mile * 2, sy)
-    for k in range(3):
-        sb.line(sx + k * half_mile, sy - 6, sx + k * half_mile, sy + 6)
-    out.append(sb.svg("d", 1.6) +
-               f'<text class="t scale-t" x="{f(sx)}" y="{sy + 22}">0</text>'
-               f'<text class="t scale-t" x="{f(sx + half_mile)}" y="{sy + 22}" text-anchor="middle">½</text>'
-               f'<text class="t scale-t" x="{f(sx + 2 * half_mile)}" y="{sy + 22}" text-anchor="middle">1 mile</text>')
-    # Cartouche
-    out.append('<g class="cart"><rect class="pf" x="610" y="40" width="250" height="96"/>'
-               '<rect class="d thin" style="--d:1.5s" pathLength="1" x="610" y="40" width="250" height="96"/>'
-               '<rect class="dg" style="--d:1.7s" pathLength="1" x="618" y="48" width="234" height="80"/>'
-               '<text class="t cart-t" x="735" y="86" text-anchor="middle">PRIME LONDON</text>'
-               '<text class="t cart-s" x="735" y="112" text-anchor="middle">Where I search</text></g>')
-    return (f'<svg class="art art-map" viewBox="0 0 {MW} {MH}" role="img" aria-labelledby="map-t">'
-            f'<title id="map-t">Illustrated map of prime London showing the River Thames, Hyde Park, '
-            f'Regent’s Park and the ten neighbourhoods searched: '
-            + ", ".join(a[0] for a in AREAS) + "</title>" + "".join(out) + "</svg>")
-
-
 if __name__ == "__main__":
     import os
     here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.makedirs(os.path.join(here, "assets", "art"), exist_ok=True)
-    for name, fn in (("elevation", elevation), ("door", door), ("london-map", london_map)):
+    for name, fn in (("elevation", elevation), ("door", door)):
         svg = fn().replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ', 1)
         open(os.path.join(here, "assets", "art", name + ".svg"), "w").write(svg)
     print("ok")

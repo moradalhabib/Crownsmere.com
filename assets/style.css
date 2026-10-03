@@ -1048,7 +1048,7 @@ picture { display: contents; }
    ========================================================================== */
 
 .art { display: block; width: 100%; height: auto; overflow: visible; color: var(--navy); }
-.art .d, .art .dg, .art .park, .art .road, .art .river, .art .river-bank, .art .water-line, .art .grid {
+.art .d, .art .dg {
   fill: none; stroke-linecap: round; stroke-linejoin: round;
   stroke-dasharray: 1; stroke-dashoffset: 1;
   transition: stroke-dashoffset 2.8s var(--ease-slow) var(--d, 0s);
@@ -1064,44 +1064,15 @@ picture { display: contents; }
 .art .fanno { font-family: var(--caps); font-size: 15px; fill: var(--gold); letter-spacing: 0.08em; }
 .art-door .panels, .art-door .dg { stroke-width: 1.1; }
 
-/* map */
-.art .grid { stroke: rgba(14, 27, 46, 0.06); stroke-width: 1; transition-duration: 1.6s; }
-.art .park { stroke: rgba(70, 92, 60, 0.55); stroke-width: 1; fill: rgba(120, 140, 100, 0); transition: stroke-dashoffset 2.4s var(--ease-slow) var(--d), fill 1.6s var(--ease) 1.6s; }
-.art .road { stroke: rgba(14, 27, 46, 0.22); stroke-width: 2.2; transition-duration: 2.2s; }
-.art .river-bank { stroke: rgba(14, 27, 46, 0.55); stroke-width: 30; transition-duration: 3s; }
-.art .river { stroke: #dfe3e2; stroke-width: 27.5; transition-duration: 3s; }
-.art .water-line { stroke: #b9c4c6; stroke-width: 7; }
-.art .water { fill: #c9d2d3; opacity: 0; transition: opacity 1s 1.4s; }
-.art .park-t { font-family: var(--display); font-style: italic; font-size: 17px; fill: rgba(60, 78, 52, 0.9); }
-.art .comp-n { font-family: var(--caps); font-size: 15px; fill: var(--gold-text); }
-.art .scale-t { font-family: var(--caps); font-size: 12px; fill: var(--ink-soft); letter-spacing: 0.1em; }
-.art .cart-t { font-family: var(--caps); font-size: 21px; letter-spacing: 0.24em; fill: var(--navy); }
-.art .cart-s { font-family: var(--display); font-style: italic; font-size: 20px; fill: var(--gold-text); }
-.art .cart .pf { opacity: 0; transition: opacity 1s 1.4s; }
-.art .mk { opacity: 0; transform: translateY(6px); transform-box: fill-box; transition: opacity 0.9s var(--ease) var(--d), transform 0.9s var(--ease) var(--d); cursor: pointer; }
-.art .mk .t { opacity: 1; transition: fill 0.4s; }
-.art .mk-halo { fill: var(--gold); opacity: 0; transform-origin: center; transform-box: fill-box; transform: scale(0.4); transition: opacity 0.5s, transform 0.6s var(--ease); }
-.art .mk-dot { fill: var(--navy); stroke: var(--gold-light); stroke-width: 1.5; transition: fill 0.4s; }
-.art .mk-n { font-family: var(--caps); font-size: 9px; fill: var(--gold-light); letter-spacing: 0.04em; }
-.art .mk-l { font-family: var(--caps); font-size: 13.5px; letter-spacing: 0.16em; fill: var(--navy); paint-order: stroke; stroke: var(--ivory); stroke-width: 5px; stroke-linejoin: round; }
-.art .mk.hl .mk-halo { opacity: 0.25; transform: scale(1); }
-.art .mk.hl .mk-dot { fill: var(--gold); }
-.art .mk.hl .mk-n { fill: var(--navy-deep); }
-.art .mk.hl .mk-l { fill: var(--gold-text); }
-
 /* drawn state */
-.art-wrap.in .art .d, .art-wrap.in .art .dg, .art-wrap.in .art .park, .art-wrap.in .art .road,
-.art-wrap.in .art .river, .art-wrap.in .art .river-bank, .art-wrap.in .art .water-line, .art-wrap.in .art .grid { stroke-dashoffset: 0; }
-.art-wrap.in .art .df, .art-wrap.in .art .gf, .art-wrap.in .art .t, .art-wrap.in .art .water, .art-wrap.in .art .cart .pf { opacity: 1; }
-.art-wrap.in .art .park { fill: rgba(120, 140, 100, 0.13); }
-.art-wrap.in .art .mk { opacity: 1; transform: none; }
-.no-js .art .d, .no-js .art .dg, .no-js .art .park, .no-js .art .road, .no-js .art .river, .no-js .art .river-bank, .no-js .art .water-line, .no-js .art .grid { stroke-dashoffset: 0; }
-.no-js .art .df, .no-js .art .gf, .no-js .art .t, .no-js .art .mk, .no-js .art .water { opacity: 1; }
+.art-wrap.in .art .d, .art-wrap.in .art .dg { stroke-dashoffset: 0; }
+.art-wrap.in .art .df, .art-wrap.in .art .gf, .art-wrap.in .art .t { opacity: 1; }
+.no-js .art .d, .no-js .art .dg { stroke-dashoffset: 0; }
+.no-js .art .df, .no-js .art .gf, .no-js .art .t { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .art .d, .art .dg, .art .park, .art .road, .art .river, .art .river-bank, .art .water-line, .art .grid { stroke-dashoffset: 0; transition: none; }
-  .art .df, .art .gf, .art .t, .art .mk, .art .water, .art .cart .pf { opacity: 1; transition: none; }
+  .art .d, .art .dg { stroke-dashoffset: 0; transition: none; }
+  .art .df, .art .gf, .art .t { opacity: 1; transition: none; }
 }
-.art-map { overflow: hidden; }
 
 /* ---------- Placing the illustrations ---------- */
 
@@ -1136,11 +1107,63 @@ picture { display: contents; }
   .pillars-4 { grid-template-columns: 1fr; }
   .pillars-4 .pillar { padding-left: 0 !important; border-left: 0 !important; }
 }
-@media (max-width: 640px) {
-  .art .mk-l { display: none; }
-  .art .mk-dot { r: 19px; stroke-width: 2.5; }
-  .art .mk-halo { r: 30px; }
-  .art .mk-n { font-size: 17px; transform: translateY(3px); }
-  .art .park-t { font-size: 24px; }
-  .art .comp-n, .art .scale-t { font-size: 20px; }
+
+
+/* Utility classes (replace inline styles, for the Content Security Policy) */
+.lede-sm { font-size: clamp(22px, 2vw, 30px); color: var(--ink-soft); }
+.m0 { margin: 0; }
+.mt-44 { margin-top: 44px; }
+
+/* ---------- Online map (Leaflet + OpenStreetMap) ---------- */
+.map-fig { padding: clamp(8px, 1vw, 14px); }
+.map-fig figcaption { padding: 12px 4px 2px; color: var(--ink-mute); }
+.map { position: relative; z-index: 0; width: 100%; aspect-ratio: 4 / 5; max-height: 78vh; min-height: 380px; background: #e9e4d8; font-family: var(--body); }
+.map-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--ink-soft); text-decoration: none; }
+.map.leaflet-container .map-fallback { display: none; }
+.map .leaflet-tile-pane { filter: grayscale(1) sepia(0.28) contrast(0.94) brightness(1.04); }
+.map .leaflet-control-attribution { font-size: 10px; background: rgba(251, 248, 242, 0.88); color: var(--ink-soft); }
+.map .leaflet-control-attribution a { color: var(--ink); }
+.map .leaflet-bar { border: 1px solid var(--rule); box-shadow: none; border-radius: 0; }
+.map .leaflet-bar a { width: 40px; height: 40px; line-height: 40px; border-radius: 0 !important; color: var(--navy); background: var(--vellum); font-family: var(--display); font-size: 22px; }
+.map .leaflet-bar a:hover { background: var(--navy); color: var(--ivory); }
+.pin { background: none; border: 0; }
+.pin span {
+  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--navy); color: var(--gold-light); border: 2px solid var(--gold-light);
+  font-family: var(--caps); font-size: 11px; letter-spacing: 0.04em;
+  box-shadow: 0 6px 14px rgba(8, 17, 31, 0.28);
+  transition: transform 0.4s var(--ease), background 0.3s, color 0.3s;
+}
+.pin.hl span, .pin:hover span { background: var(--gold); color: var(--navy-deep); border-color: var(--navy); transform: scale(1.18); }
+.pin.hl { z-index: 1000 !important; }
+.map .leaflet-popup-content-wrapper { border-radius: 0; background: var(--vellum); color: var(--ink); box-shadow: 0 14px 30px rgba(8, 17, 31, 0.2); }
+.map .leaflet-popup-tip { background: var(--vellum); }
+.map .leaflet-popup-content { margin: 14px 18px; font-family: var(--display); font-size: 20px; line-height: 1.2; }
+.map .leaflet-popup-content small { display: block; margin-top: 4px; font-family: var(--caps); font-size: 9.5px; letter-spacing: 0.24em; color: var(--gold-text); }
+.map .leaflet-container a.leaflet-popup-close-button { width: 32px; height: 32px; font-size: 20px; }
+@media (max-width: 900px) { .map { aspect-ratio: 1 / 1; max-height: none; } .map-fig figcaption { display: none; } }
+
+/* Animation delays for the line drawings (class wN = N tenths of a second) */
+.w0{--d:0s}.w1{--d:0.1s}.w2{--d:0.2s}.w3{--d:0.3s}.w4{--d:0.4s}.w5{--d:0.5s}.w6{--d:0.6s}.w7{--d:0.7s}.w8{--d:0.8s}.w9{--d:0.9s}.w10{--d:1s}.w11{--d:1.1s}.w12{--d:1.2s}.w13{--d:1.3s}.w14{--d:1.4s}.w15{--d:1.5s}.w16{--d:1.6s}.w17{--d:1.7s}.w18{--d:1.8s}.w19{--d:1.9s}.w20{--d:2s}.w21{--d:2.1s}.w22{--d:2.2s}.w23{--d:2.3s}.w24{--d:2.4s}.w25{--d:2.5s}.w26{--d:2.6s}.w27{--d:2.7s}.w28{--d:2.8s}.w29{--d:2.9s}.w30{--d:3s}.w31{--d:3.1s}.w32{--d:3.2s}.w33{--d:3.3s}.w34{--d:3.4s}.w35{--d:3.5s}.w36{--d:3.6s}.w37{--d:3.7s}.w38{--d:3.8s}.w39{--d:3.9s}.w40{--d:4s}
+.area { display: block; padding: 0; }
+.area-btn {
+  display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto; column-gap: 18px;
+  width: 100%; padding: 26px 0 24px; text-align: left;
+  background: none; border: 0; color: inherit; font: inherit; cursor: pointer;
+}
+.area-btn:focus-visible { outline: 1px solid var(--gold); outline-offset: -1px; }
+.areas-wrap > * { min-width: 0; }
+@media (max-width: 900px) { .map { min-height: 0; width: 100%; } }
+.map.leaflet-touch .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; font-size: 24px; }
+.map.leaflet-touch .leaflet-control-zoom { border: 1px solid var(--rule); }
+/* Phones held sideways (short screens): the bottom bar would cover too much of the page */
+@media (max-height: 500px) and (orientation: landscape) {
+  .actionbar { display: none !important; }
+  body { padding-bottom: 0; }
+  .hero-copy { padding-top: 96px; }
+}
+/* Very small phones: keep step labels on one line */
+@media (max-width: 360px) {
+  .steps-nav li { font-size: 9px; letter-spacing: 0.1em; }
+  .steps-nav li::before { content: "0" counter(s) "\00a0"; }
 }
