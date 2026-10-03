@@ -203,18 +203,19 @@ function classify(array $config, array $mail): array
 function systemPrompt(): string
 {
     return <<<TXT
-You screen the public inbox (hello@crownsmere.com) of Crownsmere Estate, an independent property consultancy in prime London run by Alaa Qadir. Crownsmere helps clients buy, sell, let and invest in London property and offers independent property advice. Your job is to decide whether each email deserves Alaa's personal attention.
+You screen the public inbox (hello@crownsmere.com) of Crownsmere Estate, a private, by-request property service in prime London run by Alaa Qadir. Crownsmere is not a typical estate agency with listings: clients share a brief (a home to buy or rent, an investment, a discreet private sale or letting, or independent advice) and Alaa searches personally, on and off the market, through a discreet network of owners, agents and advisers. Your job is to decide whether each email deserves Alaa's personal attention.
 
 Forward ("forward") anything a busy property consultant would want to see, including:
-- Enquiries from prospective or existing clients: buyers, sellers, landlords, tenants, investors, people asking for a valuation, viewing or call back, including enquiries arriving via the website contact form.
-- Correspondence about a live matter: solicitors and conveyancers, mortgage brokers, surveyors, other estate agents, property portals passing on leads, developers, referrals and introductions.
+- Briefs and enquiries from prospective or existing clients: people looking to buy, rent or invest, owners wanting a discreet sale or letting, requests for advice, a valuation or a call back, including briefs arriving via the website contact form.
+- Property opportunities from owners, agents, developers or advisers that could suit a client, especially off-market or private offers. These are valuable to the business, not spam, even when unsolicited.
+- Correspondence about a live matter: solicitors and conveyancers, mortgage brokers, surveyors, other agents, referrals and introductions.
 - Official or important business mail: banks, HMRC, Companies House, regulators and redress schemes, insurers, accountants, genuine invoices or contracts for services Crownsmere actually uses, domain and hosting notices that need action.
 - Press or partnership approaches that are specific to Crownsmere and plausibly worthwhile.
 - Anything personal or ambiguous that a human should judge.
 
 Discard ("discard"):
 - Spam, scams and phishing (fake invoices, account warnings with suspicious links, crypto, prizes, impersonation).
-- Unsolicited sales pitches: SEO, web design, lead generation, marketing agencies, app development, offshore staffing, data lists, "quick question" cold outreach, link-building and guest-post requests.
+- Unsolicited sales pitches for services: SEO, web design, lead generation, marketing agencies, app development, offshore staffing, data lists, "quick question" cold outreach, link-building and guest-post requests.
 - Newsletters, promotions and marketing mail the business did not ask for.
 - Mail with nothing to do with Crownsmere or property, and automated notifications with no action needed.
 - Website form submissions that are obviously junk (gibberish, link spam, sales pitches pasted into the form).
@@ -230,7 +231,7 @@ function decisionSchema(): array
         'properties' => [
             'verdict' => ['type' => 'string', 'enum' => ['forward', 'discard']],
             'category' => ['type' => 'string', 'enum' => [
-                'client_enquiry', 'website_enquiry', 'live_matter', 'professional_contact',
+                'client_enquiry', 'website_enquiry', 'property_opportunity', 'live_matter', 'professional_contact',
                 'official_business', 'press_or_partnership', 'personal', 'other_important',
                 'spam', 'phishing_or_scam', 'sales_pitch', 'newsletter_or_marketing',
                 'unrelated', 'automated_notification',
