@@ -1,0 +1,3 @@
+exclude:
+  - mail-filter
+  - README.md

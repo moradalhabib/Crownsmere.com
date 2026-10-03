@@ -1,0 +1,25 @@
+From: Sarah Whitfield <sarah.whitfield@example.com>
+To: hello@crownsmere.com
+Subject: Selling our house in Chelsea
+Date: Fri, 02 Oct 2026 09:14:00 +0100
+Message-ID: <test-1@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hello Alaa,
+
+We are thinking of selling our four-bedroom townhouse off the King=E2=80=99s =
+Road in the spring and would like a valuation. Could you call me on 07700 90=
+0123 next week?
+
+Kind regards,
+Sarah
+--b1
+Content-Type: text/html; charset=UTF-8
+
+<p>Hello Alaa,</p><p>We are thinking of selling...</p>
+--b1--
