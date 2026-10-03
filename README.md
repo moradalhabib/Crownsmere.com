@@ -13,6 +13,7 @@ Website of **Crownsmere Estate**, Alaa Qadir's private, by-request property serv
 - `assets/style.css`, `assets/main.js`
 - `assets/fonts/`: Cinzel, Cormorant Garamond and EB Garamond, self-hosted so no visitor data goes to Google
 - `assets/img/`: monogram (transparent gold), photography and skyline taken from the brand materials (WebP with JPEG fallbacks), icons
+- `tools/build.py`: generates all the HTML pages. Edit the content there and run `python3 tools/build.py` (excluded from the website)
 - `mail-filter/`: AI filter for the hello@ inbox, run on cPanel (see `mail-filter/README.md`; excluded from the website by `_config.yml`)
 
 ## Preview locally
