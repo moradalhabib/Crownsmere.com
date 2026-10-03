@@ -6,10 +6,6 @@ All page content lives in this file. Edit it, then run:  python3 tools/build.py
 import json
 import os
 import re
-import sys
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import art  # noqa: E402  original line illustrations
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://crownsmere.com"
@@ -249,6 +245,13 @@ FAQ = [
      "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."),
 ]
 
+# Map coordinates (longitude, latitude) for each neighbourhood in AREAS, in the same order
+AREA_COORDS = [(-0.1470, 51.5100), (-0.1530, 51.4975), (-0.1650, 51.4995), (-0.1680, 51.4880), (-0.1910, 51.4980),
+               (-0.2060, 51.5070), (-0.2000, 51.5150), (-0.1530, 51.5190), (-0.1740, 51.5340), (-0.1780, 51.5530)]
+
+def area_slug(name):
+    return "".join(ch for ch in name.lower().replace("\u2019", "") if ch.isalnum() or ch == " ").replace(" ", "-")
+
 def strip_tags(s):
     return re.sub(r"<[^>]+>", "", s).replace("&ldquo;", "“").replace("&rdquo;", "”").replace("&rsquo;", "’")
 
@@ -278,11 +281,11 @@ def pillars(quote="The finest homes rarely need to be advertised.", media=True):
 
 def areas():
     items = "".join(
-        f'<li class="area" data-area="{art.area_slug(strip_tags(n))}" data-reveal><button type="button" class="area-btn" aria-label="Show {strip_tags(n)} on the map"><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></button></li>'
+        f'<li class="area" data-area="{area_slug(strip_tags(n))}" data-reveal><button type="button" class="area-btn" aria-label="Show {strip_tags(n)} on the map"><span class="an-n">{i + 1:02d}</span><span class="an">{n}</span><span class="ad">{d}</span></button></li>'
         for i, (n, d) in enumerate(AREAS)
     )
-    pins = [{"slug": art.area_slug(strip_tags(n)), "name": strip_tags(n), "n": f"{i + 1:02d}",
-             "lat": a[2], "lng": a[1]} for i, ((n, d), a) in enumerate(zip(AREAS, art.AREAS))]
+    pins = [{"slug": area_slug(strip_tags(n)), "name": strip_tags(n), "n": f"{i + 1:02d}",
+             "lat": a[1], "lng": a[0]} for i, ((n, d), a) in enumerate(zip(AREAS, AREA_COORDS))]
     data = json.dumps(pins, ensure_ascii=False).replace('"', "&quot;")
     return (f'<div class="areas-wrap"><figure class="map-fig" data-reveal>'
             f'<div class="map" id="map" data-pins="{data}" role="region" aria-label="Map of the prime London neighbourhoods searched">'
@@ -322,12 +325,10 @@ def band(text, cite="Discretion &middot; Expertise &middot; Results"):
   </blockquote>
 </section>'''
 
-def drawing(svg, caption, cls=""):
-    return f'<figure class="art-wrap drawing {cls}" data-reveal>{svg}<figcaption class="caps">{caption}</figcaption></figure>'
-
-def statement_figure(caption):
+def statement_figure(caption, photo=("door", "A black-lacquered front door with brass fittings beside white columns", 433, 610)):
+    name, alt, w, h = photo
     return (f'<figure class="reveal-img" data-reveal><div class="frame">'
-            f'{pic("door", "A black-lacquered front door with brass fittings beside white columns", 433, 610)}'
+            f'{pic(name, alt, w, h)}'
             f'</div><figcaption class="caps">{caption}</figcaption></figure>')
 
 # ---------------------------------------------------------------- home
@@ -524,7 +525,7 @@ about_body = f'''
 <section class="section tight">
   <div class="wrap">
     <div class="statement">
-      {drawing(art.door(), "Drawing &middot; A Belgravia front door", "door-fig")}
+      {statement_figure("Westminster", ("westminster", "View through tall French windows across a wrought-iron balcony to Big Ben and the Palace of Westminster", 420, 480))}
       <div class="copy">
         <p class="lede dropcap" data-reveal>As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
         <div class="cols" data-reveal>
@@ -534,12 +535,6 @@ about_body = f'''
         <div class="signature" data-reveal><b>Alaa Qadir</b><span class="caps">Senior Property Consultant &middot; {BRAND}</span></div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="section tight elevation-sec">
-  <div class="wrap">
-    {drawing(art.elevation(), "Elevation study &middot; A Belgravia terrace", "elev-fig")}
   </div>
 </section>
 
