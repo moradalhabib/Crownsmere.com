@@ -166,6 +166,33 @@
     Object.keys(byId).forEach(function (id) { var el = document.getElementById(id); if (el) spy.observe(el); });
   }
 
+  /* ---------- Map: link each neighbourhood in the list to its marker ---------- */
+  var areaItems = document.querySelectorAll(".area[data-area]");
+  if (areaItems.length) {
+    var pair = function (slug, on) {
+      var mk = document.getElementById("mk-" + slug);
+      var li = document.querySelector('.area[data-area="' + slug + '"]');
+      if (mk) mk.classList.toggle("hl", on);
+      if (li) li.classList.toggle("hl", on);
+    };
+    areaItems.forEach(function (li) {
+      var slug = li.getAttribute("data-area");
+      li.addEventListener("mouseenter", function () { pair(slug, true); });
+      li.addEventListener("mouseleave", function () { pair(slug, false); });
+    });
+    document.querySelectorAll(".mk[data-area]").forEach(function (mk) {
+      var slug = mk.getAttribute("data-area");
+      mk.addEventListener("mouseenter", function () { pair(slug, true); });
+      mk.addEventListener("mouseleave", function () { pair(slug, false); });
+      mk.addEventListener("click", function () {
+        var li = document.querySelector('.area[data-area="' + slug + '"]');
+        if (li) li.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+        pair(slug, true);
+        setTimeout(function () { pair(slug, false); }, 1800);
+      });
+    });
+  }
+
   /* ---------- Magnetic primary buttons (desktop) ---------- */
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce) {
     document.querySelectorAll(".btn-gold").forEach(function (btn) {
