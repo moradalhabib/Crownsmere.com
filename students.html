@@ -125,7 +125,17 @@
           <div class="std-actions"><button class="btn btn-quiet" type="button" data-back>Back</button><button class="btn btn-gold" type="submit">Send my enquiry →</button></div>
         </div>
         <div class="std-sent" tabindex="-1" hidden><h3>Your enquiry has been sent.</h3><p>Thank you. Your enquiry has been sent to Crownsmere Estate. Alaa will be in touch.</p><a href="index.html">Return home</a></div>
-        <p class="std-status" data-invalid="Please complete the required fields." data-phone="Please check the phone number (7–15 digits)." data-sending="Sending your enquiry…" data-error="We couldn't send your enquiry just now. Please try again or email hello@crownsmere.com." role="status" aria-live="polite"></p>
+        <p class="std-status" data-invalid="Please complete the required fields." data-phone="Please check the phone number (7–15 digits)." data-sending="Sending your enquiry…" data-error="Online delivery could not be confirmed. Your answers have been kept below." role="status" aria-live="polite"></p>
+        <section class="std-fallback" tabindex="-1" hidden aria-label="Alternative enquiry delivery">
+          <h4>Keep your enquiry — send it by email</h4>
+          <p>Online delivery was not confirmed. Your answers are still here. Open your email app and press <strong>Send</strong>, or copy the complete enquiry to send it manually. Crownsmere has not received it through this form.</p>
+          <div class="std-fallback-actions">
+            <a class="btn btn-gold std-email-link" data-email-fallback href="mailto:hello@crownsmere.com">Open email app →</a>
+            <button class="btn btn-quiet" type="button" data-copy-fallback>Copy completed enquiry</button>
+          </div>
+          <p class="std-copy-feedback" data-copy-feedback aria-live="polite"></p>
+          <label class="std-copy-label" hidden>Your completed enquiry<textarea class="std-copy-text" data-copy-text rows="7" readonly></textarea></label>
+        </section>
       </form>
     </div>
     <aside class="student-advice">
@@ -194,7 +204,17 @@
           <div class="std-actions"><button class="btn btn-quiet" type="button" data-back>السابق</button><button class="btn btn-gold" type="submit">إرسال الطلب →</button></div>
         </div>
         <div class="std-sent" tabindex="-1" hidden><h3>تم إرسال طلبك.</h3><p>شكراً لك. تم إرسال طلبك إلى Crownsmere Estate وستتواصل معك علا.</p><a href="index.html">العودة للرئيسية</a></div>
-        <p class="std-status" data-invalid="يرجى تعبئة الحقول المطلوبة." data-phone="يرجى التأكد من رقم الهاتف (7 إلى 15 رقماً)." data-sending="جارٍ إرسال الطلب…" data-error="تعذر إرسال الطلب حالياً. حاول مرة أخرى أو راسل hello@crownsmere.com." role="status" aria-live="polite"></p>
+        <p class="std-status" data-invalid="يرجى تعبئة الحقول المطلوبة." data-phone="يرجى التأكد من رقم الهاتف (7 إلى 15 رقماً)." data-sending="جارٍ إرسال الطلب…" data-error="لم نتمكن من تأكيد إرسال الطلب. ما زالت إجاباتك محفوظة أدناه." role="status" aria-live="polite"></p>
+        <section class="std-fallback" tabindex="-1" hidden aria-label="طريقة بديلة لإرسال الاستفسار">
+          <h4>احتفظ بطلبك — وأرسله بالبريد الإلكتروني</h4>
+          <p>لم يتم تأكيد وصول طلبك عبر الموقع، لكن إجاباتك ما زالت محفوظة في هذه الصفحة. افتح تطبيق البريد واضغط على <strong>إرسال</strong>، أو انسخ تفاصيل الطلب وأرسلها يدوياً. لم تستلم Crownsmere الطلب من خلال هذا النموذج.</p>
+          <div class="std-fallback-actions">
+            <a class="btn btn-gold std-email-link" data-email-fallback href="mailto:hello@crownsmere.com">فتح تطبيق البريد ←</a>
+            <button class="btn btn-quiet" type="button" data-copy-fallback>نسخ الطلب المكتمل</button>
+          </div>
+          <p class="std-copy-feedback" data-copy-feedback aria-live="polite"></p>
+          <label class="std-copy-label" hidden>تفاصيل طلبك<textarea class="std-copy-text" data-copy-text rows="7" readonly dir="auto"></textarea></label>
+        </section>
       </form>
     </div>
     <aside class="student-advice">
