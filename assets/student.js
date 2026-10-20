@@ -19,6 +19,8 @@ function setLanguage(value){
  // Each language panel already has its own lang and dir attributes.
  document.documentElement.lang="en-GB";
  document.documentElement.dir="ltr";
+ var quickFormLink=document.querySelector(".actionbar a[href^=\"#\"]");
+ if(quickFormLink) quickFormLink.setAttribute("href","#"+lang+"-form");
 }
 switches.forEach(function(button){
  button.addEventListener("click",function(){setLanguage(button.getAttribute("data-lang-switch"));});
