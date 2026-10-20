@@ -30,7 +30,7 @@
 .student-form-header>span{color:var(--gold-text);letter-spacing:.16em;font-size:11px;}
 .student-form-header h2{font-size:clamp(44px,4.7vw,65px);margin:15px 0 10px;}
 .student-form-header p{margin:0;color:var(--ink-soft);}
-.student-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 34px;padding:0;list-style:none;}
+.student-progress[hidden]{display:none!important;}\n.student-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 34px;padding:0;list-style:none;}
 .student-progress li{border-top:2px solid var(--rule);padding-top:12px;color:var(--ink-mute);font-size:13px;line-height:1.4;}
 .student-progress li[aria-current="step"]{border-top-color:var(--gold);color:var(--navy);font-weight:600;}
 .student-progress li.is-complete{border-top-color:var(--gold-light);}
