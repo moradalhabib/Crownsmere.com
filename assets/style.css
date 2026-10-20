@@ -1376,3 +1376,12 @@ html.lenis, html.lenis body { height: auto; }
 .ft { background: var(--canvas) 50% 0 / 150px repeat, linear-gradient(180deg, var(--paper), var(--sand) 38%); }
 .menu { background: var(--canvas) 0 0 / 150px repeat, radial-gradient(ellipse 90% 70% at 80% 0%, var(--vellum), var(--ivory) 55%, var(--sand)); }
 @media (max-width: 360px) { .hero3d h1 { font-size: 42px; } }
+
+/* International student service link and expanded navigation */
+.student-service-link { padding-block: clamp(65px, 8vw, 105px); background: var(--paper); }
+.student-service-link h2 { font-size: clamp(39px, 5vw, 72px); max-width: 20ch; margin: 22px 0 20px; }
+.student-service-link .lede { max-width: 26em; margin: 0 0 30px; color: var(--ink-soft); }
+.menu { overflow-y: auto; }
+.menu-open .menu li:nth-child(5) a { transition-delay: .63s; }
+@media (max-width: 1099px) { .hd-nav { display: none; } .hd-menu { display: inline-flex; } }
+@media (max-height: 650px) and (max-width: 1099px) { .menu { padding-top: 95px; gap: 20px; } .menu li a { padding: 8px 0; } }

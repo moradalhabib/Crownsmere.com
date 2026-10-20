@@ -12,8 +12,8 @@ SITE = "https://crownsmere.com"
 BRAND = "Crownsmere Estate"
 # No telephone number is published: Alaa shares it personally once a brief is received.
 EMAIL = "hello@crownsmere.com"
-UPDATED = "3 October 2026"
-UPDATED_ISO = "2026-10-03"
+UPDATED = "21 October 2026"
+UPDATED_ISO = "2026-10-21"
 
 # ---------------------------------------------------------------- icons (24px line icons)
 P = {
@@ -47,7 +47,7 @@ def pic(name, alt, w, h, cls="", lazy=True, ext="jpg", priority=False):
 LOGO = lambda lazy=False: pic("monogram-sm", "", 165, 259, lazy=lazy, ext="png")
 
 # ---------------------------------------------------------------- chrome
-NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About"), ("contact.html", "Contact")]
+NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About"), ("students.html", "Students"), ("contact.html", "Contact")]
 
 ORG = {
     "@context": "https://schema.org", "@type": "RealEstateAgent", "@id": f"{SITE}/#business",
@@ -68,7 +68,7 @@ def head(title, desc, path, extra_ld=None):
     body_cls = ' class="home"' if path == "index.html" else ""
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = [ORG] + (extra_ld or [])
-    names = {"services.html": "Services", "about.html": "About", "contact.html": "Contact", "privacy.html": "Privacy notice"}
+    names = {"services.html": "Services", "about.html": "About", "students.html": "Students", "contact.html": "Contact", "privacy.html": "Privacy notice"}
     if path in names:
         ld.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE}/"},
@@ -120,8 +120,8 @@ def head(title, desc, path, extra_ld=None):
 
 def header(current):
     link = lambda h, t: '<a class="nl caps" href="%s"%s>%s</a>' % (h, ' aria-current="page"' if h == current else "", t)
-    left = "".join(link(h, t) for h, t in NAV[:3])
-    right = link(*NAV[3])
+    left = "".join(link(h, t) for h, t in NAV[:4])
+    right = link(*NAV[4])
     items = "\n".join(
         '<li><a href="%s"%s><small>%02d</small>%s</a></li>' % (h, ' aria-current="page"' if h == current else "", i + 1, t)
         for i, (h, t) in enumerate(NAV)
@@ -593,6 +593,8 @@ services_body = f'''
 </section>
 {invite("Shall we <em>begin?</em>")}'''
 
+services_body = services_body.replace('<section class="section tight" id="process">', '''<section class="section student-service-link"><div class="wrap"><div class="eyebrow caps">International student lettings</div><h2>Studying in London? <em>No UK guarantor?</em></h2><p class="lede">We can help you explore London rental homes and professional guarantor options.</p><a class="btn btn-gold caps" href="students.html">Student assistance &rarr;</a></div></section>
+<section class="section tight" id="process">''')
 page("services.html", f"Property Search, Private Sales & Lettings | {BRAND}",
      "Buying, private sales, lettings, investment and independent property advice in prime London, delivered personally and discreetly by Crownsmere Estate.",
      services_body)
@@ -797,15 +799,17 @@ privacy_body = f'''
     <p>{BRAND} is a private property consultancy based in London, United Kingdom. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact us about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 
     <h2>What we collect</h2>
-    <p>Only what you choose to share: your name, email address and telephone number, how and when you prefer to be contacted, and the details of your request (for example the kind of property you are looking for, preferred areas, budget and timeframe). If you write to us or call, we also keep that correspondence.</p>
+    <p>Only what you choose to share: your name, email address and telephone number, how and when you prefer to be contacted, and the details of your request (for example the kind of property you are looking for, preferred areas, budget and timeframe). Student enquiries may also include your university, your housing and guarantor situation and whether you have found a property. If you write to us or call, we also keep that correspondence. Please do not submit passport details, bank statements or identity documents through these public enquiry forms.</p>
 
     <h2>How we use it</h2>
     <ul>
       <li>To reply to your enquiry and discuss your brief.</li>
       <li>To carry out the search or other services you ask us to provide.</li>
       <li>To keep a record of our correspondence.</li>
+      <li>To discuss potential professional guarantor services and rental options when you ask for student assistance.</li>
     </ul>
-    <p>We rely on your request for us to act before any agreement is made, our legitimate interest in responding to enquiries, and, where you give it on the contact form, your consent to be contacted. We never use your details for unrelated marketing, and we never sell them.</p>
+    <p>We rely on your request for us to act before any agreement is made, our legitimate interest in responding to enquiries, and, where you give it on our forms, your agreement to be contacted. We never use your details for unrelated marketing, and we never sell your personal data.</p>
+    <p>If you ask us to introduce you to an estate agent or a professional guarantor provider, we will explain the proposed introduction and request your agreement before sharing information with them. Those firms may then act as independent controllers of the information you supply to them. Crownsmere may receive a disclosed referral commission from a participating partner. An enquiry does not automatically apply for a guarantor, guarantee a rental property, or authorise us to share your details with such partners.</p>
 
     <h2>Who helps us</h2>
     <p>A small number of trusted service providers process information on our behalf, only to provide their service:</p>
@@ -815,7 +819,7 @@ privacy_body = f'''
       <li><strong>Anthropic</strong> provides the AI service that screens emails sent to {EMAIL}, so that spam is filtered out and genuine enquiries reach us promptly. Emails are processed for this purpose only.</li>
       <li><strong>OpenStreetMap</strong> supplies the map images on our home page. When the map loads, your browser requests these images from the OpenStreetMap Foundation&rsquo;s servers, which receive your IP address as part of that request.</li>
     </ul>
-    <p>Some of these providers are based outside the UK, including in the United States. Where that is the case, information is transferred with appropriate safeguards in place. With your agreement, we may also share relevant details with others involved in your matter, such as solicitors or agents, when that is needed to help you.</p>
+    <p>Some of these providers are based outside the UK, including in the United States. Where that is the case, information is transferred with appropriate safeguards in place. With your separate agreement, we may also share relevant details with others involved in your matter, such as solicitors, agents or professional guarantor providers, when that is needed to help you.</p>
 
     <h2>How long we keep it</h2>
     <p>We keep your information only for as long as it is needed for the purposes above, including any legal, accounting or regulatory requirements, and then delete it securely.</p>
@@ -860,7 +864,7 @@ html = html.replace('<link rel="canonical" href="https://crownsmere.com/404.html
 open(os.path.join(OUT, "404.html"), "w").write(html)
 
 # ---------------------------------------------------------------- SEO files
-pages = [("", "1.0"), ("services.html", "0.9"), ("about.html", "0.8"), ("contact.html", "0.9"), ("privacy.html", "0.3")]
+pages = [("", "1.0"), ("services.html", "0.9"), ("about.html", "0.8"), ("students.html", "0.9"), ("contact.html", "0.9"), ("privacy.html", "0.3")]
 sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
     f"  <url><loc>{SITE}/{p}</loc><lastmod>{UPDATED_ISO}</lastmod><priority>{pr}</priority></url>\n" for p, pr in pages) + "</urlset>\n"
 open(os.path.join(OUT, "sitemap.xml"), "w").write(sitemap)
