@@ -1,6 +1,6 @@
 /* Crownsmere Estate — International student lettings & guarantor guidance
    Works with the existing ivory / navy / champagne design tokens. */
-.student-language-bar {display:flex;justify-content:space-between;align-items:center;gap:18px;padding-top:28px;padding-bottom:16px;border-bottom:1px solid var(--rule);}
+.student-language-bar {display:flex;justify-content:space-between;align-items:center;gap:18px;padding-top:clamp(118px,11vw,145px);padding-bottom:16px;border-bottom:1px solid var(--rule);}
 .student-language-bar>span{color:var(--gold-text);font-size:10px;letter-spacing:.15em}
 .student-language-bar>div{display:flex;gap:6px;flex-shrink:0;}
 .student-language-bar button{border:1px solid var(--rule);font:500 14px Georgia,serif;background:transparent;color:var(--ink);padding:9px 17px;cursor:pointer;min-height:44px;}
