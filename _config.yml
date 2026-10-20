@@ -4,3 +4,9 @@ exclude:
   - mail-filter
   - tools
   - README.md
+  - tests
+  - playwright.config.cjs
+  - node_modules
+  - test-screenshots
+  - test-results
+  - playwright-report

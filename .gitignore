@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+node_modules/
+test-screenshots/
+test-results/
+playwright-report/
