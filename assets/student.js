@@ -111,9 +111,11 @@ document.querySelectorAll(".student-form").forEach(function(form){
   say(status.getAttribute("data-sending"));
   fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)})
   .then(function(response){
-   return response.json().catch(function(){return {};}).then(function(body){return {ok:response.ok,body:body};});
+   return response.json().then(function(body){return {ok:response.ok,body:body};});
   }).then(function(response){
-   if(!response.ok||String(response.body.success)==="false")throw new Error("Delivery failed");
+   // A 200 HTML anti-bot challenge, JSON without success, or an API error is NOT delivery.
+   var confirmation=response.body && response.body.success;
+   if(!response.ok || (confirmation!==true && confirmation!=="true"))throw new Error("Delivery not confirmed");
    form.querySelector(".student-progress").hidden=true;
    stages.forEach(function(stage){stage.hidden=true;stage.classList.remove("is-active");});
    complete.hidden=false;
