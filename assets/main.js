@@ -611,9 +611,11 @@
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(data)
       })
-        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
         .then(function (res) {
-          if (!res.ok || String(res.j.success) === "false") throw new Error(res.j.message || "failed");
+          var confirmed = res.j && res.j.success;
+          // HTML challenges and ambiguous responses must not create a false 'sent' state.
+          if (!res.ok || (confirmed !== true && confirmed !== "true")) throw new Error("Delivery not confirmed");
           done();
         })
         .catch(function () {
