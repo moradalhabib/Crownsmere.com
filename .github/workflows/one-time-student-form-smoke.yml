@@ -1,0 +1,58 @@
+name: One-time Crownsmere live FormSubmit smoke test
+
+on:
+  push:
+    branches:
+      - qa/crownsmere-live-form-20261021
+
+permissions:
+  contents: read
+
+jobs:
+  live-form:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify public student page is reachable
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 25 https://crownsmere.com/students.html | grep -q 'International Student Lettings'
+          echo "PASS: Live Crownsmere student page served successfully."
+      - name: Submit one clearly marked synthetic QA enquiry via production FormSubmit endpoint
+        run: |
+          set -euo pipefail
+          cat > /tmp/qa_student.json <<'JSON'
+          {
+            "_subject": "[Crownsmere Enquiry] TEST ONLY - website student flow QA",
+            "_captcha": "false",
+            "_template": "table",
+            "source": "crownsmere.com/students",
+            "language": "English",
+            "service": "Guarantor guidance for found property",
+            "university": "Crownsmere QA synthetic test - not a real student",
+            "monthly_budget": "GBP 2500-4000",
+            "move_timeframe": "Within 1 month",
+            "guarantor_status": "No UK guarantor",
+            "property_found": "Already found a property",
+            "name": "Crownsmere Website QA - TEST ONLY",
+            "email": "qa-test@example.org",
+            "phone": "+447700900123",
+            "preferred_contact": "Email",
+            "consent": "Yes",
+            "additional_notes": "Automated technical smoke test requested for Crownsmere website quality assurance. This is NOT a real applicant; no follow-up required."
+          }
+          JSON
+          response=$(curl --silent --show-error --max-time 35 \
+            --header 'Content-Type: application/json' \
+            --header 'Accept: application/json' \
+            --request POST \
+            --data-binary @/tmp/qa_student.json \
+            'https://formsubmit.co/ajax/hello@crownsmere.com')
+          printf 'Service response: %s\n' "$(echo "$response" | head -c 900)"
+          if echo "$response" | jq -e '(.success == "true") or (.success == true)' >/dev/null; then
+            echo "PASS: Production FormSubmit service accepted synthetic Crownsmere student enquiry."
+          else
+            echo "FAIL: FormSubmit did not confirm successful acceptance; check activation, spam controls or service account."
+            exit 1
+          fi
+          echo "Note: This only confirms provider acknowledgement. Alaa must separately verify receipt in hello@crownsmere.com and the private forwarded inbox."
