@@ -30,7 +30,8 @@
 .student-form-header>span{color:var(--gold-text);letter-spacing:.16em;font-size:11px;}
 .student-form-header h2{font-size:clamp(44px,4.7vw,65px);margin:15px 0 10px;}
 .student-form-header p{margin:0;color:var(--ink-soft);}
-.student-progress[hidden]{display:none!important;}\n.student-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 34px;padding:0;list-style:none;}
+.student-progress[hidden]{display:none!important;}
+.student-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 34px;padding:0;list-style:none;}
 .student-progress li{border-top:2px solid var(--rule);padding-top:12px;color:var(--ink-mute);font-size:13px;line-height:1.4;}
 .student-progress li[aria-current="step"]{border-top-color:var(--gold);color:var(--navy);font-weight:600;}
 .student-progress li.is-complete{border-top-color:var(--gold-light);}
@@ -92,7 +93,7 @@
 .student-advice{padding:25px;}
 }
 @media(max-width:760px){
-.student-language-bar{align-items:flex-start;flex-direction:column;padding-top:15px;}
+.student-language-bar{align-items:flex-start;flex-direction:column;padding-top:calc(124px + env(safe-area-inset-top, 0px));}
 .student-hero{grid-template-columns:1fr;padding-top:42px;padding-bottom:55px;}
 .student-copy h1{font-size:clamp(51px,11vw,84px);}
 .student-photo img{height:clamp(280px,72vw,430px);}
@@ -106,3 +107,10 @@
 .student-progress li{font-size:11px;}
 }
 @media(max-width:420px){.student-progress{gap:5px;}.student-progress li{font-size:10px;}.std-actions .btn{padding-inline:15px;}.student-language-bar>span{font-size:9px;}}
+
+/* Keep the page-language switcher below the fixed Crownsmere header. */
+@media (max-width: 760px) {
+  .student-language-bar { position: relative; z-index: 1; }
+  .student-language-bar > div { flex-wrap: wrap; }
+  .student-language-bar button { min-height: 44px; }
+}
