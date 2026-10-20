@@ -32,10 +32,15 @@ for (const vp of viewports) {
     await expect(page.locator('.hd-mark')).toBeVisible();
     const header=await page.locator('header.hd').boundingBox();
     const logo=await page.locator('header .hd-mark').boundingBox();
-    const bar=await page.locator('.student-language-bar').boundingBox();
+    const barLabel=await page.locator('.student-language-bar > span').boundingBox();
+    const switchGroup=await page.locator('.student-language-bar > div').boundingBox();
     const activeSwitch=await page.locator(`[data-lang-switch="${lang}"]`).boundingBox();
-    expect(header && logo && bar && activeSwitch).toBeTruthy();
-    expect(intersects(logo,bar,2)).toBeFalsy();
+    expect(header && logo && barLabel && switchGroup && activeSwitch).toBeTruthy();
+    // The bar's top padding intentionally extends behind the fixed header.
+    // Only visible content must remain clear of the logo/header.
+    expect(intersects(logo,barLabel,2)).toBeFalsy();
+    expect(intersects(logo,switchGroup,2)).toBeFalsy();
+    expect(intersects(header,barLabel,2)).toBeFalsy();
     expect(intersects(header,activeSwitch,2)).toBeFalsy();
     const metrics=await page.evaluate(() => ({
       pageScrollWidth:document.documentElement.scrollWidth,
@@ -70,8 +75,10 @@ for(const lang of langs) {
    await expect(page.locator(`[data-lang-switch="${other}"]`)).toHaveAttribute('aria-pressed','true');
    await expect(page.locator('.actionbar a[href^="#"]')).toHaveAttribute('href','#'+other+'-form');
    const logo=await page.locator('header .hd-mark').boundingBox();
-   const bar=await page.locator('.student-language-bar').boundingBox();
-   expect(intersects(logo,bar,2)).toBeFalsy();
+   const barLabel=await page.locator('.student-language-bar > span').boundingBox();
+   const switchGroup=await page.locator('.student-language-bar > div').boundingBox();
+   expect(intersects(logo,barLabel,2)).toBeFalsy();
+   expect(intersects(logo,switchGroup,2)).toBeFalsy();
    await page.locator('.hd-menu').click();
    await expect(page.locator('.menu')).toBeVisible();
    await expect(page.locator('.menu a[href="students.html"]')).toHaveAttribute('aria-current','page');
