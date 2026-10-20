@@ -16,7 +16,8 @@ jobs:
       - name: Verify public student page is reachable
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error --max-time 25 https://crownsmere.com/students.html | grep -q 'International Student Lettings'
+          curl --fail --silent --show-error --max-time 25 -o /tmp/crownsmere-student.html https://crownsmere.com/students.html
+          grep -q 'International Student Lettings' /tmp/crownsmere-student.html
           echo "PASS: Live Crownsmere student page served successfully."
       - name: Submit one clearly marked synthetic QA enquiry via production FormSubmit endpoint
         run: |
