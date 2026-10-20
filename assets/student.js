@@ -15,8 +15,10 @@ function setLanguage(value){
   button.classList.toggle("is-active",active);
   button.setAttribute("aria-pressed",String(active));
  });
- document.documentElement.lang=lang==="ar"?"ar":"en-GB";
- document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ // Keep navigation and the centred Crownsmere logo in their original LTR layout.
+ // Each language panel already has its own lang and dir attributes.
+ document.documentElement.lang="en-GB";
+ document.documentElement.dir="ltr";
 }
 switches.forEach(function(button){
  button.addEventListener("click",function(){setLanguage(button.getAttribute("data-lang-switch"));});
