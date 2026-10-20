@@ -58,8 +58,8 @@
 .std-actions .btn{min-width:120px;text-align:center;cursor:pointer;}
 .student-form:not(.enhanced) .std-actions{display:none;}
 .student-form:not(.enhanced) .student-stage{border-bottom:1px solid var(--rule);padding-bottom:20px;margin-bottom:30px;}
-.student-form:not(.enhanced) .student-stage:last-of-type .std-actions{display:flex;}
-.student-form:not(.enhanced) .student-stage:last-of-type [data-back]{display:none;}
+.student-form:not(.enhanced) .student-stage[data-student-step="2"] .std-actions{display:flex;}
+.student-form:not(.enhanced) .student-stage[data-student-step="2"] [data-back]{display:none;}
 .std-status{min-height:1.4em;color:var(--ink-soft);font-size:15px;margin:18px 0 0;}
 .std-status.is-error{color:var(--error);}
 .std-sent{text-align:center;padding:30px 5px;}
