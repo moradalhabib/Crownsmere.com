@@ -185,3 +185,26 @@ test('works with JavaScript disabled: first form and submit are available', asyn
  expect(await form.getAttribute('action')).toMatch(/^https:\/\/formsubmit.co\//);
  await context.close();
 });
+
+
+for(const lang of ['en','ar']) {
+ for(const responseType of ['html-challenge','missing-success']) {
+  test(`${lang} student form rejects HTTP 200 ${responseType} instead of falsely confirming delivery`, async({page})=>{
+    await page.route('https://formsubmit.co/ajax/**',route=>route.fulfill(responseType==='html-challenge'
+       ? {status:200,contentType:'text/html',body:'<!DOCTYPE html><html><body>Just a moment...</body></html>'}
+       : {status:200,contentType:'application/json',body:'{}'}));
+    await page.goto('/students.html?lang='+lang);
+    const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
+    await form.locator('.student-stage.is-active [data-next]').click();
+    await form.locator('.student-stage.is-active [data-next]').click();
+    await form.locator('input[name="name"]').fill('Crownsmere QA Test');
+    await form.locator('input[name="email"]').fill('qa-test@example.org');
+    await form.locator('input[name="consent"]').check();
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator('.std-status')).toHaveClass(/is-error/);
+    await expect(form.locator('.std-sent')).toBeHidden();
+    await expect(form.locator('input[name="name"]')).toHaveValue('Crownsmere QA Test');
+    await expect(form.locator('button[type="submit"]')).toBeEnabled();
+  });
+ }
+}
