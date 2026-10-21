@@ -1,0 +1,30 @@
+name: Visual QA snapshot export
+on:
+  push:
+    branches:
+      - fix/crownsmere-visual-refinement-20261021
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check repository content
+        run: |
+          test -f index.html
+          test -f assets/experience.css
+          test -f tools/build.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crownsmere-visual-site
+          retention-days: 3
+          path: |
+            *.html
+            assets/
+            tools/build.py
+            tests/e2e/
+            playwright.config.cjs
+            site.webmanifest
+            .github/workflows/student-e2e.yml
