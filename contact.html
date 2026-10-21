@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
@@ -89,7 +89,7 @@
         <div class="caps">Crownsmere Estate &nbsp;&middot;&nbsp; London</div>
         <p class="display m0">A private brief</p>
       </div>
-      <form class="letter-form" data-endpoint="https://formsubmit.co/ajax/hello@crownsmere.com" novalidate>
+      <form class="letter-form" action="mailto:alaa.qadir@crownsmere.com" method="POST" enctype="text/plain" novalidate>
         <input type="hidden" name="_subject" value="[Crownsmere Enquiry] New client brief from the website">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
@@ -132,13 +132,23 @@
           </fieldset>
           <div class="field"><label class="caps" for="f-time">Best time to call</label><select id="f-time" name="best_time"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></div>
           <label class="consent"><input type="checkbox" name="consent" value="Yes" required><span>I am happy for Crownsmere Estate to contact me by telephone and email about this request. My details will be held in confidence and never shared. See the <a href="privacy.html">privacy notice</a>.</span></label>
-          <div class="step-actions"><button type="button" class="btn btn-quiet caps" data-back>&larr; Back</button><button class="btn btn-gold caps" type="submit">Send my brief <span aria-hidden="true">&rarr;</span></button></div>
+          <div class="step-actions"><button type="button" class="btn btn-quiet caps" data-back>&larr; Back</button><button class="btn btn-gold caps" type="submit">Continue to email <span aria-hidden="true">&rarr;</span></button></div>
         </div>
 
         <div class="sent-panel" tabindex="-1">
           <p class="display">Thank you.</p>
         </div>
         <p class="form-status" role="status" aria-live="polite"></p>
+        <div class="contact-mail-backup" hidden>
+          <h3>Your email is ready.</h3>
+          <p>Your email app should open with a private letter to Alaa. Please review it and press <strong>Send</strong>. If nothing opens, use the buttons below to keep your enquiry.</p>
+          <div class="btn-row">
+            <a class="btn btn-gold caps" data-contact-email href="mailto:hello@crownsmere.com">Open prepared email &rarr;</a>
+            <button class="btn caps" type="button" data-contact-copy>Copy my enquiry</button>
+          </div>
+          <p data-contact-feedback aria-live="polite"></p>
+          <label class="contact-copy-label" hidden>Prepared enquiry<textarea rows="8" readonly data-contact-text></textarea></label>
+        </div>
       </form>
     </div>
     <aside class="preview" aria-label="Your letter, as it will be read">
