@@ -13,6 +13,8 @@ on:
       - 'assets/student.css'
       - 'assets/student.js'
       - 'assets/style.css'
+      - 'assets/experience.css'
+      - 'assets/mobile-header.css'
       - 'assets/main.js'
       - 'tests/e2e/**'
       - 'playwright.config.cjs'
