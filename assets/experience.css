@@ -244,3 +244,19 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
 .contact-copy-label { display: block; font: 400 15px/1.5 var(--body); margin-top: 15px; color: var(--ink-soft); }
 .contact-copy-label textarea { display: block; width: 100%; min-height: 180px; border: 1px solid var(--stone); background: white; color: var(--navy); padding: 15px; font: 15px/1.55 system-ui, sans-serif; margin-top: 8px; resize: vertical; }
 @media(max-width: 650px) { .contact-mail-backup .btn-row { display: grid; } .contact-mail-backup .btn { width: 100%; } }
+
+/* Audited visual legibility: imagery must never overwhelm copy. */
+.quick-card::before {
+  background: linear-gradient(180deg, rgba(4,13,26,.10) 0%,rgba(4,13,26,.55) 34%,rgba(4,13,26,.96) 100%);
+}
+.quick-card-inner { text-shadow: 0 2px 8px rgba(0,0,0,.2); }
+@media (max-width: 900px) {
+  /* Touch devices do not require scrolling animations to make core information readable. */
+  [data-reveal], .reveal-img > figcaption, .reveal-img > blockquote {
+    opacity: 1 !important; transform: none !important;
+  }
+  [data-highlight] .hw { opacity: 1 !important; }
+  .sw > span { transform: none !important; }
+  .reveal-img .frame { clip-path: none !important; }
+  .reveal-img .frame img { transform: none !important; }
+}
