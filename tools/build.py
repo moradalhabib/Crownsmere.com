@@ -474,20 +474,6 @@ index_body = f'''
   </div>
 </section>
 
-<section class="gallery-strip" aria-labelledby="london-gallery-heading">
-  <div class="wrap">
-    <div class="gallery-head">
-      <h2 id="london-gallery-heading">A more personal <em>London.</em></h2>
-      <p class="gallery-note">From classic streets to contemporary interiors, our searches start with what matters to you.</p>
-    </div>
-    <div class="gallery-images">
-      <figure>{pic("colonnade", "London white-stucco residences on a leafy street", 563, 398)}<figcaption>Residential London</figcaption></figure>
-      <figure>{pic("interior", "Elegant contemporary London living room", 826, 463)}<figcaption>Spaces to call home</figcaption></figure>
-      <figure>{pic("door", "A classic London townhouse entrance with brass details", 433, 610)}<figcaption>Every detail considered</figcaption></figure>
-    </div>
-  </div>
-</section>
-
 <section class="section" id="approach">
   <div class="wrap">
     <div class="section-head">
