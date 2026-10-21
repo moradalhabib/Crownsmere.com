@@ -248,29 +248,16 @@ document.querySelectorAll(".student-form").forEach(function(form){
    say(status.getAttribute("data-invalid"),true);return;
   }
   delete data._honey;
-  var endpoint=form.getAttribute("data-endpoint");
-  if(!endpoint){say(status.getAttribute("data-error"),true);return;}
-  sending=true;submit.disabled=true;
-  say(status.getAttribute("data-sending"));
-  fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)})
-  .then(function(response){
-   return response.json().then(function(body){return {ok:response.ok,body:body};});
-  }).then(function(response){
-   // A 200 HTML anti-bot challenge, JSON without success, or an API error is NOT delivery.
-   var confirmation=response.body && response.body.success;
-   if(!response.ok || (confirmation!==true && confirmation!=="true"))throw new Error("Delivery not confirmed");
-   form.querySelector(".student-progress").hidden=true;
-   stages.forEach(function(stage){stage.hidden=true;stage.classList.remove("is-active");});
-   complete.hidden=false;
-   if(fallback)fallback.hidden=true;
-   say("");
-   form.reset();
-   complete.focus({preventScroll:true});
-   complete.scrollIntoView({block:"center",behavior:"smooth"});
-  }).catch(function(){
-   say(status.getAttribute("data-error"),true);
-   showFallback(data);
-  }).then(function(){sending=false;submit.disabled=false;});
+  // Email is prepared on the visitor's own device; the website does not send it.
+  // This navigation happens synchronously from the submit gesture (mobile Safari).
+  var draft=showFallback(data);
+  say(isArabic
+   ?"رسالتك جاهزة. راجعها واضغط إرسال في تطبيق البريد الإلكتروني."
+   :"Your email is ready. Review it and press Send in your email app.");
+  if(draft){
+   try { window.location.href=draft; }
+   catch(error) { /* Keep the visible Open email / Copy options. */ }
+  }
  });
  show(0,false);
 });
