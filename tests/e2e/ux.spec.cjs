@@ -33,6 +33,13 @@ for (const [url,name] of pages) {
         height:document.documentElement.scrollHeight,
         header:document.querySelector('.hd')?.getBoundingClientRect().height||0
       }));
+      if(metrics.scrollWidth>vp.width+3) {
+        const offenders=await page.evaluate(() => Array.from(document.querySelectorAll('body *')).map(el=>{
+          const r=el.getBoundingClientRect(); const cs=getComputedStyle(el);
+          return {tag:el.tagName,cls:String(el.className||'').slice(0,70),text:(el.textContent||'').trim().slice(0,38),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),display:cs.display,overflow:cs.overflowX};
+        }).filter(x=>x.display!=='none' && x.right>window.innerWidth+6 && x.width>20).slice(0,30));
+        console.log('CROWNSMERE_OVERFLOW '+JSON.stringify({name,vp,metrics,offenders}));
+      }
       expect(metrics.scrollWidth, JSON.stringify({name,vp,metrics})).toBeLessThanOrEqual(vp.width + 3);
       expect(metrics.height).toBeGreaterThan(500);
       expect(metrics.header).toBeLessThan(130);
