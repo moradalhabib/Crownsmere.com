@@ -41,7 +41,8 @@ jobs:
       - name: Install WebKit for iPhone-equivalent checks
         run: npx playwright install --with-deps webkit
       - name: Verify key iPhone user journeys in WebKit
-        run: npx playwright test --config=playwright.config.cjs --browser webkit --grep 'iphone-390|student page:|student form: all|general website brief opens|home: premium' --workers=1
+        run: |
+          npx playwright test --config=playwright.config.cjs --browser webkit --grep 'iphone-390|student page:|student form: all|general website brief opens|home: premium' --workers=1
       - name: Attach QA screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
