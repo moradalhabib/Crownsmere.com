@@ -260,3 +260,12 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
   .reveal-img .frame { clip-path: none !important; }
   .reveal-img .frame img { transform: none !important; }
 }
+
+/* 320px QA: prevent long card titles from expanding the grid track. */
+.quick-grid { min-width: 0; }
+.quick-card, .quick-card-inner { min-width: 0; max-width: 100%; }
+.quick-card h3, .quick-card p { overflow-wrap: break-word; }
+@media (max-width: 700px) {
+  .quick-grid { grid-template-columns: minmax(0,1fr) !important; }
+  .quick-card { width: 100%; }
+}
