@@ -37,6 +37,10 @@ jobs:
         run: |
           mkdir -p test-screenshots
           npx playwright test --config=playwright.config.cjs
+      - name: Install WebKit browser dependencies
+        run: npx playwright install --with-deps webkit
+      - name: Test iOS Safari-equivalent browser
+        run: npx playwright test --config=playwright.config.cjs --browser webkit --grep 'iphone-390|student enquiry offers complete email fallback|student email fallback disappears on successful retry|language switching'
       - name: Attach QA screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
