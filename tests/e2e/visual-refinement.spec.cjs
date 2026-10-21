@@ -96,3 +96,30 @@ test('mobile services are compact and avoid repeated interior photography',async
     await page.screenshot({path:'test-screenshots/compact-services-'+width+'.png',fullPage:true,animations:'disabled'});
   }
 });
+
+
+test('mobile menu keyboard focus is contained and Escape returns focus',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ const button=page.locator('.hd-menu');
+ await button.focus();
+ await page.keyboard.press('Enter');
+ await expect(button).toHaveAttribute('aria-expanded','true');
+ await expect(page.locator('.menu a').first()).toBeFocused();
+ await page.keyboard.press('Shift+Tab');
+ await expect(page.locator('.menu a').last()).toBeFocused();
+ await page.keyboard.press('Tab');
+ await expect(page.locator('.menu a').first()).toBeFocused();
+ await page.keyboard.press('Escape');
+ await expect(button).toBeFocused();
+ await expect(button).toHaveAttribute('aria-expanded','false');
+ await expect(page.locator('.menu')).toHaveAttribute('inert','');
+});
+test('mobile menu closes when switching to desktop viewport',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ await page.locator('.hd-menu').click();
+ await expect(page.locator('.hd-menu')).toHaveAttribute('aria-expanded','true');
+ await page.setViewportSize({width:1440,height:900});
+ await expect(page.locator('.hd-menu')).toHaveAttribute('aria-expanded','false');
+});
