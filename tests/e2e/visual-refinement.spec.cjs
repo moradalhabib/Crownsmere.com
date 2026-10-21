@@ -29,3 +29,20 @@ for(const vp of viewports){
   }
  });
 }
+
+for(const [path,name] of [['/services.html','services'],['/about.html','about'],['/students.html','students'],['/contact.html','contact'],['/privacy.html','privacy']]){
+  test('visual site review '+name+': mobile and desktop layout and visible content',async({page})=>{
+    for(const vp of [{name:'mobile',width:390,height:844},{name:'desktop',width:1440,height:900}]){
+      await page.setViewportSize(vp);
+      await page.goto(path);
+      const data=await page.evaluate(()=>{
+        const header=document.querySelector('.hd')?.getBoundingClientRect();
+        const main=document.querySelector('main')?.getBoundingClientRect();
+        return {scrollWidth:document.documentElement.scrollWidth,viewport:innerWidth,headerHeight:header?.height,mainHeight:main?.height};
+      });
+      expect(data.scrollWidth).toBeLessThanOrEqual(vp.width+3);
+      expect(data.mainHeight).toBeGreaterThan(500);
+      await page.screenshot({path:'test-screenshots/refined-'+name+'-'+vp.name+'.png',fullPage:true,animations:'disabled'});
+    }
+  });
+}
