@@ -1,0 +1,6 @@
+@media (max-width:700px) {
+  .hd { transition: transform .24s ease, background .24s ease, padding .24s ease; }
+  .hd.is-hidden-on-scroll:not(:focus-within) { transform: translateY(-110%); }
+  .menu-open .hd { transform: none !important; }
+}
+@media (prefers-reduced-motion:reduce) { .hd { transition-duration: .01ms; } }
