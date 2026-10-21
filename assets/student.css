@@ -147,3 +147,6 @@
  .std-fallback-actions {flex-direction:column;}
  .std-fallback-actions .btn {width:100%;}
 }
+
+/* Wizard transitions and keyboard focus should land below the fixed nav. */
+.student-form, .student-stage, .student-stage h3, .std-field input, .std-field select, .std-field textarea {scroll-margin-top:clamp(108px,14vw,155px);}
