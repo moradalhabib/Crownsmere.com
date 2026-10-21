@@ -144,3 +144,18 @@ test('mobile service cards and process steps have breathing room and usable touc
  expect(measures.cardHeight).toBeGreaterThanOrEqual(280);
  await page.screenshot({path:'test-screenshots/mobile-balanced-spacing.png',fullPage:true,animations:'disabled'});
 });
+
+test('final content accuracy: email draft is not misrepresented as sent',async({page})=>{
+ await page.goto('/students.html');
+ const text=await page.locator('main').innerText();
+ expect(text).not.toContain('Your enquiry has been sent.');
+ const html=await page.locator('main').innerHTML();
+ expect(html).not.toContain('تم إرسال طلبك.');
+ await page.goto('/contact.html');
+ const contact=await page.locator('main').innerText();
+ expect(contact).not.toContain('never shared');
+ expect(contact).toContain('further agreement');
+ await page.goto('/privacy.html');
+ const privacy=await page.locator('main').innerText();
+ expect(privacy).toContain('if enabled');
+});
