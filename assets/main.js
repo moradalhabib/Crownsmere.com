@@ -43,9 +43,22 @@
 
   /* ---------- Header state ---------- */
   var hd = document.querySelector(".hd");
+  var lastHeaderScroll = window.scrollY;
+  var mobileHeader = window.matchMedia("(max-width: 700px)");
   function onScrollHeader() {
     if (!hd) return;
-    hd.classList.toggle("is-scrolled", window.scrollY > 40);
+    var current = window.scrollY;
+    hd.classList.toggle("is-scrolled", current > 40);
+    // On phones, move the fixed header out of the way while scrolling down.
+    // Bring it back as soon as the visitor scrolls up, preserving menu access.
+    if (mobileHeader.matches && current > 170 && current > lastHeaderScroll + 1 &&
+        !root.classList.contains("menu-open") &&
+        !hd.contains(document.activeElement)) {
+      hd.classList.add("is-hidden-on-scroll");
+    } else if (!mobileHeader.matches || current < 120 || current < lastHeaderScroll - 1) {
+      hd.classList.remove("is-hidden-on-scroll");
+    }
+    lastHeaderScroll = current;
   }
   window.addEventListener("scroll", onScrollHeader, { passive: true });
   onScrollHeader();

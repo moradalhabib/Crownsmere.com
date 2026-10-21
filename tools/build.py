@@ -112,6 +112,7 @@ def head(title, desc, path, extra_ld=None):
 <link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
 {hero_preload}<link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/experience.css">
+<link rel="stylesheet" href="assets/mobile-header.css">
 {'<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">' if path == "index.html" else ""}
 <script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
 </head>
@@ -313,7 +314,7 @@ def pillars(quote="The finest homes rarely need to be advertised.", media=True):
     return f'''<div class="pillars-wrap">
       <div class="pillars">{items}</div>
       <figure class="pillars-media reveal-img" data-reveal>
-        <div class="mat"><div class="frame">{pic("colonnade", "White stucco townhouses on a leafy London street", 563, 398)}</div></div>
+        <div class="mat"><div class="frame">{pic("door", "A classic London townhouse entrance", 433, 610)}</div></div>
         <blockquote>{quote}</blockquote>
       </figure>
     </div>'''
@@ -443,7 +444,7 @@ index_body = f'''
     </div>
     <div class="quick-grid">
       <a class="quick-card" href="contact.html" aria-label="Buy or find a London property, share your requirements">
-        {pic("townhouse", "White London townhouses in a prime residential area", 1055, 687)}
+        {pic("colonnade", "Elegant London residential street", 563, 398)}
         <div class="quick-card-inner">
           <span class="quick-tag">BUY &middot; INVEST</span>
           <h3>Find a London home</h3>
@@ -474,28 +475,13 @@ index_body = f'''
   </div>
 </section>
 
-<section class="gallery-strip" aria-labelledby="london-gallery-heading">
-  <div class="wrap">
-    <div class="gallery-head">
-      <h2 id="london-gallery-heading">A more personal <em>London.</em></h2>
-      <p class="gallery-note">From classic streets to contemporary interiors, our searches start with what matters to you.</p>
-    </div>
-    <div class="gallery-images">
-      <figure>{pic("colonnade", "London white-stucco residences on a leafy street", 563, 398)}<figcaption>Residential London</figcaption></figure>
-      <figure>{pic("interior", "Elegant contemporary London living room", 826, 463)}<figcaption>Spaces to call home</figcaption></figure>
-      <figure>{pic("door", "A classic London townhouse entrance with brass details", 433, 610)}<figcaption>Every detail considered</figcaption></figure>
-    </div>
-  </div>
-</section>
-
 <section class="section" id="approach">
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>I.</b>The Approach</div>
-      <h2 data-reveal data-split>No shop window. <em>No listings.</em> Just your brief.</h2>
+      <h2 data-reveal data-split>A personal approach to <em>London property.</em></h2>
     </div>
     <div class="statement">
-      {statement_figure("Prime London")}
       <div class="copy">
         <p class="lede dropcap" data-highlight>Crownsmere Estate is not a typical estate agency. Rather than selling whatever happens to be on the books, I work from your brief, searching personally to find what is genuinely right for you.</p>
         <div class="cols" data-reveal>

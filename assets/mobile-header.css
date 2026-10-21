@@ -1,0 +1,24 @@
+@media (max-width:700px) {
+  .hd { transition: transform .24s ease, background .24s ease, padding .24s ease; }
+  .hd.is-hidden-on-scroll:not(:focus-within) { transform: translateY(-110%); }
+  .menu-open .hd { transform: none !important; }
+}
+@media (prefers-reduced-motion:reduce) { .hd { transition-duration: .01ms; } }
+
+@media (max-width:700px) {
+  .ft { padding-top: 34px; padding-bottom: 18px; }
+  .ft-top { gap: 20px 16px; padding-bottom: 28px; }
+  .ft-brand { gap: 12px; }
+  .ft-brand p { font-size: 24px; }
+  .ft h4 { margin-bottom: 10px; }
+  .ft-bottom { padding-top: 16px; gap: 10px; }
+  .student-hero { padding-top: 35px; padding-bottom: 24px; gap: 20px; }
+  .student-copy h1 { margin: 12px 0 16px; }
+  .student-lede { font-size: 19px; line-height: 1.5; margin-bottom: 19px; }
+  .student-intro-note { margin-top: 12px; }
+  .student-photo img { height: 230px; }
+  .student-main { padding-top: 0; padding-bottom: 34px; }
+  .student-form-header { margin-bottom: 20px; padding-bottom: 19px; }
+  .student-form-header h2 { margin: 10px 0 7px; }
+  .student-application { padding: 18px; }
+}

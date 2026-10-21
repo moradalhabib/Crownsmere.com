@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix/crownsmere-visual-refinement-20261021
       - fix/student-language-header-overlap-20261021
       - improve/crownsmere-ux-mobile-20261021
   pull_request:
