@@ -443,7 +443,7 @@ index_body = f'''
     </div>
     <div class="quick-grid">
       <a class="quick-card" href="contact.html" aria-label="Buy or find a London property, share your requirements">
-        {pic("townhouse", "White London townhouses in a prime residential area", 1055, 687)}
+        {pic("colonnade", "Elegant London residential street", 563, 398)}
         <div class="quick-card-inner">
           <span class="quick-tag">BUY &middot; INVEST</span>
           <h3>Find a London home</h3>
