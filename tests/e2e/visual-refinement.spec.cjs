@@ -61,3 +61,12 @@ test('mobile header clears section headings on scroll down and returns on scroll
  await expect(page.locator('.hd')).not.toHaveClass(/is-hidden-on-scroll/);
  await expect(page.locator('.hd-menu')).toBeVisible();
 });
+
+test('student application starts promptly after concise introduction',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/students.html');
+ await expect(page.locator('.student-info')).toHaveCount(0);
+ const formTop=await page.locator('#en-form').evaluate(el=>el.getBoundingClientRect().top+window.scrollY);
+ expect(formTop).toBeLessThan(1350);
+ await expect(page.locator('form.student-form[data-form-lang="en"]')).toBeVisible();
+});
