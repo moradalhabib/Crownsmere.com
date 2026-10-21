@@ -318,3 +318,12 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
   .hd { min-height: 88px; }
   .home #approach { scroll-margin-top: 106px; }
 }
+
+/* Explicit stacking: overlay MUST paint above the image and below the copy. */
+.quick-card img { z-index: 0; }
+.quick-card::before { z-index: 1; pointer-events: none; }
+.quick-card-inner { z-index: 2; }
+@media(max-width:700px) {
+  .quick-card:focus-visible { outline-offset: 2px; }
+  .quick-card .quick-go { min-height: 28px; align-items: center; }
+}
