@@ -152,7 +152,7 @@ test('final content accuracy: email draft is not misrepresented as sent',async({
  const html=await page.locator('main').innerHTML();
  expect(html).not.toContain('تم إرسال طلبك.');
  await page.goto('/contact.html');
- const contact=await page.locator('main').innerText();
+ const contact=await page.locator('main').textContent();
  expect(contact).not.toContain('never shared');
  expect(contact).toContain('further agreement');
  await page.goto('/privacy.html');
