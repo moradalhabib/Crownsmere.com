@@ -111,6 +111,7 @@ def head(title, desc, path, extra_ld=None):
 <link rel="preload" href="assets/fonts/eb-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
 {hero_preload}<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/experience.css">
 {'<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">' if path == "index.html" else ""}
 <script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
 </head>
@@ -132,7 +133,7 @@ def header(current):
     {LOGO()}
     <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Private Property Consultancy</span></small></span>
   </a>
-  <nav class="hd-nav" aria-label="Main"><div class="hd-l">{left}</div><div class="hd-r">{right}<a class="btn btn-gold caps" href="contact.html">Enquire <span aria-hidden="true">&rarr;</span></a></div></nav>
+  <nav class="hd-nav" aria-label="Main"><div class="hd-l">{left}</div><div class="hd-r">{right}<a class="btn btn-gold caps" href="contact.html">Start enquiry <span aria-hidden="true">&rarr;</span></a></div></nav>
   <button class="hd-menu caps" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
 </header>
 <nav class="menu" id="menu" aria-label="Mobile">
@@ -584,8 +585,8 @@ index_body = f'''
 </section>
 {invite()}'''
 
-page("index.html", f"{BRAND} | Private Property Search in Prime London",
-     "Private property search in prime London. Share your brief and we find the right home, on and off the market, in Mayfair, Belgravia, Chelsea and beyond.",
+page("index.html", f"{BRAND} | Buy, Sell & Rent London Property",
+     "Crownsmere Estate offers personal London property search, private sales, lettings and international student rental assistance. Speak to property consultant Alaa Qadir.",
      index_body, extra_ld=[FAQ_LD])
 
 # ---------------------------------------------------------------- services
