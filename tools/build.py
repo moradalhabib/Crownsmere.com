@@ -251,7 +251,7 @@ FAQ = [
     ("I live overseas. Can you still help?",
      "Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person."),
     ("Is my enquiry confidential?",
-     "Completely. Your brief and your details are used only to help you, and are never shared without your permission. See the <a href=\"privacy.html\">privacy notice</a> for details."),
+     "Completely. Your brief and your details are used only to help you, and are shared with relevant partners only with your further agreement. See the <a href=\"privacy.html\">privacy notice</a> for details."),
     ("How are fees agreed?",
      "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."),
 ]
