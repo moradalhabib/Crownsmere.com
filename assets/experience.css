@@ -269,3 +269,52 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
   .quick-grid { grid-template-columns: minmax(0,1fr) !important; }
   .quick-card { width: 100%; }
 }
+
+
+/* Visual QA refinement: compact, image-led, non-repetitive presentation. */
+#approach .statement { grid-template-columns: minmax(0,1fr); max-width: 980px; gap: 0; }
+#approach .statement .copy { gap: clamp(16px,2.2vw,28px); }
+#approach .statement .cols { gap: clamp(16px,3vw,32px); }
+#approach .section-head { margin-bottom: clamp(22px,3vw,38px); }
+#approach .facts { margin-top: clamp(28px,4vw,48px); }
+.quick-card { background-color: #111d2b; }
+.quick-card::before { background: linear-gradient(180deg, rgba(5,15,28,.12), rgba(5,15,28,.53) 37%, rgba(5,15,28,.96) 100%); }
+.quick-card .quick-tag { color: #f6dda7; }
+.quick-card .quick-go { color: #fff3d6; }
+@media(max-width:700px) {
+  html { scroll-padding-top: 98px; }
+  .section { padding-block: 34px; }
+  .section.tight { padding-top: 14px; }
+  .section-head { margin-bottom: 22px; gap: 9px; }
+  .section-head h2 { font-size: clamp(35px,9vw,49px); line-height:1.08; }
+  .section-mark { padding-top: 0; gap: 3px; }
+  .quick-entrances { padding: 32px 0 34px; }
+  .quick-entrances .quick-heading { margin-bottom: 20px; }
+  .quick-entrances h2 { font-size: clamp(37px,9vw,48px); margin-bottom: 8px; }
+  .quick-entrances .quick-heading p { font-size: 17px; line-height:1.5; }
+  .quick-grid { gap: 12px; }
+  .quick-card, .quick-card:last-child { aspect-ratio: auto; min-height: 245px; }
+  .quick-card-inner { padding: 20px 21px 19px; gap: 5px; }
+  .quick-card h3 { font-size: clamp(32px,8vw,40px); line-height:1.02; max-width: 15ch; }
+  .quick-card p { font-size: 16px; line-height:1.37; max-width: 31ch; margin: 0 0 4px; }
+  .quick-card .quick-go { font-size: 11px; padding-top: 5px; }
+  .quick-imagery-note { font-size: 12px; line-height:1.4; margin-top: 14px; }
+  #approach .statement { display:block; }
+  #approach .statement .copy { gap: 16px; }
+  #approach .statement .cols { gap: 13px; }
+  #approach .statement .cols p { font-size: 16px; line-height:1.5; }
+  #approach .statement .lede { font-size: 20px; line-height:1.48; }
+  #approach .facts { margin-top: 22px; }
+  #approach .facts div { padding-block: 15px; }
+  #approach .signature { gap: 2px; }
+  .gallery-strip { display:none !important; }
+  .briefs-sec { display:none; }
+  .journey-pin { padding-block: 30px; }
+  .journey-track { gap: 9px; }
+  .journey-track .step-card { padding: 17px; }
+  .journey-track .step-card h3 { font-size: 25px; }
+  .home-showcase .showcase-inner { padding-top: 139px; padding-bottom: 45px; }
+  .home-showcase h1 { font-size: clamp(45px,11vw,60px); }
+  .hd { min-height: 88px; }
+  .home #approach { scroll-margin-top: 106px; }
+}
