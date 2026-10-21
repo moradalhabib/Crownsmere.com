@@ -52,22 +52,22 @@ document.querySelectorAll(".student-form").forEach(function(form){
       ["Preferred areas","preferred_areas"],["Further details","additional_notes"],
       ["Full name","name"],["Email","email"],["Telephone / WhatsApp","phone"],["Preferred contact","preferred_contact"]];
   var intro=isArabic
-   ? "مرحباً علا،\\n\\nلم أتمكن من إرسال استفساري عبر موقع Crownsmere وأود طلب المساعدة في الإيجار أو الضمان.\\n"
-   : "Dear Alaa,\\n\\nThe Crownsmere website could not confirm delivery of my student enquiry. Please review the details below.\\n";
+   ? "مرحباً علا،\n\nلم أتمكن من إرسال استفساري عبر موقع Crownsmere وأود طلب المساعدة في الإيجار أو الضمان.\n"
+   : "Dear Alaa,\n\nThe Crownsmere website could not confirm delivery of my student enquiry. Please review the details below.\n";
   var detail=labels.map(function(row){
    var value=String(data[row[1]]||"").trim();
    return row[0]+": "+(value||"—");
-  }).join("\\n");
-  var end=isArabic?"\\n\\nتم إرسال هذه الرسالة يدوياً باستخدام خيار البريد الإلكتروني البديل."
-   :"\\n\\nSent manually using the Crownsmere student enquiry email alternative.";
-  return intro+"\\n"+detail+end;
+  }).join("\n");
+  var end=isArabic?"\n\nتم إرسال هذه الرسالة يدوياً باستخدام خيار البريد الإلكتروني البديل."
+   :"\n\nSent manually using the Crownsmere student enquiry email alternative.";
+  return intro+"\n"+detail+end;
  }
  function showFallback(data){
   if(!fallback)return;
   fallbackBody=enquirySummary(data);
   var subject="[Crownsmere Enquiry] Student assistance - "+String(data.name||"").trim().slice(0,90);
   if(emailLink)emailLink.href="mailto:"+fallbackEmail+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(fallbackBody);
-  if(copyText)copyText.value="To: "+fallbackEmail+"\\nSubject: "+subject+"\\n\\n"+fallbackBody;
+  if(copyText)copyText.value="To: "+fallbackEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
   if(copyFeedback)copyFeedback.textContent="";
   if(copyLabel)copyLabel.hidden=true;
   fallback.hidden=false;
