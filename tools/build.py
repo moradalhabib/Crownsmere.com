@@ -313,7 +313,7 @@ def pillars(quote="The finest homes rarely need to be advertised.", media=True):
     return f'''<div class="pillars-wrap">
       <div class="pillars">{items}</div>
       <figure class="pillars-media reveal-img" data-reveal>
-        <div class="mat"><div class="frame">{pic("colonnade", "White stucco townhouses on a leafy London street", 563, 398)}</div></div>
+        <div class="mat"><div class="frame">{pic("door", "A classic London townhouse entrance", 433, 610)}</div></div>
         <blockquote>{quote}</blockquote>
       </figure>
     </div>'''
