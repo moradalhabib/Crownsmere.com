@@ -46,3 +46,18 @@ for(const [path,name] of [['/services.html','services'],['/about.html','about'],
     }
   });
 }
+
+test('mobile header clears section headings on scroll down and returns on scroll up',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ await expect(page.locator('.hd')).toBeVisible();
+ await page.evaluate(()=>window.scrollTo(0,1450));
+ await page.waitForTimeout(450);
+ await expect(page.locator('.hd')).toHaveClass(/is-hidden-on-scroll/);
+ const hidden=await page.locator('.hd').evaluate(e=>getComputedStyle(e).transform);
+ expect(hidden).not.toBe('none');
+ await page.evaluate(()=>window.scrollTo(0,1250));
+ await page.waitForTimeout(450);
+ await expect(page.locator('.hd')).not.toHaveClass(/is-hidden-on-scroll/);
+ await expect(page.locator('.hd-menu')).toBeVisible();
+});
