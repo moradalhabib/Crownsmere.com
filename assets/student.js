@@ -43,25 +43,97 @@ document.querySelectorAll(".student-form").forEach(function(form){
  var fallbackEmail="alaa.qadir@crownsmere.com";
  var archiveEmail="hello@crownsmere.com";
  function enquirySummary(data){
-  var labels=isArabic
-   ? [["نوع المساعدة","service"],["الجامعة أو الكلية","university"],["الميزانية الشهرية","monthly_budget"],
-      ["موعد الانتقال","move_timeframe"],["حالة الضامن","guarantor_status"],["هل وجدت عقاراً؟","property_found"],
-      ["المناطق المفضلة","preferred_areas"],["ملاحظات إضافية","additional_notes"],
-      ["الاسم","name"],["البريد الإلكتروني","email"],["الهاتف","phone"],["طريقة التواصل","preferred_contact"]]
-   : [["Service requested","service"],["University / college","university"],["Monthly budget","monthly_budget"],
-      ["Moving timeframe","move_timeframe"],["Guarantor situation","guarantor_status"],["Property already found","property_found"],
-      ["Preferred areas","preferred_areas"],["Further details","additional_notes"],
-      ["Full name","name"],["Email","email"],["Telephone / WhatsApp","phone"],["Preferred contact","preferred_contact"]];
-  var intro=isArabic
-   ? "مرحباً علا،\n\nلم أتمكن من إرسال استفساري عبر موقع Crownsmere وأود طلب المساعدة في الإيجار أو الضمان.\n"
-   : "Dear Alaa,\n\nThe Crownsmere website could not confirm delivery of my student enquiry. Please review the details below.\n";
-  var detail=labels.map(function(row){
-   var value=String(data[row[1]]||"").trim();
-   return row[0]+": "+(value||"—");
-  }).join("\n");
-  var end=isArabic?"\n\nتم إرسال هذه الرسالة يدوياً باستخدام خيار البريد الإلكتروني البديل."
-   :"\n\nSent manually using the Crownsmere student enquiry email alternative.";
-  return intro+"\n"+detail+end;
+  var choices={
+   service:{
+    "Apartment and guarantor help":["Apartment search and guarantor guidance","البحث عن شقة والمساعدة في خيارات الضمان"],
+    "Guarantor guidance for found property":["Guarantor guidance for a property already found","المساعدة في خيارات الضمان لعقار وجدته"],
+    "Apartment search only":["Apartment search only","البحث عن شقة للإيجار فقط"]
+   },
+   monthly_budget:{
+    "Not decided":["Not decided yet","لم أحدد الميزانية بعد"],
+    "Under GBP 1500":["Under £1,500 per month","أقل من £1,500 شهرياً"],
+    "GBP 1500-2500":["£1,500–£2,500 per month","من £1,500 إلى £2,500 شهرياً"],
+    "GBP 2500-4000":["£2,500–£4,000 per month","من £2,500 إلى £4,000 شهرياً"],
+    "Over GBP 4000":["Over £4,000 per month","أكثر من £4,000 شهرياً"]
+   },
+   move_timeframe:{
+    "As soon as possible":["As soon as possible","في أقرب وقت ممكن"],
+    "Within 1 month":["Within one month","خلال شهر واحد"],
+    "Within 1-3 months":["Within 1–3 months","خلال شهر إلى ثلاثة أشهر"],
+    "Later/unsure":["Later / not sure yet","لاحقاً / لم أحدد بعد"]
+   },
+   guarantor_status:{
+    "No UK guarantor":["I do not have a UK guarantor","ليس لدي ضامن في المملكة المتحدة"],
+    "Potential overseas family guarantor":["I may have a family guarantor overseas","قد يستطيع أحد أفراد عائلتي خارج المملكة المتحدة أن يكون ضامناً"],
+    "Exploring professional guarantor":["I want advice about professional guarantor services","أرغب في معرفة خدمات الضامن المهني"],
+    "Unsure":["I am not sure yet","لست متأكداً بعد"]
+   },
+   property_found:{
+    "Need to find a property":["Not yet — please help me search","لم أجد عقاراً بعد وأحتاج للمساعدة في البحث"],
+    "Already found a property":["Yes — I have a particular property in mind","نعم، وجدت عقاراً محدداً"],
+    "Comparing options":["Still comparing properties","ما زلت أقارن بين العقارات"]
+   },
+   preferred_contact:{
+    "Email":["Email","البريد الإلكتروني"],
+    "Phone":["Telephone call","مكالمة هاتفية"],
+    "WhatsApp":["WhatsApp","واتساب"]
+   }
+  };
+  function value(name){
+   var raw=String(data[name]||"").trim();
+   var mapped=choices[name]&&choices[name][raw];
+   return mapped?mapped[isArabic?1:0]:raw;
+  }
+  function line(label,name,optional){
+   var result=value(name);
+   return result||!optional?label+": "+(result||(isArabic?"غير محدد":"Not provided")):"";
+  }
+  function section(title,lines){
+   var present=lines.filter(Boolean);
+   return present.length?title+"\n"+present.join("\n"):"";
+  }
+  var name=String(data.name||"").trim();
+  var sections=isArabic?[
+   section("بيانات الطالب",[line("الاسم الكامل","name"),line("الجامعة أو الكلية","university",true)]),
+   section("متطلبات السكن",[
+    line("نوع المساعدة المطلوبة","service"),
+    line("ميزانية الإيجار الشهرية","monthly_budget"),
+    line("موعد الانتقال","move_timeframe"),
+    line("المناطق المفضلة في لندن","preferred_areas",true),
+    line("حالة البحث عن العقار","property_found")
+   ]),
+   section("وضع الضامن",[line("الضامن المتاح","guarantor_status")]),
+   section("معلومات التواصل",[
+    line("البريد الإلكتروني","email"),line("رقم الهاتف أو واتساب","phone",true),
+    line("طريقة التواصل المفضلة","preferred_contact")
+   ]),
+   value("additional_notes")?section("تفاصيل إضافية",[value("additional_notes")]):""
+  ]:[
+   section("STUDENT DETAILS",[line("Full name","name"),line("University / college","university",true)]),
+   section("RENTAL REQUIREMENTS",[
+    line("Assistance required","service"),
+    line("Monthly rental budget","monthly_budget"),
+    line("Preferred move-in time","move_timeframe"),
+    line("Preferred London areas","preferred_areas",true),
+    line("Property search status","property_found")
+   ]),
+   section("GUARANTOR SITUATION",[line("Current situation","guarantor_status")]),
+   section("CONTACT DETAILS",[
+    line("Email address","email"),line("Phone / WhatsApp","phone",true),
+    line("Preferred contact method","preferred_contact")
+   ]),
+   value("additional_notes")?section("ADDITIONAL NOTES",[value("additional_notes")]):""
+  ];
+  var introduction=isArabic
+   ?"مرحباً أستاذة علا،\n\nأنا طالب دولي وأرغب في مساعدتكم في إيجار عقار في لندن أو معرفة خيارات الضامن المناسبة. فيما يلي تفاصيل طلبي:"
+   :"Dear Alaa,\n\nI am an international student seeking assistance with renting a home in London and/or understanding UK guarantor options. Please find my requirements below.";
+  var end=isArabic
+   ?"أرجو التواصل معي لمناقشة الخيارات المتاحة.\n\nمع خالص التحية،\n"+name
+   :"I would appreciate your guidance and look forward to hearing from you.\n\nKind regards,\n"+name;
+  var origin=isArabic
+   ?"أُعدّت هذه الرسالة عبر نموذج الطلاب في crownsmere.com/students.html"
+   :"Prepared using the student enquiry form at crownsmere.com/students.html";
+  return introduction+"\n\n"+sections.filter(Boolean).join("\n\n")+"\n\n"+end+"\n\n"+origin;
  }
  function showFallback(data){
   if(!fallback)return;
