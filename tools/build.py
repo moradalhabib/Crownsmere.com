@@ -481,7 +481,6 @@ index_body = f'''
       <h2 data-reveal data-split>A personal approach to <em>London property.</em></h2>
     </div>
     <div class="statement">
-      
       <div class="copy">
         <p class="lede dropcap" data-highlight>Crownsmere Estate is not a typical estate agency. Rather than selling whatever happens to be on the books, I work from your brief, searching personally to find what is genuinely right for you.</p>
         <div class="cols" data-reveal>
