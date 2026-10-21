@@ -366,3 +366,18 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
   #approach .facts div { padding-block: 14px; }
   #approach .facts div + div { margin-top: 0; }
 }
+
+
+/* Mobile navigation: accessible touch targets and reduced motion.
+   Avoid long reveal animations and prevent background scroll while the overlay is open. */
+@media (max-width: 1099px) {
+  html.menu-open { overflow: hidden; }
+  .hd-menu { min-height: 44px; min-width: 44px; justify-content: center; }
+  .menu { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .menu li a { min-height: 48px; align-items: center; }
+  .menu a:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: -4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu { transition: none !important; }
+  .hd-menu i::before, .hd-menu i::after { transition: none !important; }
+}
