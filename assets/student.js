@@ -40,7 +40,8 @@ document.querySelectorAll(".student-form").forEach(function(form){
  var copyText=fallback&&fallback.querySelector("[data-copy-text]");
  var isArabic=form.getAttribute("data-form-lang")==="ar";
  var fallbackBody="";
- var fallbackEmail="hello@crownsmere.com";
+ var fallbackEmail="alaa.qadir@crownsmere.com";
+ var archiveEmail="hello@crownsmere.com";
  function enquirySummary(data){
   var labels=isArabic
    ? [["نوع المساعدة","service"],["الجامعة أو الكلية","university"],["الميزانية الشهرية","monthly_budget"],
