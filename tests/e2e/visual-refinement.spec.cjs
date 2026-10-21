@@ -70,3 +70,30 @@ test('student application starts promptly after concise introduction',async({pag
  expect(formTop).toBeLessThan(1350);
  await expect(page.locator('form.student-form[data-form-lang="en"]')).toBeVisible();
 });
+
+
+test('mobile services are compact and avoid repeated interior photography',async({page})=>{
+  for(const width of [320,390,430]){
+    await page.setViewportSize({width,height:844});
+    await page.goto('/services.html');
+    await expect(page.locator('.services-list .service')).toHaveCount(5);
+    const result=await page.evaluate(()=>{
+      const repeated=document.querySelector('.market-media');
+      const first=document.querySelector('.services-list .service');
+      const li=first?.querySelector('li');
+      return {
+        scrollWidth:document.documentElement.scrollWidth,
+        pageHeight:document.documentElement.scrollHeight,
+        duplicateImageHidden:repeated?getComputedStyle(repeated).display==='none':true,
+        firstPadding:first?getComputedStyle(first).paddingTop:null,
+        bulletPadding:li?getComputedStyle(li).paddingTop:null
+      };
+    });
+    expect(result.scrollWidth).toBeLessThanOrEqual(width+3);
+    expect(result.duplicateImageHidden).toBeTruthy();
+    expect(parseFloat(result.firstPadding)).toBeLessThanOrEqual(30);
+    expect(parseFloat(result.bulletPadding)).toBeLessThanOrEqual(10);
+    expect(result.pageHeight).toBeLessThan(8100);
+    await page.screenshot({path:'test-screenshots/compact-services-'+width+'.png',fullPage:true,animations:'disabled'});
+  }
+});
