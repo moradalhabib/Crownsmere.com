@@ -414,29 +414,75 @@ process_cards = "".join(
 )
 
 index_body = f'''
-<section class="hero3d" aria-label="Crownsmere Estate">
-  <div class="hero3d-stage" aria-hidden="true">
-    <div class="seal">{SEAL}</div>
-    <img class="crest-fallback" src="assets/img/monogram.png" alt="" width="330" height="518">
-    <canvas class="crest-canvas"></canvas>
-  </div>
-  <div class="hero3d-corners caps" aria-hidden="true"><span>Private Property Search</span><span>51&deg;30&prime;N &middot; 0&deg;09&prime;W</span></div>
-  <div class="hero3d-copy wrap">
-    <h1><span class="line"><span>The right home,</span></span><span class="line"><span><em>found for you.</em></span></span></h1>
-    <div class="hero3d-side">
-      <p>A private, by-request property service in prime London. You share your brief; I search discreetly, on and off the market, and bring you only what is genuinely right.</p>
-      <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
+<section class="home-showcase" aria-label="Crownsmere London property consultancy">
+  <picture class="showcase-picture">
+    <source type="image/webp" srcset="assets/img/townhouse.webp">
+    <img src="assets/img/townhouse.jpg" alt="An elegant white-stucco London townhouse" width="1055" height="687" fetchpriority="high">
+  </picture>
+  <div class="wrap showcase-inner">
+    <div class="showcase-copy">
+      <div class="showcase-eyebrow caps">Prime London &middot; Private Property Consultancy</div>
+      <h1>London property, <em>personally handled.</em></h1>
+      <p>Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a carefully guided property search and personal advice.</p>
+      <div class="showcase-actions">
+        <a class="btn btn-gold caps" href="contact.html">Tell us what you need <span aria-hidden="true">&rarr;</span></a>
+        <a class="showcase-secondary" href="students.html">International student? Get rental help <span aria-hidden="true">&rarr;</span></a>
+      </div>
+      <p class="showcase-footnote">Prime London &middot; By appointment &middot; Personal service</p>
     </div>
   </div>
-  <a class="scroll-cue caps" href="#reveal"><span>Discover</span><i aria-hidden="true"></i></a>
 </section>
 
-<section class="arch" id="reveal" aria-label="A more personal London">
-  <div class="arch-pin">
-    <div class="arch-window">{pic("townhouse", "A white stucco London townhouse with a black front door and columned porch", 1055, 687)}</div>
-    <div class="arch-copy">
-      <span class="caps">People &middot; Property &middot; Perspective</span>
-      <p class="display">A more personal <em>London.</em></p>
+<section class="quick-entrances" aria-labelledby="quick-choices-heading">
+  <div class="wrap">
+    <div class="quick-heading">
+      <div class="eyebrow caps">How can we help?</div>
+      <h2 id="quick-choices-heading">Find your way <em>forward.</em></h2>
+      <p>Select what you're looking for. We'll guide you towards the right next step, with a personal response rather than a long property catalogue.</p>
+    </div>
+    <div class="quick-grid">
+      <a class="quick-card" href="contact.html" aria-label="Buy or find a London property, share your requirements">
+        {pic("townhouse", "White London townhouses in a prime residential area", 1055, 687)}
+        <div class="quick-card-inner">
+          <span class="quick-tag">BUY &middot; INVEST</span>
+          <h3>Find a London home</h3>
+          <p>A personal property search, including opportunities not publicly listed.</p>
+          <span class="quick-go">Start your search &rarr;</span>
+        </div>
+      </a>
+      <a class="quick-card" href="services.html#sell" aria-label="Sell or let your property with Crownsmere">
+        {pic("interior", "An elegant London apartment interior", 826, 463)}
+        <div class="quick-card-inner">
+          <span class="quick-tag">SELL &middot; LET</span>
+          <h3>Your property, carefully represented</h3>
+          <p>Discreet introductions, trusted relationships and thoughtful negotiation.</p>
+          <span class="quick-go">Explore services &rarr;</span>
+        </div>
+      </a>
+      <a class="quick-card" href="students.html" aria-label="International students, request London rental and guarantor assistance">
+        {pic("westminster", "Central London and Westminster viewed from a city apartment", 420, 480)}
+        <div class="quick-card-inner">
+          <span class="quick-tag">INTERNATIONAL STUDENTS</span>
+          <h3>Studying in London?</h3>
+          <p>Find a rental home and explore options without a UK guarantor.</p>
+          <span class="quick-go">Get student assistance &rarr;</span>
+        </div>
+      </a>
+    </div>
+    <p class="quick-imagery-note">Images illustrate London properties and neighbourhoods, not guaranteed available listings.</p>
+  </div>
+</section>
+
+<section class="gallery-strip" aria-labelledby="london-gallery-heading">
+  <div class="wrap">
+    <div class="gallery-head">
+      <h2 id="london-gallery-heading">A more personal <em>London.</em></h2>
+      <p class="gallery-note">From classic streets to contemporary interiors, our searches start with what matters to you.</p>
+    </div>
+    <div class="gallery-images">
+      <figure>{pic("colonnade", "London white-stucco residences on a leafy street", 563, 398)}<figcaption>Residential London</figcaption></figure>
+      <figure>{pic("interior", "Elegant contemporary London living room", 826, 463)}<figcaption>Spaces to call home</figcaption></figure>
+      <figure>{pic("door", "A classic London townhouse entrance with brass details", 433, 610)}<figcaption>Every detail considered</figcaption></figure>
     </div>
   </div>
 </section>
@@ -561,12 +607,16 @@ services_body = f'''
       <h1><span class="line"><span>By request.</span></span><span class="line"><span><em>Personally found.</em></span></span></h1>
       {LOGO()}
     </div>
-    <p class="lede" data-reveal>There is no shop window here. Every engagement begins with your brief, and every search is carried out personally, with complete discretion.</p>
+    <p class="lede" data-reveal>A clearer way to buy, sell, rent or invest in London. Choose the service you need, and Alaa will guide you personally.</p>
   </div>
 </section>
 
 <nav class="subnav" aria-label="Services"><div class="wrap">{subnav}</div></nav>
 
+<section class="service-photo-band wrap" aria-label="London property photography">
+  {pic("interior", "An elegant London apartment living room", 826, 463)}
+  <div><div class="eyebrow caps">Crownsmere Estate</div><h2>Properties, people, <em>perspective.</em></h2><p>Personally guided services across prime London.</p></div>
+</section>
 <section class="section tight services-list">
   <div class="wrap">
     {svc("01", "Buy", "buy", "Tell me what you are looking for, and I will find it: on the market, off the market, or not yet on anyone&rsquo;s radar.", ["A private briefing on your requirements", "A personal search, on and off the market", "Access to homes that are never advertised", "A curated shortlist, checked before you see it", "Accompanied private viewings", "Negotiation and support through to completion"])}
@@ -610,7 +660,7 @@ about_body = f'''
       <h1><span class="line"><span>Why</span></span><span class="line"><span><em>Crownsmere.</em></span></span></h1>
       {LOGO()}
     </div>
-    <p class="lede" data-reveal>A personal, discreet and one-to-one property service, built around the client rather than the listing.</p>
+    <p class="lede" data-reveal>Work directly with Alaa Qadir on a property search shaped around your priorities and London neighbourhoods.</p>
   </div>
 </section>
 
@@ -686,7 +736,7 @@ contact_body = f'''
 <section class="section tight">
   <div class="wrap">
     <div class="contact-intro" data-reveal>
-      <p class="lede lede-sm">Tell me what you are looking for, in as much or as little detail as you like. As you answer, your brief is composed into a letter, exactly as I will read it. I will be in touch personally, in complete confidence.</p>
+      <p class="lede lede-sm">Tell Alaa what you need. This short guided form prepares a personalised enquiry, helping you explain your property requirements clearly.</p>
       <dl>
         <div><dt class="caps">Telephone</dt><dd>Shared personally, <em>once your brief is received</em></dd></div>
         <div><dt class="caps">Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
