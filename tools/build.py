@@ -112,6 +112,7 @@ def head(title, desc, path, extra_ld=None):
 <link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
 {hero_preload}<link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/experience.css">
+<link rel="stylesheet" href="assets/mobile-header.css">
 {'<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">' if path == "index.html" else ""}
 <script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
 </head>
