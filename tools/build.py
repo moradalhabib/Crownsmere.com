@@ -478,10 +478,10 @@ index_body = f'''
   <div class="wrap">
     <div class="section-head">
       <div class="section-mark caps"><b>I.</b>The Approach</div>
-      <h2 data-reveal data-split>No shop window. <em>No listings.</em> Just your brief.</h2>
+      <h2 data-reveal data-split>A personal approach to <em>London property.</em></h2>
     </div>
     <div class="statement">
-      {statement_figure("Prime London")}
+      
       <div class="copy">
         <p class="lede dropcap" data-highlight>Crownsmere Estate is not a typical estate agency. Rather than selling whatever happens to be on the books, I work from your brief, searching personally to find what is genuinely right for you.</p>
         <div class="cols" data-reveal>
