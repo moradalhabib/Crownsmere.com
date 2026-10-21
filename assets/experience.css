@@ -225,3 +225,22 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
   .journey-track .step-card h3 { font-size: 27px; }
   .journey-track .step-card p { font-size: 16px; line-height: 1.4; margin: 6px 0 0; }
 }
+
+/* One clear and reliable email draft path for the general contact form. */
+.contact-mail-backup[hidden], .contact-copy-label[hidden] { display: none !important; }
+.contact-mail-backup {
+  padding: clamp(18px, 2.2vw, 30px);
+  margin-top: 25px;
+  background: var(--paper);
+  border: 1px solid var(--gold);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.contact-mail-backup h3 { font: 400 clamp(31px, 4vw, 45px)/1.15 var(--display); margin: 0 0 12px; color: var(--navy); }
+.contact-mail-backup p { font: 400 17px/1.5 var(--body); color: var(--ink-soft); margin: 0 0 18px; }
+.contact-mail-backup .btn-row { display: flex; gap: 11px; flex-wrap: wrap; }
+.contact-mail-backup .btn { padding: 13px 18px; min-height: 50px; text-align: center; font-size: 11px; }
+.contact-mail-backup [data-contact-feedback] { margin-top: 15px; font: 400 15px/1.5 var(--body); }
+.contact-copy-label { display: block; font: 400 15px/1.5 var(--body); margin-top: 15px; color: var(--ink-soft); }
+.contact-copy-label textarea { display: block; width: 100%; min-height: 180px; border: 1px solid var(--stone); background: white; color: var(--navy); padding: 15px; font: 15px/1.55 system-ui, sans-serif; margin-top: 8px; resize: vertical; }
+@media(max-width: 650px) { .contact-mail-backup .btn-row { display: grid; } .contact-mail-backup .btn { width: 100%; } }
