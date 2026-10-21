@@ -136,22 +136,30 @@ document.querySelectorAll(".student-form").forEach(function(form){
   return introduction+"\n\n"+sections.filter(Boolean).join("\n\n")+"\n\n"+end+"\n\n"+origin;
  }
  function showFallback(data){
-  if(!fallback)return;
+  if(!fallback)return "";
   fallbackBody=enquirySummary(data);
-  var subject="[Crownsmere Enquiry] Student assistance - "+String(data.name||"").trim().slice(0,90);
-  if(emailLink)emailLink.href="mailto:"+fallbackEmail+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(fallbackBody);
-  if(copyText)copyText.value="To: "+fallbackEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
+  var who=String(data.name||"").replace(/[\r\n<>]/g," ").trim().slice(0,75);
+  var subject=isArabic
+   ?"Crownsmere Estate | طلب سكن للطلاب الدوليين | "+who
+   :"Crownsmere Estate | International Student Rental Enquiry | "+who;
+  var mailto="mailto:"+fallbackEmail
+   +"?cc="+encodeURIComponent(archiveEmail)
+   +"&subject="+encodeURIComponent(subject)
+   +"&body="+encodeURIComponent(fallbackBody);
+  if(emailLink)emailLink.setAttribute("href",mailto);
+  if(copyText)copyText.value="To: "+fallbackEmail+"\nCc: "+archiveEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
   if(copyFeedback)copyFeedback.textContent="";
   if(copyLabel)copyLabel.hidden=true;
   fallback.hidden=false;
+  return mailto;
  }
  if(copyButton){
   copyButton.addEventListener("click",function(){
    var text=copyText?copyText.value:fallbackBody;
    if(!text)return;
    function copied(){if(copyFeedback)copyFeedback.textContent=isArabic
-    ?"تم نسخ الطلب. الصقه في رسالة بريد إلى hello@crownsmere.com واضغط إرسال."
-    :"Enquiry copied. Paste it into an email to hello@crownsmere.com and press Send.";}
+    ?"تم نسخ الطلب. الصقه في رسالة بريد إلى علا واضغط إرسال."
+    :"Enquiry copied. Paste it into an email to Alaa and press Send.";}
    function manual(){
     if(copyLabel)copyLabel.hidden=false;
     if(copyText){copyText.focus();copyText.select();}
