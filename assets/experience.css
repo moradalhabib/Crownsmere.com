@@ -1,0 +1,153 @@
+/* Crownsmere 2026 UX edition — a visual, accessible, mobile-first refinement.
+ * Preserve the established ivory / champagne / navy design system.
+ * All imagery below is from Crownsmere's existing website asset library.
+ */
+html { scroll-padding-top: 105px; }
+:where(section[id], article[id], form[id]) { scroll-margin-top: 110px; }
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 4px;
+}
+.hd-mark, .hd-menu, .hd-nav a, .actionbar a { touch-action: manipulation; }
+.btn, .hd-nav a, .menu a, .choice, .area-btn, .quick-card { -webkit-tap-highlight-color: transparent; }
+
+/* Clear, photo-led choices directly after the home hero. */
+.quick-entrances {
+  padding: clamp(60px, 8vw, 118px) 0;
+  background: var(--vellum);
+  border-block: 1px solid var(--rule);
+}
+.quick-entrances .quick-heading { max-width: 890px; margin: 0 0 35px; }
+.quick-entrances .quick-heading .eyebrow { margin-bottom: 14px; }
+.quick-entrances h2 { font-size: clamp(43px, 5vw, 78px); line-height: 1.02; margin-bottom: 14px; }
+.quick-entrances .quick-heading p { margin: 0; max-width: 42em; color: var(--ink-soft); font-size: clamp(18px, 1.5vw, 23px); }
+.quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 27px); }
+.quick-card {
+  position: relative;
+  display: grid;
+  align-items: end;
+  isolation: isolate;
+  min-width: 0;
+  aspect-ratio: 0.9;
+  overflow: hidden;
+  border: 1px solid rgba(176,141,87,.45);
+  background: var(--navy);
+  text-decoration: none;
+  color: #fff;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.quick-card picture { display: contents; }
+.quick-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.quick-card::before { content: ""; position: absolute; inset: 0; z-index: 0; background: linear-gradient(180deg, rgba(6,17,31,.08) 0%, rgba(6,17,31,.16) 34%, rgba(6,17,31,.94) 100%); }
+.quick-card-inner { position: relative; z-index: 1; padding: clamp(21px, 2.5vw, 34px); display: grid; gap: 9px; }
+.quick-card .quick-tag { color: #e6cc95; letter-spacing: .15em; font: 500 11px/1.4 var(--caps); }
+.quick-card h3 { color: white; font-family: var(--display); font-size: clamp(33px, 3.4vw, 56px); line-height: 1.02; }
+.quick-card p { color: #f5eee3; max-width: 32ch; font: 400 clamp(16px, 1.4vw, 21px)/1.45 var(--body); margin: 0 0 9px; }
+.quick-card .quick-go { display: inline-flex; align-items: center; gap: 7px; color: #f3dfb9; font: 500 11px/1.5 var(--caps); letter-spacing: .1em; }
+.quick-card:focus-visible { outline-offset: 3px; }
+@media (hover: hover) {
+  .quick-card:hover { transform: translateY(-5px); box-shadow: 0 24px 45px -25px rgba(14,27,46,.55); }
+  .quick-card:hover img { transform: scale(1.055); }
+}
+
+/* Cross-site photo gallery: images illustrate the London lifestyle rather than advertised inventory. */
+.gallery-strip { padding: clamp(48px, 7vw, 95px) 0; background: var(--vellum); }
+.gallery-strip .gallery-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin: 0 0 30px; }
+.gallery-strip h2 { font-size: clamp(39px, 4vw, 66px); }
+.gallery-strip .gallery-note { color: var(--ink-mute); max-width: 38ch; font: 400 17px/1.5 var(--body); margin: 0; }
+.gallery-images { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: clamp(9px, 1.6vw, 22px); }
+.gallery-images figure { min-width: 0; margin: 0; }
+.gallery-images img { display: block; width: 100%; aspect-ratio: 4 / 4.4; height: auto; object-fit: cover; }
+.gallery-images figcaption { padding-top: 12px; font: 500 11px/1.4 var(--caps); letter-spacing: .13em; color: var(--bronze); }
+.gallery-images figure:first-child img { aspect-ratio: 4 / 4.4; }
+.gallery-images figure:nth-child(2) img { object-position: 60% 50%; }
+
+/* Clear paths from each page to enquiry. */
+.page-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 31px; }
+.page-actions .btn { min-height: 50px; }
+.audience-note { margin-top: 18px; color: var(--ink-mute); font: 400 16px/1.5 var(--body); }
+.hero-shortcuts { display: flex; align-items: center; flex-wrap: wrap; gap: 11px 20px; margin-top: 3px; }
+.hero-shortcuts a { color: var(--navy); font: 500 13px/1.5 var(--caps); text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 6px; }
+.section.tight { scroll-margin-top: 100px; }
+
+/* Mobile comfort: reduce motion, scroll distance and avoid form/fixed-footer collisions. */
+@media (max-width: 1099px) {
+  .hd { background: rgba(246,240,228,.97); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .menu { overflow-y: auto; overscroll-behavior: contain; }
+  .menu li a { min-height: 54px; }
+  .ft-top { gap: 28px; }
+}
+@media (max-width: 900px) {
+  .section { padding-block: clamp(55px, 9vw, 88px); }
+  .section.tight { padding-top: 0; }
+  .quick-entrances { padding-block: clamp(44px, 7vw, 72px); }
+  .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quick-card:last-child { grid-column: 1 / -1; aspect-ratio: 2.1; }
+  .quick-card h3 { font-size: clamp(33px, 4.5vw, 45px); }
+  .gallery-images { gap: 12px; }
+  .gallery-strip .gallery-head { align-items: start; flex-direction: column; gap: 10px; }
+  .composer .preview { display: none; }
+  .contact-intro { margin-bottom: 30px; }
+  .menu li a { padding: 8px 0; font-size: clamp(34px, 7vw, 51px); line-height: 1.18; }
+}
+@media (max-width: 700px) {
+  /* The header already carries the royal mark. Lead with property imagery and plain language. */
+  .home .hero3d {
+    position: relative;
+    min-height: 0;
+    padding-top: 116px;
+    background: linear-gradient(180deg, rgba(246,240,228,.52) 0%, rgba(246,240,228,.79) 36%, rgba(246,240,228,.97) 77%), url("img/townhouse.webp") 50% 35% / cover no-repeat;
+  }
+  .home .hero3d-stage, .home .hero3d-corners, .home .seal { display: none; }
+  .home .hero3d-copy { padding-block: clamp(70px, 12vw, 125px) 52px; gap: 19px; }
+  .home .hero3d h1 { font-size: clamp(46px, 12vw, 65px); line-height: 1.03; }
+  .home .hero3d-side { gap: 17px; padding: 0; }
+  .home .hero3d-side p { font-size: clamp(17px, 4.5vw, 21px); line-height: 1.52; color: var(--navy); }
+  .hero-shortcuts { margin-top: 3px; }
+  .hero-shortcuts a { font-size: 11px; padding-block: 7px; }
+  .quick-heading h2 { font-size: clamp(38px, 9vw, 52px); }
+  .quick-grid { grid-template-columns: 1fr; gap: 15px; }
+  .quick-card, .quick-card:last-child { grid-column: auto; aspect-ratio: 1.3; min-height: 275px; }
+  .quick-card img { object-position: 50% 45%; }
+  .quick-card .quick-tag { font-size: 9.5px; }
+  .quick-card h3 { font-size: clamp(35px, 9vw, 46px); }
+  .quick-card p { font-size: 17px; }
+  .gallery-images { grid-template-columns: 1fr 1fr; }
+  .gallery-images figure:first-child { grid-column: 1 / -1; }
+  .gallery-images figure:first-child img { aspect-ratio: 16 / 10; }
+  .gallery-images img { aspect-ratio: 1; }
+  .gallery-images figcaption { font-size: 9.5px; }
+  .page-hero { padding-top: 126px; padding-bottom: 40px; }
+  .page-hero h1 { font-size: clamp(46px, 11vw, 74px); line-height: 1.04; }
+  .page-hero .lede { margin-top: 21px; font-size: 23px; }
+  .page-hero .eyebrow { margin-bottom: 16px; }
+  .page-actions { flex-direction: column; align-items: stretch; margin-top: 20px; }
+  .page-actions .btn { width: 100%; text-align: center; }
+  .student-main .student-application { padding: 20px; }
+  .student-stage .std-actions .btn { min-height: 48px; }
+  .field input, .field select, .field textarea { font-size: 21px; }
+  .letter { padding: 26px 22px; }
+  .letter::before { inset: 8px; }
+  .letter-head { margin-bottom: 25px; }
+  .contact-intro { gap: 16px; }
+  .hero3d-side .btn { min-height: 52px; }
+  .actionbar { display: none !important; }
+  body { padding-bottom: 0 !important; }
+  .ft-top { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
+  .ft-brand { grid-column: 1 / -1; }
+  .ft-brand b { font-size: 16px; letter-spacing: .1em; }
+  .ft-brand img { height: 50px; }
+  .ft-motto { font-size: clamp(12px, 3vw, 20px); letter-spacing: .12em; }
+}
+@media (max-width: 350px) {
+  .hd-mark { gap: 7px; }
+  .hd-mark img { height: 34px; }
+  .hd-mark .wm b { font-size: 11px; letter-spacing: .11em; }
+  .hd-menu { gap: 6px; }
+  .hero-shortcuts { gap: 3px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-card, .quick-card img { transition: none; }
+}
+/* Form focus should scroll out from beneath the persistent fixed brand header. */
+form, .field input, .field textarea, .field select, .std-field input, .std-field select, .std-field textarea { scroll-margin-top: 112px; }
