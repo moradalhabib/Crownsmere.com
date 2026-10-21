@@ -32,6 +32,67 @@ document.querySelectorAll(".student-form").forEach(function(form){
  var status=form.querySelector(".std-status");
  var complete=form.querySelector(".std-sent");
  var submit=form.querySelector('[type="submit"]');
+ var fallback=form.querySelector(".std-fallback");
+ var emailLink=fallback&&fallback.querySelector("[data-email-fallback]");
+ var copyButton=fallback&&fallback.querySelector("[data-copy-fallback]");
+ var copyFeedback=fallback&&fallback.querySelector("[data-copy-feedback]");
+ var copyLabel=fallback&&fallback.querySelector(".std-copy-label");
+ var copyText=fallback&&fallback.querySelector("[data-copy-text]");
+ var isArabic=form.getAttribute("data-form-lang")==="ar";
+ var fallbackBody="";
+ var fallbackEmail="hello@crownsmere.com";
+ function enquirySummary(data){
+  var labels=isArabic
+   ? [["نوع المساعدة","service"],["الجامعة أو الكلية","university"],["الميزانية الشهرية","monthly_budget"],
+      ["موعد الانتقال","move_timeframe"],["حالة الضامن","guarantor_status"],["هل وجدت عقاراً؟","property_found"],
+      ["المناطق المفضلة","preferred_areas"],["ملاحظات إضافية","additional_notes"],
+      ["الاسم","name"],["البريد الإلكتروني","email"],["الهاتف","phone"],["طريقة التواصل","preferred_contact"]]
+   : [["Service requested","service"],["University / college","university"],["Monthly budget","monthly_budget"],
+      ["Moving timeframe","move_timeframe"],["Guarantor situation","guarantor_status"],["Property already found","property_found"],
+      ["Preferred areas","preferred_areas"],["Further details","additional_notes"],
+      ["Full name","name"],["Email","email"],["Telephone / WhatsApp","phone"],["Preferred contact","preferred_contact"]];
+  var intro=isArabic
+   ? "مرحباً علا،\n\nلم أتمكن من إرسال استفساري عبر موقع Crownsmere وأود طلب المساعدة في الإيجار أو الضمان.\n"
+   : "Dear Alaa,\n\nThe Crownsmere website could not confirm delivery of my student enquiry. Please review the details below.\n";
+  var detail=labels.map(function(row){
+   var value=String(data[row[1]]||"").trim();
+   return row[0]+": "+(value||"—");
+  }).join("\n");
+  var end=isArabic?"\n\nتم إرسال هذه الرسالة يدوياً باستخدام خيار البريد الإلكتروني البديل."
+   :"\n\nSent manually using the Crownsmere student enquiry email alternative.";
+  return intro+"\n"+detail+end;
+ }
+ function showFallback(data){
+  if(!fallback)return;
+  fallbackBody=enquirySummary(data);
+  var subject="[Crownsmere Enquiry] Student assistance - "+String(data.name||"").trim().slice(0,90);
+  if(emailLink)emailLink.href="mailto:"+fallbackEmail+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(fallbackBody);
+  if(copyText)copyText.value="To: "+fallbackEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
+  if(copyFeedback)copyFeedback.textContent="";
+  if(copyLabel)copyLabel.hidden=true;
+  fallback.hidden=false;
+ }
+ if(copyButton){
+  copyButton.addEventListener("click",function(){
+   var text=copyText?copyText.value:fallbackBody;
+   if(!text)return;
+   function copied(){if(copyFeedback)copyFeedback.textContent=isArabic
+    ?"تم نسخ الطلب. الصقه في رسالة بريد إلى hello@crownsmere.com واضغط إرسال."
+    :"Enquiry copied. Paste it into an email to hello@crownsmere.com and press Send.";}
+   function manual(){
+    if(copyLabel)copyLabel.hidden=false;
+    if(copyText){copyText.focus();copyText.select();}
+    if(copyFeedback)copyFeedback.textContent=isArabic
+     ?"إذا تعذر النسخ تلقائياً، حدد النص أدناه وانسخه إلى رسالة بريد إلكتروني."
+     :"If copying was blocked, select the text below and copy it into an email.";
+   }
+   if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(copied,manual);
+   }else{
+    manual();
+   }
+  });
+ }
  var current=0,sending=false;
  form.noValidate=true; // Custom validation accounts for hidden wizard steps.
  form.classList.add("enhanced");
@@ -59,6 +120,7 @@ document.querySelectorAll(".student-form").forEach(function(form){
   return !bad;
  }
  function show(index,focus){
+  if(fallback)fallback.hidden=true;
   current=Math.max(0,Math.min(stages.length-1,index));
   stages.forEach(function(stage,i){
    stage.classList.toggle("is-active",i===current);
@@ -119,12 +181,14 @@ document.querySelectorAll(".student-form").forEach(function(form){
    form.querySelector(".student-progress").hidden=true;
    stages.forEach(function(stage){stage.hidden=true;stage.classList.remove("is-active");});
    complete.hidden=false;
+   if(fallback)fallback.hidden=true;
    say("");
    form.reset();
    complete.focus({preventScroll:true});
    complete.scrollIntoView({block:"center",behavior:"smooth"});
   }).catch(function(){
    say(status.getAttribute("data-error"),true);
+   showFallback(data);
   }).then(function(){sending=false;submit.disabled=false;});
  });
  show(0,false);

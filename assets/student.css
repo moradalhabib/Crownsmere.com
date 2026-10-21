@@ -114,3 +114,39 @@
   .student-language-bar > div { flex-wrap: wrap; }
   .student-language-bar button { min-height: 44px; }
 }
+
+/* Student enquiry backup when FormSubmit cannot confirm acceptance.
+   Hidden unless submission fails; text is never silently discarded. */
+.std-fallback[hidden], .std-copy-label[hidden] { display:none!important; }
+.std-fallback {
+  margin-top:24px;
+  padding:clamp(19px,3vw,28px);
+  background:var(--paper);
+  border:1px solid var(--gold);
+  box-shadow:0 9px 35px -25px rgba(14,27,46,.35);
+  overflow-wrap:anywhere;
+}
+.std-fallback h4 {
+  font-family:var(--display);
+  font-weight:400;
+  color:var(--navy);
+  font-size:clamp(28px,3vw,39px);
+  line-height:1.15;
+  margin:0 0 11px;
+}
+.std-fallback p {font-size:clamp(16px,1.5vw,19px);line-height:1.55;margin:0 0 16px;color:var(--ink-soft);}
+.std-fallback-actions {display:flex;flex-wrap:wrap;align-items:stretch;gap:12px;margin:18px 0 10px;}
+.std-fallback-actions .btn {padding:13px 18px;min-width:unset;text-align:center;white-space:normal;line-height:1.5;font-family:var(--body);font-size:16px;}
+.std-email-link {background:var(--champagne);border-color:var(--gold);font-weight:600;}
+.std-fallback .std-copy-feedback {font-size:15px;margin:14px 0 0;min-height:1em;}
+.std-copy-label {display:block;margin-top:15px;font-size:14px;color:var(--ink-soft);}
+.std-copy-text {display:block;width:100%;min-height:160px;margin:8px 0 0;padding:10px;background:#fffdfa;border:1px solid var(--stone);color:var(--navy);font:15px/1.5 system-ui,sans-serif;direction:ltr;text-align:start;resize:vertical;}
+.student-language[dir="rtl"] .std-fallback h4, .student-language[dir="rtl"] .std-fallback p, .student-language[dir="rtl"] .std-fallback-actions .btn {font-family:"Noto Naskh Arabic","Geeza Pro",Arial,sans-serif;}
+.student-language[dir="rtl"] .std-copy-text {direction:rtl;}
+@media (max-width:520px) {
+ .std-fallback-actions {flex-direction:column;}
+ .std-fallback-actions .btn {width:100%;}
+}
+
+/* Wizard transitions and keyboard focus should land below the fixed nav. */
+.student-form, .student-stage, .student-stage h3, .std-field input, .std-field select, .std-field textarea {scroll-margin-top:clamp(108px,14vw,155px);}
