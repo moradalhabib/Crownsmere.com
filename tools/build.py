@@ -82,7 +82,7 @@ def head(title, desc, path, extra_ld=None):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
@@ -111,6 +111,7 @@ def head(title, desc, path, extra_ld=None):
 <link rel="preload" href="assets/fonts/eb-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
 {hero_preload}<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/experience.css">
 {'<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">' if path == "index.html" else ""}
 <script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
 </head>
@@ -132,7 +133,7 @@ def header(current):
     {LOGO()}
     <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Private Property Consultancy</span></small></span>
   </a>
-  <nav class="hd-nav" aria-label="Main"><div class="hd-l">{left}</div><div class="hd-r">{right}<a class="btn btn-gold caps" href="contact.html">Enquire <span aria-hidden="true">&rarr;</span></a></div></nav>
+  <nav class="hd-nav" aria-label="Main"><div class="hd-l">{left}</div><div class="hd-r">{right}<a class="btn btn-gold caps" href="contact.html">Start enquiry <span aria-hidden="true">&rarr;</span></a></div></nav>
   <button class="hd-menu caps" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
 </header>
 <nav class="menu" id="menu" aria-label="Mobile">
@@ -414,29 +415,75 @@ process_cards = "".join(
 )
 
 index_body = f'''
-<section class="hero3d" aria-label="Crownsmere Estate">
-  <div class="hero3d-stage" aria-hidden="true">
-    <div class="seal">{SEAL}</div>
-    <img class="crest-fallback" src="assets/img/monogram.png" alt="" width="330" height="518">
-    <canvas class="crest-canvas"></canvas>
-  </div>
-  <div class="hero3d-corners caps" aria-hidden="true"><span>Private Property Search</span><span>51&deg;30&prime;N &middot; 0&deg;09&prime;W</span></div>
-  <div class="hero3d-copy wrap">
-    <h1><span class="line"><span>The right home,</span></span><span class="line"><span><em>found for you.</em></span></span></h1>
-    <div class="hero3d-side">
-      <p>A private, by-request property service in prime London. You share your brief; I search discreetly, on and off the market, and bring you only what is genuinely right.</p>
-      <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
+<section class="home-showcase" aria-label="Crownsmere London property consultancy">
+  <picture class="showcase-picture">
+    <source type="image/webp" srcset="assets/img/townhouse.webp">
+    <img src="assets/img/townhouse.jpg" alt="An elegant white-stucco London townhouse" width="1055" height="687" fetchpriority="high">
+  </picture>
+  <div class="wrap showcase-inner">
+    <div class="showcase-copy">
+      <div class="showcase-eyebrow caps">Prime London &middot; Private Property Consultancy</div>
+      <h1>London property, <em>personally handled.</em></h1>
+      <p>Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a carefully guided property search and personal advice.</p>
+      <div class="showcase-actions">
+        <a class="btn btn-gold caps" href="contact.html">Tell us what you need <span aria-hidden="true">&rarr;</span></a>
+        <a class="showcase-secondary" href="students.html">International student? Get rental help <span aria-hidden="true">&rarr;</span></a>
+      </div>
+      <p class="showcase-footnote">Prime London &middot; By appointment &middot; Personal service</p>
     </div>
   </div>
-  <a class="scroll-cue caps" href="#reveal"><span>Discover</span><i aria-hidden="true"></i></a>
 </section>
 
-<section class="arch" id="reveal" aria-label="A more personal London">
-  <div class="arch-pin">
-    <div class="arch-window">{pic("townhouse", "A white stucco London townhouse with a black front door and columned porch", 1055, 687)}</div>
-    <div class="arch-copy">
-      <span class="caps">People &middot; Property &middot; Perspective</span>
-      <p class="display">A more personal <em>London.</em></p>
+<section class="quick-entrances" aria-labelledby="quick-choices-heading">
+  <div class="wrap">
+    <div class="quick-heading">
+      <div class="eyebrow caps">How can we help?</div>
+      <h2 id="quick-choices-heading">Find your way <em>forward.</em></h2>
+      <p>Select what you're looking for. We'll guide you towards the right next step, with a personal response rather than a long property catalogue.</p>
+    </div>
+    <div class="quick-grid">
+      <a class="quick-card" href="contact.html" aria-label="Buy or find a London property, share your requirements">
+        {pic("townhouse", "White London townhouses in a prime residential area", 1055, 687)}
+        <div class="quick-card-inner">
+          <span class="quick-tag">BUY &middot; INVEST</span>
+          <h3>Find a London home</h3>
+          <p>A personal property search, including opportunities not publicly listed.</p>
+          <span class="quick-go">Start your search &rarr;</span>
+        </div>
+      </a>
+      <a class="quick-card" href="services.html#sell" aria-label="Sell or let your property with Crownsmere">
+        {pic("interior", "An elegant London apartment interior", 826, 463)}
+        <div class="quick-card-inner">
+          <span class="quick-tag">SELL &middot; LET</span>
+          <h3>Your property, carefully represented</h3>
+          <p>Discreet introductions, trusted relationships and thoughtful negotiation.</p>
+          <span class="quick-go">Explore services &rarr;</span>
+        </div>
+      </a>
+      <a class="quick-card" href="students.html" aria-label="International students, request London rental and guarantor assistance">
+        {pic("westminster", "Central London and Westminster viewed from a city apartment", 420, 480)}
+        <div class="quick-card-inner">
+          <span class="quick-tag">INTERNATIONAL STUDENTS</span>
+          <h3>Studying in London?</h3>
+          <p>Find a rental home and explore options without a UK guarantor.</p>
+          <span class="quick-go">Get student assistance &rarr;</span>
+        </div>
+      </a>
+    </div>
+    <p class="quick-imagery-note">Images illustrate London properties and neighbourhoods, not guaranteed available listings.</p>
+  </div>
+</section>
+
+<section class="gallery-strip" aria-labelledby="london-gallery-heading">
+  <div class="wrap">
+    <div class="gallery-head">
+      <h2 id="london-gallery-heading">A more personal <em>London.</em></h2>
+      <p class="gallery-note">From classic streets to contemporary interiors, our searches start with what matters to you.</p>
+    </div>
+    <div class="gallery-images">
+      <figure>{pic("colonnade", "London white-stucco residences on a leafy street", 563, 398)}<figcaption>Residential London</figcaption></figure>
+      <figure>{pic("interior", "Elegant contemporary London living room", 826, 463)}<figcaption>Spaces to call home</figcaption></figure>
+      <figure>{pic("door", "A classic London townhouse entrance with brass details", 433, 610)}<figcaption>Every detail considered</figcaption></figure>
     </div>
   </div>
 </section>
@@ -538,8 +585,8 @@ index_body = f'''
 </section>
 {invite()}'''
 
-page("index.html", f"{BRAND} | Private Property Search in Prime London",
-     "Private property search in prime London. Share your brief and we find the right home, on and off the market, in Mayfair, Belgravia, Chelsea and beyond.",
+page("index.html", f"{BRAND} | Buy, Sell & Rent London Property",
+     "Crownsmere Estate offers personal London property search, private sales, lettings and international student rental assistance. Speak to property consultant Alaa Qadir.",
      index_body, extra_ld=[FAQ_LD])
 
 # ---------------------------------------------------------------- services
@@ -561,12 +608,16 @@ services_body = f'''
       <h1><span class="line"><span>By request.</span></span><span class="line"><span><em>Personally found.</em></span></span></h1>
       {LOGO()}
     </div>
-    <p class="lede" data-reveal>There is no shop window here. Every engagement begins with your brief, and every search is carried out personally, with complete discretion.</p>
+    <p class="lede" data-reveal>A clearer way to buy, sell, rent or invest in London. Choose the service you need, and Alaa will guide you personally.</p>
   </div>
 </section>
 
 <nav class="subnav" aria-label="Services"><div class="wrap">{subnav}</div></nav>
 
+<section class="service-photo-band wrap" aria-label="London property photography">
+  {pic("interior", "An elegant London apartment living room", 826, 463)}
+  <div><div class="eyebrow caps">Crownsmere Estate</div><h2>Properties, people, <em>perspective.</em></h2><p>Personally guided services across prime London.</p></div>
+</section>
 <section class="section tight services-list">
   <div class="wrap">
     {svc("01", "Buy", "buy", "Tell me what you are looking for, and I will find it: on the market, off the market, or not yet on anyone&rsquo;s radar.", ["A private briefing on your requirements", "A personal search, on and off the market", "Access to homes that are never advertised", "A curated shortlist, checked before you see it", "Accompanied private viewings", "Negotiation and support through to completion"])}
@@ -610,7 +661,7 @@ about_body = f'''
       <h1><span class="line"><span>Why</span></span><span class="line"><span><em>Crownsmere.</em></span></span></h1>
       {LOGO()}
     </div>
-    <p class="lede" data-reveal>A personal, discreet and one-to-one property service, built around the client rather than the listing.</p>
+    <p class="lede" data-reveal>Work directly with Alaa Qadir on a property search shaped around your priorities and London neighbourhoods.</p>
   </div>
 </section>
 
@@ -668,7 +719,7 @@ def options(vals):
 
 def step_actions(n, last=False):
     back = '<button type="button" class="btn btn-quiet caps" data-back>&larr; Back</button>' if n > 1 else '<span></span>'
-    nxt = ('<button class="btn btn-gold caps" type="submit">Send my brief <span aria-hidden="true">&rarr;</span></button>' if last
+    nxt = ('<button class="btn btn-gold caps" type="submit">Continue to email <span aria-hidden="true">&rarr;</span></button>' if last
            else '<button type="button" class="btn btn-gold caps" data-next>Continue <span aria-hidden="true">&rarr;</span></button>')
     return f'<div class="step-actions">{back}{nxt}</div>'
 
@@ -686,7 +737,7 @@ contact_body = f'''
 <section class="section tight">
   <div class="wrap">
     <div class="contact-intro" data-reveal>
-      <p class="lede lede-sm">Tell me what you are looking for, in as much or as little detail as you like. As you answer, your brief is composed into a letter, exactly as I will read it. I will be in touch personally, in complete confidence.</p>
+      <p class="lede lede-sm">Tell Alaa what you need. This short guided form prepares a personalised enquiry, helping you explain your property requirements clearly.</p>
       <dl>
         <div><dt class="caps">Telephone</dt><dd>Shared personally, <em>once your brief is received</em></dd></div>
         <div><dt class="caps">Email</dt><dd><a href="mailto:{EMAIL}">{EMAIL}</a></dd></div>
@@ -700,7 +751,7 @@ contact_body = f'''
         <div class="caps">{BRAND} &nbsp;&middot;&nbsp; London</div>
         <p class="display m0">A private brief</p>
       </div>
-      <form class="letter-form" data-endpoint="https://formsubmit.co/ajax/{EMAIL}" novalidate>
+      <form class="letter-form" action="mailto:alaa.qadir@crownsmere.com" method="POST" enctype="text/plain" novalidate>
         <input type="hidden" name="_subject" value="[Crownsmere Enquiry] New client brief from the website">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
@@ -750,6 +801,16 @@ contact_body = f'''
           <p class="display">Thank you.</p>
         </div>
         <p class="form-status" role="status" aria-live="polite"></p>
+        <div class="contact-mail-backup" hidden>
+          <h3>Your email is ready.</h3>
+          <p>Your email app should open with a private letter to Alaa. Please review it and press <strong>Send</strong>. If nothing opens, use the buttons below to keep your enquiry.</p>
+          <div class="btn-row">
+            <a class="btn btn-gold caps" data-contact-email href="mailto:hello@crownsmere.com">Open prepared email &rarr;</a>
+            <button class="btn caps" type="button" data-contact-copy>Copy my enquiry</button>
+          </div>
+          <p data-contact-feedback aria-live="polite"></p>
+          <label class="contact-copy-label" hidden>Prepared enquiry<textarea rows="8" readonly data-contact-text></textarea></label>
+        </div>
       </form>
     </div>
     <aside class="preview" aria-label="Your letter, as it will be read">
@@ -814,7 +875,7 @@ privacy_body = f'''
     <h2>Who helps us</h2>
     <p>A small number of trusted service providers process information on our behalf, only to provide their service:</p>
     <ul>
-      <li><strong>FormSubmit</strong> delivers messages sent through the contact form to our inbox.</li>
+      <li><strong>Your chosen email provider</strong> sends the email you choose to send from your mail application. We do not automatically receive or store incomplete website form entries.</li>
       <li><strong>Our email hosting provider</strong> stores the emails you send us.</li>
       <li><strong>Anthropic</strong> provides the AI service that screens emails sent to {EMAIL}, so that spam is filtered out and genuine enquiries reach us promptly. Emails are processed for this purpose only.</li>
       <li><strong>OpenStreetMap</strong> supplies the map images on our home page. When the map loads, your browser requests these images from the OpenStreetMap Foundation&rsquo;s servers, which receive your IP address as part of that request.</li>
@@ -828,7 +889,7 @@ privacy_body = f'''
     <p>You can ask to see the information we hold about you, to correct it, to delete it, to restrict or object to its use, or to receive a copy of it. Where we rely on your consent, you can withdraw it at any time. Just email <a href="mailto:{EMAIL}">{EMAIL}</a>. If you are unhappy with how your information has been handled, you can complain to the Information Commissioner&rsquo;s Office at <a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>.</p>
 
     <h2>Cookies</h2>
-    <p>This website does not use cookies, analytics or advertising trackers. It remembers, for the length of your visit only, that you have seen the opening animation, so that it does not play on every page. Fonts, images and scripts are served from this website itself; the only exception is the map images described above.</p>
+    <p>This website does not use analytics or advertising trackers. The website loads fonts, images and scripts locally, except for map images supplied by OpenStreetMap when you choose to view the map. Your draft enquiries remain in your browser until you send them from your own mail application.</p>
 
     <h2>Security</h2>
     <p>This website is served only over an encrypted (HTTPS) connection and uses a strict content security policy. To report a security concern, please email <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>

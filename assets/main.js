@@ -567,6 +567,27 @@
     form.addEventListener("change", queueCompose);
     compose();
 
+    /* The contact composer opens a mail draft. The visitor must press Send. */
+    var mailBackup=form.querySelector(".contact-mail-backup");
+    var backupLink=mailBackup&&mailBackup.querySelector("[data-contact-email]");
+    var backupCopy=mailBackup&&mailBackup.querySelector("[data-contact-copy]");
+    var backupField=mailBackup&&mailBackup.querySelector("[data-contact-text]");
+    var backupFeedback=mailBackup&&mailBackup.querySelector("[data-contact-feedback]");
+    var backupLabel=mailBackup&&mailBackup.querySelector(".contact-copy-label");
+    if(backupCopy){
+      backupCopy.addEventListener("click",function(){
+        var value=backupField?backupField.value:"";
+        if(!value)return;
+        function ready(){if(backupFeedback)backupFeedback.textContent="Copied. Paste your brief into an email to Alaa and press Send.";}
+        function manual(){
+          if(backupLabel)backupLabel.hidden=false;
+          if(backupField){backupField.focus();backupField.select();}
+          if(backupFeedback)backupFeedback.textContent="Select the letter below and copy it into your preferred email app.";
+        }
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(ready,manual);}
+        else manual();
+      });
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (sending) return;
@@ -588,40 +609,32 @@
       new FormData(form).forEach(function (v, k) { data[k] = typeof v === "string" ? v.trim() : v; });
       data.letter = compose();
 
-      var done = function () {
-        if (preview) preview.classList.add("sealed");
-        form.reset();
-        form.classList.add("sent");
-        say("Your brief has been received. Alaa will be in touch with you personally.");
-        var panel = form.querySelector(".sent-panel");
-        if (panel) panel.focus();
-      };
-
-      // Honeypot: bots fill hidden fields. Pretend all is well and send nothing.
-      if (data._honey) { done(); return; }
+      // No third-party form processor: open a prepared email from the user's gesture.
+      if(data._honey)return;
       delete data._honey;
+      var fullName=String(data.name||"").replace(/[\r\n<>]/g," ").trim().slice(0,80);
+      var subject="Crownsmere Estate | Private Property Brief | "+fullName;
+      var body=data.letter+"\n\n"+
+        "CONTACT DETAILS\n"+
+        "Email: "+String(data.email||"")+"\n"+
+        "Telephone: "+String(data.phone||"")+"\n"+
+        "Preferred contact: "+String(data.preferred_contact||"Either")+"\n"+
+        "Best time to call: "+String(data.best_time||"Any time")+"\n\n"+
+        "Prepared at crownsmere.com/contact.html";
+      var recipient="alaa.qadir@crownsmere.com";
+      var copyRecipient="hello@crownsmere.com";
+      var draft="mailto:"+recipient+"?cc="+encodeURIComponent(copyRecipient)+
+        "&subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+      if(backupLink)backupLink.href=draft;
+      if(backupField)backupField.value="To: "+recipient+"\nCc: "+copyRecipient+
+        "\nSubject: "+subject+"\n\n"+body;
+      if(backupFeedback)backupFeedback.textContent="";
+      if(backupLabel)backupLabel.hidden=true;
+      if(mailBackup)mailBackup.hidden=false;
+      say("Your email is ready. Review it in your mail app and press Send.");
+      try {window.location.href=draft;}
+      catch(err){/* The visible email link and copy option remain available. */}
 
-      var endpoint = form.getAttribute("data-endpoint");
-      if (!endpoint) { say("Online enquiries open shortly. Kindly email hello@crownsmere.com.", true); return; }
-
-      sending = true;
-      say("Sending your brief\u2026");
-      fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(data)
-      })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-        .then(function (res) {
-          var confirmed = res.j && res.j.success;
-          // HTML challenges and ambiguous responses must not create a false 'sent' state.
-          if (!res.ok || (confirmed !== true && confirmed !== "true")) throw new Error("Delivery not confirmed");
-          done();
-        })
-        .catch(function () {
-          say("The message could not be sent just now. Kindly try again, or email hello@crownsmere.com.", true);
-        })
-        .then(function () { sending = false; });
     });
   }
 })();

@@ -40,45 +40,126 @@ document.querySelectorAll(".student-form").forEach(function(form){
  var copyText=fallback&&fallback.querySelector("[data-copy-text]");
  var isArabic=form.getAttribute("data-form-lang")==="ar";
  var fallbackBody="";
- var fallbackEmail="hello@crownsmere.com";
+ var fallbackEmail="alaa.qadir@crownsmere.com";
+ var archiveEmail="hello@crownsmere.com";
  function enquirySummary(data){
-  var labels=isArabic
-   ? [["نوع المساعدة","service"],["الجامعة أو الكلية","university"],["الميزانية الشهرية","monthly_budget"],
-      ["موعد الانتقال","move_timeframe"],["حالة الضامن","guarantor_status"],["هل وجدت عقاراً؟","property_found"],
-      ["المناطق المفضلة","preferred_areas"],["ملاحظات إضافية","additional_notes"],
-      ["الاسم","name"],["البريد الإلكتروني","email"],["الهاتف","phone"],["طريقة التواصل","preferred_contact"]]
-   : [["Service requested","service"],["University / college","university"],["Monthly budget","monthly_budget"],
-      ["Moving timeframe","move_timeframe"],["Guarantor situation","guarantor_status"],["Property already found","property_found"],
-      ["Preferred areas","preferred_areas"],["Further details","additional_notes"],
-      ["Full name","name"],["Email","email"],["Telephone / WhatsApp","phone"],["Preferred contact","preferred_contact"]];
-  var intro=isArabic
-   ? "مرحباً علا،\n\nلم أتمكن من إرسال استفساري عبر موقع Crownsmere وأود طلب المساعدة في الإيجار أو الضمان.\n"
-   : "Dear Alaa,\n\nThe Crownsmere website could not confirm delivery of my student enquiry. Please review the details below.\n";
-  var detail=labels.map(function(row){
-   var value=String(data[row[1]]||"").trim();
-   return row[0]+": "+(value||"—");
-  }).join("\n");
-  var end=isArabic?"\n\nتم إرسال هذه الرسالة يدوياً باستخدام خيار البريد الإلكتروني البديل."
-   :"\n\nSent manually using the Crownsmere student enquiry email alternative.";
-  return intro+"\n"+detail+end;
+  var choices={
+   service:{
+    "Apartment and guarantor help":["Apartment search and guarantor guidance","البحث عن شقة والمساعدة في خيارات الضمان"],
+    "Guarantor guidance for found property":["Guarantor guidance for a property already found","المساعدة في خيارات الضمان لعقار وجدته"],
+    "Apartment search only":["Apartment search only","البحث عن شقة للإيجار فقط"]
+   },
+   monthly_budget:{
+    "Not decided":["Not decided yet","لم أحدد الميزانية بعد"],
+    "Under GBP 1500":["Under £1,500 per month","أقل من £1,500 شهرياً"],
+    "GBP 1500-2500":["£1,500–£2,500 per month","من £1,500 إلى £2,500 شهرياً"],
+    "GBP 2500-4000":["£2,500–£4,000 per month","من £2,500 إلى £4,000 شهرياً"],
+    "Over GBP 4000":["Over £4,000 per month","أكثر من £4,000 شهرياً"]
+   },
+   move_timeframe:{
+    "As soon as possible":["As soon as possible","في أقرب وقت ممكن"],
+    "Within 1 month":["Within one month","خلال شهر واحد"],
+    "Within 1-3 months":["Within 1–3 months","خلال شهر إلى ثلاثة أشهر"],
+    "Later/unsure":["Later / not sure yet","لاحقاً / لم أحدد بعد"]
+   },
+   guarantor_status:{
+    "No UK guarantor":["I do not have a UK guarantor","ليس لدي ضامن في المملكة المتحدة"],
+    "Potential overseas family guarantor":["I may have a family guarantor overseas","قد يستطيع أحد أفراد عائلتي خارج المملكة المتحدة أن يكون ضامناً"],
+    "Exploring professional guarantor":["I want advice about professional guarantor services","أرغب في معرفة خدمات الضامن المهني"],
+    "Unsure":["I am not sure yet","لست متأكداً بعد"]
+   },
+   property_found:{
+    "Need to find a property":["Not yet — please help me search","لم أجد عقاراً بعد وأحتاج للمساعدة في البحث"],
+    "Already found a property":["Yes — I have a particular property in mind","نعم، وجدت عقاراً محدداً"],
+    "Comparing options":["Still comparing properties","ما زلت أقارن بين العقارات"]
+   },
+   preferred_contact:{
+    "Email":["Email","البريد الإلكتروني"],
+    "Phone":["Telephone call","مكالمة هاتفية"],
+    "WhatsApp":["WhatsApp","واتساب"]
+   }
+  };
+  function value(name){
+   var raw=String(data[name]||"").trim();
+   var mapped=choices[name]&&choices[name][raw];
+   return mapped?mapped[isArabic?1:0]:raw;
+  }
+  function line(label,name,optional){
+   var result=value(name);
+   return result||!optional?label+": "+(result||(isArabic?"غير محدد":"Not provided")):"";
+  }
+  function section(title,lines){
+   var present=lines.filter(Boolean);
+   return present.length?title+"\n"+present.join("\n"):"";
+  }
+  var name=String(data.name||"").trim();
+  var sections=isArabic?[
+   section("بيانات الطالب",[line("الاسم الكامل","name"),line("الجامعة أو الكلية","university",true)]),
+   section("متطلبات السكن",[
+    line("نوع المساعدة المطلوبة","service"),
+    line("ميزانية الإيجار الشهرية","monthly_budget"),
+    line("موعد الانتقال","move_timeframe"),
+    line("المناطق المفضلة في لندن","preferred_areas",true),
+    line("حالة البحث عن العقار","property_found")
+   ]),
+   section("وضع الضامن",[line("الضامن المتاح","guarantor_status")]),
+   section("معلومات التواصل",[
+    line("البريد الإلكتروني","email"),line("رقم الهاتف أو واتساب","phone",true),
+    line("طريقة التواصل المفضلة","preferred_contact")
+   ]),
+   value("additional_notes")?section("تفاصيل إضافية",[value("additional_notes")]):""
+  ]:[
+   section("STUDENT DETAILS",[line("Full name","name"),line("University / college","university",true)]),
+   section("RENTAL REQUIREMENTS",[
+    line("Assistance required","service"),
+    line("Monthly rental budget","monthly_budget"),
+    line("Preferred move-in time","move_timeframe"),
+    line("Preferred London areas","preferred_areas",true),
+    line("Property search status","property_found")
+   ]),
+   section("GUARANTOR SITUATION",[line("Current situation","guarantor_status")]),
+   section("CONTACT DETAILS",[
+    line("Email address","email"),line("Phone / WhatsApp","phone",true),
+    line("Preferred contact method","preferred_contact")
+   ]),
+   value("additional_notes")?section("ADDITIONAL NOTES",[value("additional_notes")]):""
+  ];
+  var introduction=isArabic
+   ?"مرحباً أستاذة علا،\n\nأنا طالب دولي وأرغب في مساعدتكم في إيجار عقار في لندن أو معرفة خيارات الضامن المناسبة. فيما يلي تفاصيل طلبي:"
+   :"Dear Alaa,\n\nI am an international student seeking assistance with renting a home in London and/or understanding UK guarantor options. Please find my requirements below.";
+  var end=isArabic
+   ?"أرجو التواصل معي لمناقشة الخيارات المتاحة.\n\nمع خالص التحية،\n"+name
+   :"I would appreciate your guidance and look forward to hearing from you.\n\nKind regards,\n"+name;
+  var origin=isArabic
+   ?"أُعدّت هذه الرسالة عبر نموذج الطلاب في crownsmere.com/students.html"
+   :"Prepared using the student enquiry form at crownsmere.com/students.html";
+  return introduction+"\n\n"+sections.filter(Boolean).join("\n\n")+"\n\n"+end+"\n\n"+origin;
  }
  function showFallback(data){
-  if(!fallback)return;
+  if(!fallback)return "";
   fallbackBody=enquirySummary(data);
-  var subject="[Crownsmere Enquiry] Student assistance - "+String(data.name||"").trim().slice(0,90);
-  if(emailLink)emailLink.href="mailto:"+fallbackEmail+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(fallbackBody);
-  if(copyText)copyText.value="To: "+fallbackEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
+  var who=String(data.name||"").replace(/[\r\n<>]/g," ").trim().slice(0,75);
+  var subject=isArabic
+   ?"Crownsmere Estate | طلب سكن للطلاب الدوليين | "+who
+   :"Crownsmere Estate | International Student Rental Enquiry | "+who;
+  var mailto="mailto:"+fallbackEmail
+   +"?cc="+encodeURIComponent(archiveEmail)
+   +"&subject="+encodeURIComponent(subject)
+   +"&body="+encodeURIComponent(fallbackBody);
+  if(emailLink)emailLink.setAttribute("href",mailto);
+  if(copyText)copyText.value="To: "+fallbackEmail+"\nCc: "+archiveEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
   if(copyFeedback)copyFeedback.textContent="";
   if(copyLabel)copyLabel.hidden=true;
   fallback.hidden=false;
+  return mailto;
  }
  if(copyButton){
   copyButton.addEventListener("click",function(){
    var text=copyText?copyText.value:fallbackBody;
    if(!text)return;
    function copied(){if(copyFeedback)copyFeedback.textContent=isArabic
-    ?"تم نسخ الطلب. الصقه في رسالة بريد إلى hello@crownsmere.com واضغط إرسال."
-    :"Enquiry copied. Paste it into an email to hello@crownsmere.com and press Send.";}
+    ?"تم نسخ الطلب. الصقه في رسالة بريد إلى علا واضغط إرسال."
+    :"Enquiry copied. Paste it into an email to Alaa and press Send.";}
    function manual(){
     if(copyLabel)copyLabel.hidden=false;
     if(copyText){copyText.focus();copyText.select();}
@@ -167,29 +248,16 @@ document.querySelectorAll(".student-form").forEach(function(form){
    say(status.getAttribute("data-invalid"),true);return;
   }
   delete data._honey;
-  var endpoint=form.getAttribute("data-endpoint");
-  if(!endpoint){say(status.getAttribute("data-error"),true);return;}
-  sending=true;submit.disabled=true;
-  say(status.getAttribute("data-sending"));
-  fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data)})
-  .then(function(response){
-   return response.json().then(function(body){return {ok:response.ok,body:body};});
-  }).then(function(response){
-   // A 200 HTML anti-bot challenge, JSON without success, or an API error is NOT delivery.
-   var confirmation=response.body && response.body.success;
-   if(!response.ok || (confirmation!==true && confirmation!=="true"))throw new Error("Delivery not confirmed");
-   form.querySelector(".student-progress").hidden=true;
-   stages.forEach(function(stage){stage.hidden=true;stage.classList.remove("is-active");});
-   complete.hidden=false;
-   if(fallback)fallback.hidden=true;
-   say("");
-   form.reset();
-   complete.focus({preventScroll:true});
-   complete.scrollIntoView({block:"center",behavior:"smooth"});
-  }).catch(function(){
-   say(status.getAttribute("data-error"),true);
-   showFallback(data);
-  }).then(function(){sending=false;submit.disabled=false;});
+  // Email is prepared on the visitor's own device; the website does not send it.
+  // This navigation happens synchronously from the submit gesture (mobile Safari).
+  var draft=showFallback(data);
+  say(isArabic
+   ?"رسالتك جاهزة. راجعها واضغط إرسال في تطبيق البريد الإلكتروني."
+   :"Your email is ready. Review it and press Send in your email app.");
+  if(draft){
+   try { window.location.href=draft; }
+   catch(error) { /* Keep the visible Open email / Copy options. */ }
+  }
  });
  show(0,false);
 });

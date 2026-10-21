@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - fix/student-language-header-overlap-20261021
+      - improve/crownsmere-ux-mobile-20261021
   pull_request:
     paths:
       - 'students.html'
@@ -37,6 +38,11 @@ jobs:
         run: |
           mkdir -p test-screenshots
           npx playwright test --config=playwright.config.cjs
+      - name: Install WebKit for iPhone-equivalent checks
+        run: npx playwright install --with-deps webkit
+      - name: Verify key iPhone user journeys in WebKit
+        run: |
+          npx playwright test --config=playwright.config.cjs --browser webkit --grep 'iphone-390|student page:|student form: all|general website brief opens|home: premium' --workers=1
       - name: Attach QA screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4

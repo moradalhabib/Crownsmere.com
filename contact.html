@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
@@ -32,6 +32,7 @@
 <link rel="preload" href="assets/fonts/eb-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/experience.css">
 
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "RealEstateAgent", "@id": "https://crownsmere.com/#business", "name": "Crownsmere Estate", "description": "A private, by-request property search and consultancy service in prime London: clients share a brief and Alaa Qadir finds the right property, on and off the market.", "url": "https://crownsmere.com/", "email": "hello@crownsmere.com", "image": "https://crownsmere.com/assets/img/townhouse.jpg", "logo": "https://crownsmere.com/assets/img/monogram.png", "areaServed": [{"@type": "City", "name": "London"}, {"@type": "Place", "name": "Mayfair"}, {"@type": "Place", "name": "Belgravia"}, {"@type": "Place", "name": "Knightsbridge"}, {"@type": "Place", "name": "Chelsea"}, {"@type": "Place", "name": "Kensington"}, {"@type": "Place", "name": "Holland Park"}, {"@type": "Place", "name": "Notting Hill"}, {"@type": "Place", "name": "Marylebone"}, {"@type": "Place", "name": "St John’s Wood"}, {"@type": "Place", "name": "Hampstead"}], "address": {"@type": "PostalAddress", "addressLocality": "London", "addressCountry": "GB"}, "employee": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant", "worksFor": {"@id": "https://crownsmere.com/#business"}}, "slogan": "A more personal London.", "knowsAbout": ["Prime London property", "Property search", "Off-market property", "Private property sales", "Lettings", "Property investment"]}, {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://crownsmere.com/"}, {"@type": "ListItem", "position": 2, "name": "Contact", "item": "https://crownsmere.com/contact.html"}]}]</script>
 </head>
@@ -43,7 +44,7 @@
     <picture><source type="image/webp" srcset="assets/img/monogram-sm.webp"><img src="assets/img/monogram-sm.png" alt="" width="165" height="259"></picture>
     <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Private Property Consultancy</span></small></span>
   </a>
-  <nav class="hd-nav" aria-label="Main"><div class="hd-l"><a class="nl caps" href="index.html">Home</a><a class="nl caps" href="services.html">Services</a><a class="nl caps" href="about.html">About</a><a class="nl caps" href="students.html">Students</a></div><div class="hd-r"><a class="nl caps" href="contact.html" aria-current="page">Contact</a><a class="btn btn-gold caps" href="contact.html">Enquire <span aria-hidden="true">&rarr;</span></a></div></nav>
+  <nav class="hd-nav" aria-label="Main"><div class="hd-l"><a class="nl caps" href="index.html">Home</a><a class="nl caps" href="services.html">Services</a><a class="nl caps" href="about.html">About</a><a class="nl caps" href="students.html">Students</a></div><div class="hd-r"><a class="nl caps" href="contact.html" aria-current="page">Contact</a><a class="btn btn-gold caps" href="contact.html">Start enquiry <span aria-hidden="true">&rarr;</span></a></div></nav>
   <button class="hd-menu caps" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
 </header>
 <nav class="menu" id="menu" aria-label="Mobile">
@@ -74,7 +75,7 @@
 <section class="section tight">
   <div class="wrap">
     <div class="contact-intro" data-reveal>
-      <p class="lede lede-sm">Tell me what you are looking for, in as much or as little detail as you like. As you answer, your brief is composed into a letter, exactly as I will read it. I will be in touch personally, in complete confidence.</p>
+      <p class="lede lede-sm">Tell Alaa what you need. This short guided form prepares a personalised enquiry, helping you explain your property requirements clearly.</p>
       <dl>
         <div><dt class="caps">Telephone</dt><dd>Shared personally, <em>once your brief is received</em></dd></div>
         <div><dt class="caps">Email</dt><dd><a href="mailto:hello@crownsmere.com">hello@crownsmere.com</a></dd></div>
@@ -88,7 +89,7 @@
         <div class="caps">Crownsmere Estate &nbsp;&middot;&nbsp; London</div>
         <p class="display m0">A private brief</p>
       </div>
-      <form class="letter-form" data-endpoint="https://formsubmit.co/ajax/hello@crownsmere.com" novalidate>
+      <form class="letter-form" action="mailto:alaa.qadir@crownsmere.com" method="POST" enctype="text/plain" novalidate>
         <input type="hidden" name="_subject" value="[Crownsmere Enquiry] New client brief from the website">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
@@ -131,13 +132,23 @@
           </fieldset>
           <div class="field"><label class="caps" for="f-time">Best time to call</label><select id="f-time" name="best_time"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></div>
           <label class="consent"><input type="checkbox" name="consent" value="Yes" required><span>I am happy for Crownsmere Estate to contact me by telephone and email about this request. My details will be held in confidence and never shared. See the <a href="privacy.html">privacy notice</a>.</span></label>
-          <div class="step-actions"><button type="button" class="btn btn-quiet caps" data-back>&larr; Back</button><button class="btn btn-gold caps" type="submit">Send my brief <span aria-hidden="true">&rarr;</span></button></div>
+          <div class="step-actions"><button type="button" class="btn btn-quiet caps" data-back>&larr; Back</button><button class="btn btn-gold caps" type="submit">Continue to email <span aria-hidden="true">&rarr;</span></button></div>
         </div>
 
         <div class="sent-panel" tabindex="-1">
           <p class="display">Thank you.</p>
         </div>
         <p class="form-status" role="status" aria-live="polite"></p>
+        <div class="contact-mail-backup" hidden>
+          <h3>Your email is ready.</h3>
+          <p>Your email app should open with a private letter to Alaa. Please review it and press <strong>Send</strong>. If nothing opens, use the buttons below to keep your enquiry.</p>
+          <div class="btn-row">
+            <a class="btn btn-gold caps" data-contact-email href="mailto:hello@crownsmere.com">Open prepared email &rarr;</a>
+            <button class="btn caps" type="button" data-contact-copy>Copy my enquiry</button>
+          </div>
+          <p data-contact-feedback aria-live="polite"></p>
+          <label class="contact-copy-label" hidden>Prepared enquiry<textarea rows="8" readonly data-contact-text></textarea></label>
+        </div>
       </form>
     </div>
     <aside class="preview" aria-label="Your letter, as it will be read">
