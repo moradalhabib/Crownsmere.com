@@ -82,7 +82,7 @@ def head(title, desc, path, extra_ld=None):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
@@ -719,7 +719,7 @@ def options(vals):
 
 def step_actions(n, last=False):
     back = '<button type="button" class="btn btn-quiet caps" data-back>&larr; Back</button>' if n > 1 else '<span></span>'
-    nxt = ('<button class="btn btn-gold caps" type="submit">Send my brief <span aria-hidden="true">&rarr;</span></button>' if last
+    nxt = ('<button class="btn btn-gold caps" type="submit">Continue to email <span aria-hidden="true">&rarr;</span></button>' if last
            else '<button type="button" class="btn btn-gold caps" data-next>Continue <span aria-hidden="true">&rarr;</span></button>')
     return f'<div class="step-actions">{back}{nxt}</div>'
 
@@ -751,7 +751,7 @@ contact_body = f'''
         <div class="caps">{BRAND} &nbsp;&middot;&nbsp; London</div>
         <p class="display m0">A private brief</p>
       </div>
-      <form class="letter-form" data-endpoint="https://formsubmit.co/ajax/{EMAIL}" novalidate>
+      <form class="letter-form" action="mailto:alaa.qadir@crownsmere.com" method="POST" enctype="text/plain" novalidate>
         <input type="hidden" name="_subject" value="[Crownsmere Enquiry] New client brief from the website">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
@@ -801,6 +801,16 @@ contact_body = f'''
           <p class="display">Thank you.</p>
         </div>
         <p class="form-status" role="status" aria-live="polite"></p>
+        <div class="contact-mail-backup" hidden>
+          <h3>Your email is ready.</h3>
+          <p>Your email app should open with a private letter to Alaa. Please review it and press <strong>Send</strong>. If nothing opens, use the buttons below to keep your enquiry.</p>
+          <div class="btn-row">
+            <a class="btn btn-gold caps" data-contact-email href="mailto:hello@crownsmere.com">Open prepared email &rarr;</a>
+            <button class="btn caps" type="button" data-contact-copy>Copy my enquiry</button>
+          </div>
+          <p data-contact-feedback aria-live="polite"></p>
+          <label class="contact-copy-label" hidden>Prepared enquiry<textarea rows="8" readonly data-contact-text></textarea></label>
+        </div>
       </form>
     </div>
     <aside class="preview" aria-label="Your letter, as it will be read">
@@ -865,7 +875,7 @@ privacy_body = f'''
     <h2>Who helps us</h2>
     <p>A small number of trusted service providers process information on our behalf, only to provide their service:</p>
     <ul>
-      <li><strong>FormSubmit</strong> delivers messages sent through the contact form to our inbox.</li>
+      <li><strong>Your chosen email provider</strong> sends the email you choose to send from your mail application. We do not automatically receive or store incomplete website form entries.</li>
       <li><strong>Our email hosting provider</strong> stores the emails you send us.</li>
       <li><strong>Anthropic</strong> provides the AI service that screens emails sent to {EMAIL}, so that spam is filtered out and genuine enquiries reach us promptly. Emails are processed for this purpose only.</li>
       <li><strong>OpenStreetMap</strong> supplies the map images on our home page. When the map loads, your browser requests these images from the OpenStreetMap Foundation&rsquo;s servers, which receive your IP address as part of that request.</li>
