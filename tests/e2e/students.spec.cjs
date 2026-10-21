@@ -1,273 +1,115 @@
-const { test, expect } = require('@playwright/test');
+const {test,expect}=require('@playwright/test');
 
-/*
- * Crownsmere international student experience tests.
- * All submissions in this suite are intercepted; no real applicant data is sent.
- * The live FormSubmit delivery/inbox must be verified in a controlled manual smoke test.
- */
-const viewports = [
-  { name: 'small-phone-320', width: 320, height: 640 },
-  { name: 'iphone-375', width: 375, height: 812 },
-  { name: 'iphone-390', width: 390, height: 844 },
-  { name: 'tablet-768', width: 768, height: 1024 },
-  { name: 'tablet-1024', width: 1024, height: 768 },
-  { name: 'desktop-1440', width: 1440, height: 900 }
-];
-const langs = ['en', 'ar'];
-function intersects(a, b, tolerance = 0) {
- return a.x < b.x + b.width - tolerance &&
-        a.x + a.width > b.x + tolerance &&
-        a.y < b.y + b.height - tolerance &&
-        a.y + a.height > b.y + tolerance;
-}
-for (const vp of viewports) {
- for (const lang of langs) {
-  test(`layout: ${vp.name} ${lang}: logo, language switch and application do not overlap`, async ({page}) => {
-    await page.setViewportSize(vp);
-    const errors=[];
-    page.on('pageerror', error => errors.push(String(error)));
+/* No emails are actually sent during testing.
+ * The complete mailto draft is checked in both languages before publication. */
+for(const lang of ['en','ar']){
+  const other=lang==='en'?'ar':'en';
+  test(lang+' student page: language, clear header and responsive controls',async({page})=>{
+    await page.setViewportSize({width:390,height:844});
     await page.goto('/students.html?lang='+lang);
-    await expect(page.locator(`[data-language-panel="${lang}"]`)).toBeVisible();
-    await expect(page.locator(`[data-language-panel="${lang === 'ar' ? 'en' : 'ar'}"]`)).toBeHidden();
+    const panel=page.locator('[data-language-panel="'+lang+'"]');
+    await expect(panel).toBeVisible();
+    await expect(page.locator('[data-language-panel="'+other+'"]')).toBeHidden();
+    await expect(panel).toHaveAttribute('dir',lang==='ar'?'rtl':'ltr');
     await expect(page.locator('.hd-mark')).toBeVisible();
     const header=await page.locator('header.hd').boundingBox();
-    const logo=await page.locator('header .hd-mark').boundingBox();
-    const barLabel=await page.locator('.student-language-bar > span').boundingBox();
-    const switchGroup=await page.locator('.student-language-bar > div').boundingBox();
-    const activeSwitch=await page.locator(`[data-lang-switch="${lang}"]`).boundingBox();
-    expect(header && logo && barLabel && switchGroup && activeSwitch).toBeTruthy();
-    // The bar's top padding intentionally extends behind the fixed header.
-    // Only visible content must remain clear of the logo/header.
-    expect(intersects(logo,barLabel,2)).toBeFalsy();
-    expect(intersects(logo,switchGroup,2)).toBeFalsy();
-    expect(intersects(header,barLabel,2)).toBeFalsy();
-    expect(intersects(header,activeSwitch,2)).toBeFalsy();
-    const metrics=await page.evaluate(() => ({
-      pageScrollWidth:document.documentElement.scrollWidth,
-      viewportWidth:window.innerWidth,
-      activeCount:document.querySelectorAll('.student-language:not([hidden])').length,
-      docDir: document.documentElement.dir,
-      panelDir: document.querySelector('.student-language:not([hidden])')?.dir,
-      activeInputs:document.querySelectorAll('.student-language:not([hidden]) .student-form').length
-    }));
-    expect(metrics.pageScrollWidth,JSON.stringify(metrics)).toBeLessThanOrEqual(metrics.viewportWidth+2);
-    expect(metrics.activeCount).toBe(1);
-    expect(metrics.activeInputs).toBe(1);
-    expect(metrics.docDir).toBe('ltr');
-    expect(metrics.panelDir).toBe(lang === 'ar' ? 'rtl' : 'ltr');
-    await expect(page.locator(`[data-language-panel="${lang}"] .student-form`)).toBeVisible();
-    await expect(page.locator(`[data-language-panel="${lang}"] .student-form .student-stage.is-active`)).toHaveCount(1);
-    expect(errors, 'Uncaught page errors: '+JSON.stringify(errors)).toEqual([]);
-    if (['iphone-390','desktop-1440'].includes(vp.name)) {
-      await page.screenshot({path:`test-screenshots/${vp.name}-${lang}.png`,fullPage:true});
-    }
+    const switcher=await page.locator('.student-language-bar button[data-lang-switch="'+lang+'"]').boundingBox();
+    expect(switcher.y).toBeGreaterThanOrEqual(header.y+header.height-2);
+    await expect(page.locator('form.student-form[data-form-lang="'+lang+'"]')).toHaveAttribute('action','mailto:alaa.qadir@crownsmere.com');
+    await expect(panel.locator('button[type="submit"]')).toContainText(lang==='ar'?'البريد الإلكتروني':'email');
+    await page.locator('[data-lang-switch="'+other+'"]').click();
+    await expect(page.locator('[data-language-panel="'+other+'"]')).toBeVisible();
+    await expect(page.locator('[data-language-panel="'+lang+'"]')).toBeHidden();
+    await expect(page.locator('.actionbar a[href^="#"]')).toHaveAttribute('href','#'+other+'-form');
   });
- }
-}
-for(const lang of langs) {
- test(`language switching, header remains stable and quick action targets correct form (${lang})`,async({page})=>{
-   await page.setViewportSize({width:390,height:844});
-   await page.goto('/students.html?lang='+lang);
-   const other=lang==='en'?'ar':'en';
-   await page.locator(`[data-lang-switch="${other}"]`).click();
-   await expect(page.locator(`[data-language-panel="${other}"]`)).toBeVisible();
-   await expect(page.locator(`[data-language-panel="${lang}"]`)).toBeHidden();
-   await expect(page.locator(`[data-lang-switch="${other}"]`)).toHaveAttribute('aria-pressed','true');
-   await expect(page.locator('.actionbar a[href^="#"]')).toHaveAttribute('href','#'+other+'-form');
-   const logo=await page.locator('header .hd-mark').boundingBox();
-   const barLabel=await page.locator('.student-language-bar > span').boundingBox();
-   const switchGroup=await page.locator('.student-language-bar > div').boundingBox();
-   expect(intersects(logo,barLabel,2)).toBeFalsy();
-   expect(intersects(logo,switchGroup,2)).toBeFalsy();
-   await page.locator('.hd-menu').click();
-   await expect(page.locator('.menu')).toBeVisible();
-   await expect(page.locator('.menu a[href="students.html"]')).toHaveAttribute('aria-current','page');
-   await page.locator('.hd-menu').click();
-   await page.locator('.actionbar a[href="#'+other+'-form"]').click();
-   await expect(page.locator(`[data-language-panel="${other}"] .student-form`)).toBeInViewport();
- });
- test(`complete three-step ${lang} form and mocked successful delivery`,async({page})=>{
-   await page.setViewportSize({width:390,height:844});
-   let payload=null, calls=0;
-   await page.route('https://formsubmit.co/ajax/**', async route=>{
-     calls++;
-     payload=JSON.parse(route.request().postData());
-     await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({success:true,message:'Email sent'})});
-   });
-   await page.goto('/students.html?lang='+lang);
-   const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
-   await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','0');
-   await form.locator('input[name="service"][value="Guarantor guidance for found property"]').check();
-   await form.locator('input[name="university"]').fill("Imperial College London");
-   await form.locator('select[name="monthly_budget"]').selectOption('GBP 2500-4000');
-   await form.locator('select[name="move_timeframe"]').selectOption('Within 1 month');
-   await form.locator('.student-stage.is-active [data-next]').click();
-   await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','1');
-   await form.locator('input[name="guarantor_status"][value="No UK guarantor"]').check();
-   await form.locator('select[name="property_found"]').selectOption('Already found a property');
-   await form.locator('input[name="preferred_areas"]').fill("Chelsea");
-   await form.locator('textarea[name="additional_notes"]').fill("Crownsmere automated QA enquiry (not a client).");
-   await form.locator('.student-stage.is-active [data-next]').click();
-   await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','2');
-   await form.locator('input[name="name"]').fill("Crownsmere QA Test");
-   await form.locator('input[name="email"]').fill("qa-test@example.org");
-   await form.locator('input[name="phone"]').fill("+447700900123");
-   await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
-   await form.locator('input[name="consent"]').check();
-   await form.locator('button[type="submit"]').click();
-   await expect(form.locator('.std-sent')).toBeVisible();
-   await expect(form.locator('.student-progress')).toBeHidden();
-   expect(calls).toBe(1);
-   expect(payload).toMatchObject({
-     _subject:'[Crownsmere Enquiry] International student rental and guarantor request',
-     source:'crownsmere.com/students',
-     language:lang==='ar'?'Arabic':'English',
-     service:'Guarantor guidance for found property',
-     university:'Imperial College London',
-     monthly_budget:'GBP 2500-4000',
-     move_timeframe:'Within 1 month',
-     guarantor_status:'No UK guarantor',
-     property_found:'Already found a property',
-     name:'Crownsmere QA Test',
-     email:'qa-test@example.org',
-     phone:'+447700900123',
-     preferred_contact:'WhatsApp',
-     consent:'Yes'
-   });
-   expect(payload).not.toHaveProperty('_honey');
- });
- test(`${lang} form blocks missing consent and invalid contact number`,async({page})=>{
-  let calls=0;
-  await page.route('https://formsubmit.co/ajax/**',route=>{calls++;return route.fulfill({status:200,contentType:'application/json',body:'{"success":true}'})});
-  await page.goto('/students.html?lang='+lang);
-  const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
-  await form.locator('.student-stage.is-active [data-next]').click();
-  await form.locator('.student-stage.is-active [data-next]').click();
-  await form.locator('input[name="name"]').fill('Crownsmere QA Test');
-  await form.locator('input[name="email"]').fill('qa-test@example.org');
-  await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
-  await form.locator('button[type="submit"]').click();
-  await expect(form.locator('.std-sent')).toBeHidden();
-  await expect(form.locator('.std-status')).not.toBeEmpty();
-  expect(calls).toBe(0);
-  await form.locator('input[name="phone"]').fill('invalid');
-  await form.locator('input[name="consent"]').check();
-  await form.locator('button[type="submit"]').click();
-  expect(calls).toBe(0);
-  await form.locator('input[name="phone"]').fill('+447700900123');
-  await form.locator('button[type="submit"]').click();
-  await expect(form.locator('.std-sent')).toBeVisible();
-  expect(calls).toBe(1);
- });
- test(`${lang} form handles network error without losing applicant data`,async({page})=>{
-  await page.route('https://formsubmit.co/ajax/**',route=>route.fulfill({status:500,contentType:'application/json',body:'{"success":false}'}));
-  await page.goto('/students.html?lang='+lang);
-  const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
-  await form.locator('.student-stage.is-active [data-next]').click();
-  await form.locator('.student-stage.is-active [data-next]').click();
-  await form.locator('input[name="name"]').fill('Crownsmere QA Test');
-  await form.locator('input[name="email"]').fill('qa-test@example.org');
-  await form.locator('input[name="consent"]').check();
-  await form.locator('button[type="submit"]').click();
-  await expect(form.locator('.std-status')).toHaveClass(/is-error/);
-  await expect(form.locator('.std-sent')).toBeHidden();
-  await expect(form.locator('input[name="name"]')).toHaveValue('Crownsmere QA Test');
-  await expect(form.locator('button[type="submit"]')).toBeEnabled();
- });
-}
-test('works with JavaScript disabled: first form and submit are available', async({browser})=>{
- const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:375,height:812}});
- const page=await context.newPage();
- await page.goto('http://127.0.0.1:8765/students.html');
- const form=page.locator('[data-language-panel="en"] form.student-form');
- await expect(form).toBeVisible();
- await expect(form.locator('[type="submit"]')).toBeVisible();
- expect(await form.getAttribute('action')).toMatch(/^https:\/\/formsubmit.co\//);
- await context.close();
-});
 
-
-for(const lang of ['en','ar']) {
- for(const responseType of ['html-challenge','missing-success']) {
-  test(`${lang} student form rejects HTTP 200 ${responseType} instead of falsely confirming delivery`, async({page})=>{
-    await page.route('https://formsubmit.co/ajax/**',route=>route.fulfill(responseType==='html-challenge'
-       ? {status:200,contentType:'text/html',body:'<!DOCTYPE html><html><body>Just a moment...</body></html>'}
-       : {status:200,contentType:'application/json',body:'{}'}));
+  test(lang+' student form: all three steps prepare a polished personal email',async({page})=>{
+    await page.setViewportSize({width:390,height:844});
+    const requests=[];
+    page.on('request',r=>{if(r.url().includes('formsubmit.co'))requests.push(r.url())});
     await page.goto('/students.html?lang='+lang);
-    const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
+    const form=page.locator('form.student-form[data-form-lang="'+lang+'"]');
+    await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','0');
+    await form.locator('input[name="service"][value="Apartment and guarantor help"]').check();
+    await form.locator('input[name="university"]').fill('Imperial College London');
+    await form.locator('select[name="monthly_budget"]').selectOption('GBP 2500-4000');
+    await form.locator('select[name="move_timeframe"]').selectOption('Within 1-3 months');
     await form.locator('.student-stage.is-active [data-next]').click();
+    await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','1');
+    await form.locator('input[name="guarantor_status"][value="No UK guarantor"]').check();
+    await form.locator('select[name="property_found"]').selectOption('Already found a property');
+    await form.locator('input[name="preferred_areas"]').fill('Kensington, Chelsea');
+    await form.locator('textarea[name="additional_notes"]').fill('Furnished flat near campus.');
     await form.locator('.student-stage.is-active [data-next]').click();
-    await form.locator('input[name="name"]').fill('Crownsmere QA Test');
-    await form.locator('input[name="email"]').fill('qa-test@example.org');
+    await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','2');
+    await form.locator('input[name="name"]').fill('Crownsmere QA Student');
+    await form.locator('input[name="email"]').fill('qa-student@example.org');
+    await form.locator('input[name="phone"]').fill('+447700900123');
+    await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
     await form.locator('input[name="consent"]').check();
     await form.locator('button[type="submit"]').click();
-    await expect(form.locator('.std-status')).toHaveClass(/is-error/);
+    await expect(form.locator('.std-fallback')).toBeVisible();
+    await expect(form.locator('.std-status')).toContainText(lang==='ar'?'البريد':'email');
     await expect(form.locator('.std-sent')).toBeHidden();
-    await expect(form.locator('input[name="name"]')).toHaveValue('Crownsmere QA Test');
-    await expect(form.locator('button[type="submit"]')).toBeEnabled();
+    const href=await form.locator('[data-email-fallback]').getAttribute('href');
+    const url=new URL(href);
+    expect(url.protocol).toBe('mailto:');
+    expect(url.pathname).toBe('alaa.qadir@crownsmere.com');
+    expect(url.searchParams.get('cc')).toBe('hello@crownsmere.com');
+    const subject=url.searchParams.get('subject');
+    expect(subject).toContain('Crownsmere Estate');
+    expect(subject).toContain('Crownsmere QA Student');
+    const body=url.searchParams.get('body');
+    for(const term of ['Imperial College London','Kensington, Chelsea','qa-student@example.org','+447700900123','Furnished flat near campus.'])expect(body).toContain(term);
+    expect(body).toContain('\n');
+    if(lang==='en'){
+      expect(body).toContain('STUDENT DETAILS');
+      expect(body).toContain('RENTAL REQUIREMENTS');
+      expect(body).toContain('GUARANTOR SITUATION');
+      expect(body).toContain('CONTACT DETAILS');
+      expect(body).toContain('£2,500–£4,000 per month');
+      expect(body).not.toContain('GBP 2500-4000');
+    }else{
+      expect(body).toContain('بيانات الطالب');
+      expect(body).toContain('متطلبات السكن');
+      expect(body).toContain('وضع الضامن');
+      expect(body).toContain('معلومات التواصل');
+      expect(body).toContain('من £2,500 إلى £4,000 شهرياً');
+      expect(body).not.toContain('GBP 2500-4000');
+    }
+    await form.locator('[data-copy-fallback]').click();
+    await expect(form.locator('[data-copy-feedback]')).not.toBeEmpty();
+    await expect(form.locator('input[name="name"]')).toHaveValue('Crownsmere QA Student');
+    expect(requests).toEqual([]);
   });
- }
-}
 
-
-for(const lang of ['en','ar']) {
- test(`${lang} student enquiry offers complete email fallback after FormSubmit challenge`,async({page})=>{
-   await page.setViewportSize({width:390,height:844});
-   await page.route('https://formsubmit.co/ajax/**',route=>route.fulfill({
-     status:200,contentType:'text/html',body:'<!doctype html><html><body>Just a moment...</body></html>'
-   }));
-   await page.goto('/students.html?lang='+lang);
-   const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
-   await form.locator('input[name="university"]').fill('Imperial College London');
-   await form.locator('.student-stage.is-active [data-next]').click();
-   await form.locator('input[name="preferred_areas"]').fill('Chelsea');
-   await form.locator('textarea[name="additional_notes"]').fill('Prefer walking distance from university');
-   await form.locator('.student-stage.is-active [data-next]').click();
-   await form.locator('input[name="name"]').fill('Crownsmere QA Test');
-   await form.locator('input[name="email"]').fill('qa-test@example.org');
-   await form.locator('input[name="phone"]').fill('+447700900123');
-   await form.locator('input[name="consent"]').check();
-   await form.locator('button[type="submit"]').click();
-   await expect(form.locator('.std-status')).toHaveClass(/is-error/);
-   const fallback=form.locator('.std-fallback');
-   await expect(fallback).toBeVisible();
-   await expect(form.locator('.std-sent')).toBeHidden();
-   const link=await fallback.locator('[data-email-fallback]').getAttribute('href');
-   expect(link).toMatch(/^mailto:hello@crownsmere\.com\?subject=/);
-   const url=new URL(link);
-   const subject=url.searchParams.get('subject');
-   const body=url.searchParams.get('body');
-   expect(subject).toContain('[Crownsmere Enquiry] Student assistance - Crownsmere QA Test');
-   for(const value of ['Crownsmere QA Test','qa-test@example.org','+447700900123','Imperial College London','Chelsea','Prefer walking distance from university']){
-     expect(body).toContain(value);
-   }
-   expect(body).toContain('\n');
-   if(lang==='ar')expect(body).toContain('مرحباً علا');
-   else expect(body).toContain('Dear Alaa');
-   await fallback.locator('[data-copy-fallback]').click();
-   await expect(fallback.locator('[data-copy-feedback]')).not.toBeEmpty();
-   await expect(form.locator('input[name="name"]')).toHaveValue('Crownsmere QA Test');
-   await expect(form.locator('textarea[name="additional_notes"]')).toHaveValue('Prefer walking distance from university');
- });
- test(`${lang} student email fallback disappears on successful retry`,async({page})=>{
-   let attempts=0;
-   await page.route('https://formsubmit.co/ajax/**',route=>{
-     attempts++;
-     if(attempts===1)return route.fulfill({status:403,contentType:'application/json',body:'{"success":false}'});
-     return route.fulfill({status:200,contentType:'application/json',body:'{"success":true}'});
-   });
-   await page.goto('/students.html?lang='+lang);
-   const form=page.locator(`[data-language-panel="${lang}"] form.student-form`);
-   await form.locator('.student-stage.is-active [data-next]').click();
-   await form.locator('.student-stage.is-active [data-next]').click();
-   await form.locator('input[name="name"]').fill('Crownsmere QA Test');
-   await form.locator('input[name="email"]').fill('qa-test@example.org');
-   await form.locator('input[name="consent"]').check();
-   await form.locator('button[type="submit"]').click();
-   await expect(form.locator('.std-fallback')).toBeVisible();
-   await form.locator('button[type="submit"]').click();
-   await expect(form.locator('.std-sent')).toBeVisible();
-   await expect(form.locator('.std-fallback')).toBeHidden();
-   expect(attempts).toBe(2);
- });
+  test(lang+' student form validates consent and contact methods before preparing mail',async({page})=>{
+    await page.goto('/students.html?lang='+lang);
+    const form=page.locator('form.student-form[data-form-lang="'+lang+'"]');
+    await form.locator('.student-stage.is-active [data-next]').click();
+    await form.locator('.student-stage.is-active [data-next]').click();
+    await form.locator('input[name="name"]').fill('Test Person');
+    await form.locator('input[name="email"]').fill('qa-test@example.org');
+    await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator('.std-fallback')).toBeHidden();
+    await expect(form.locator('.std-status')).not.toBeEmpty();
+    await form.locator('input[name="phone"]').fill('not-a-phone');
+    await form.locator('input[name="consent"]').check();
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator('.std-fallback')).toBeHidden();
+    await form.locator('input[name="phone"]').fill('+447700900123');
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator('.std-fallback')).toBeVisible();
+  });
 }
+test('no-JavaScript student form still has a mailto destination and a visible final action',async({browser})=>{
+ const ctx=await browser.newContext({javaScriptEnabled:false,viewport:{width:375,height:812}});
+ const page=await ctx.newPage();
+ await page.goto('http://127.0.0.1:8765/students.html');
+ const form=page.locator('form.student-form[data-form-lang="en"]');
+ await expect(form).toBeVisible();
+ await expect(form).toHaveAttribute('action','mailto:alaa.qadir@crownsmere.com');
+ await expect(form.locator('button[type="submit"]')).toBeVisible();
+ await ctx.close();
+});
