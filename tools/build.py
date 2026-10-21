@@ -779,7 +779,7 @@ contact_body = f'''
             {choice("preferred_contact", "Telephone")}{choice("preferred_contact", "Email")}{choice("preferred_contact", "Either", checked=True)}
           </fieldset>
           <div class="field"><label class="caps" for="f-time">Best time to call</label><select id="f-time" name="best_time">{options(["Any time", "Morning", "Afternoon", "Evening"])}</select></div>
-          <label class="consent"><input type="checkbox" name="consent" value="Yes" required><span>I am happy for {BRAND} to contact me by telephone and email about this request. My details will be held in confidence and never shared. See the <a href="privacy.html">privacy notice</a>.</span></label>
+          <label class="consent"><input type="checkbox" name="consent" value="Yes" required><span>I am happy for {BRAND} to contact me by telephone and email about this request. My details will be handled confidentially and will not be shared with an estate agent or guarantor provider without my further agreement. See the <a href="privacy.html">privacy notice</a>.</span></label>
           {step_actions(3, last=True)}
         </div>
 
@@ -807,7 +807,7 @@ contact_body = f'''
         <p class="pv-close">With kind regards,<br><span class="pv-name" data-pv-name>&nbsp;</span></p>
         <div class="pv-seal" aria-hidden="true">{pic("monogram-sm", "", 165, 259, ext="png")}</div>
       </div>
-      <p class="pv-note caps">Composed as you go &middot; Sent in confidence</p>
+      <p class="pv-note caps">Composed as you go &middot; Review and send by email</p>
     </aside>
     </div>
   </div>
@@ -863,7 +863,7 @@ privacy_body = f'''
     <ul>
       <li><strong>Your chosen email provider</strong> sends the email you choose to send from your mail application. We do not automatically receive or store incomplete website form entries.</li>
       <li><strong>Our email hosting provider</strong> stores the emails you send us.</li>
-      <li><strong>Anthropic</strong> provides the AI service that screens emails sent to {EMAIL}, so that spam is filtered out and genuine enquiries reach us promptly. Emails are processed for this purpose only.</li>
+      <li><strong>AI-assisted email filtering</strong> may be used for spam screening if enabled for our {EMAIL} mailbox. Where active, messages may be processed by Anthropic for that limited purpose.</li>
       <li><strong>OpenStreetMap</strong> supplies the map images on our home page. When the map loads, your browser requests these images from the OpenStreetMap Foundation&rsquo;s servers, which receive your IP address as part of that request.</li>
     </ul>
     <p>Some of these providers are based outside the UK, including in the United States. Where that is the case, information is transferred with appropriate safeguards in place. With your separate agreement, we may also share relevant details with others involved in your matter, such as solicitors, agents or professional guarantor providers, when that is needed to help you.</p>
