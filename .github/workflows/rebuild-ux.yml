@@ -3,7 +3,7 @@ name: Rebuild Crownsmere visual UX pages
 on:
   push:
     branches:
-      - improve/crownsmere-ux-mobile-20261021
+      - fix/crownsmere-visual-refinement-20261021
   workflow_dispatch:
 
 permissions:
@@ -32,4 +32,4 @@ jobs:
             exit 0
           fi
           git commit -m "Regenerate photo-led Crownsmere HTML and navigation"
-          git push origin HEAD:improve/crownsmere-ux-mobile-20261021
+          git push origin HEAD:fix/crownsmere-visual-refinement-20261021
