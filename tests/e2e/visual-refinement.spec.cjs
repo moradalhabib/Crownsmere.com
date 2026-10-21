@@ -106,6 +106,7 @@ test('mobile menu keyboard focus is contained and Escape returns focus',async({p
  await page.keyboard.press('Enter');
  await expect(button).toHaveAttribute('aria-expanded','true');
  await expect(page.locator('.menu a').first()).toBeFocused();
+ await page.screenshot({path:'test-screenshots/mobile-menu-open-keyboard.png',animations:'disabled'});
  await page.keyboard.press('Shift+Tab');
  await expect(page.locator('.menu a').last()).toBeFocused();
  await page.keyboard.press('Tab');
