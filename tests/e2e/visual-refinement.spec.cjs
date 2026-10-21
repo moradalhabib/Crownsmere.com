@@ -90,9 +90,72 @@ test('mobile services are compact and avoid repeated interior photography',async
     });
     expect(result.scrollWidth).toBeLessThanOrEqual(width+3);
     expect(result.duplicateImageHidden).toBeTruthy();
-    expect(parseFloat(result.firstPadding)).toBeLessThanOrEqual(30);
-    expect(parseFloat(result.bulletPadding)).toBeLessThanOrEqual(10);
-    expect(result.pageHeight).toBeLessThan(8100);
+    expect(parseFloat(result.firstPadding)).toBeGreaterThanOrEqual(34);
+    expect(parseFloat(result.bulletPadding)).toBeGreaterThanOrEqual(10);
+    expect(result.pageHeight).toBeLessThan(9500);
     await page.screenshot({path:'test-screenshots/compact-services-'+width+'.png',fullPage:true,animations:'disabled'});
   }
+});
+
+
+test('mobile menu keyboard focus is contained and Escape returns focus',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ const button=page.locator('.hd-menu');
+ await button.focus();
+ await page.keyboard.press('Enter');
+ await expect(button).toHaveAttribute('aria-expanded','true');
+ await expect(page.locator('.menu a').first()).toBeFocused();
+ await page.screenshot({path:'test-screenshots/mobile-menu-open-keyboard.png',animations:'disabled'});
+ await page.keyboard.press('Shift+Tab');
+ await expect(page.locator('.menu a').last()).toBeFocused();
+ await page.keyboard.press('Tab');
+ await expect(page.locator('.menu a').first()).toBeFocused();
+ await page.keyboard.press('Escape');
+ await expect(button).toBeFocused();
+ await expect(button).toHaveAttribute('aria-expanded','false');
+ await expect(page.locator('.menu')).toHaveAttribute('inert','');
+});
+test('mobile menu closes when switching to desktop viewport',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ await page.locator('.hd-menu').click();
+ await expect(page.locator('.hd-menu')).toHaveAttribute('aria-expanded','true');
+ await page.setViewportSize({width:1440,height:900});
+ await expect(page.locator('.hd-menu')).toHaveAttribute('aria-expanded','false');
+});
+
+test('mobile service cards and process steps have breathing room and usable touch targets',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/');
+ const measures=await page.evaluate(()=>{
+  const cards=[...document.querySelectorAll('.quick-card')];
+  const first=cards[0],heading=first.querySelector('h3'),go=first.querySelector('.quick-go');
+  const c=getComputedStyle(first.querySelector('.quick-card-inner'));
+  return {gap:parseFloat(getComputedStyle(document.querySelector('.quick-grid')).gap),
+    padding:parseFloat(c.paddingTop),
+    lineHeight:parseFloat(getComputedStyle(heading).lineHeight),
+    actionHeight:go.getBoundingClientRect().height,
+    cardHeight:first.getBoundingClientRect().height};
+ });
+ expect(measures.gap).toBeGreaterThanOrEqual(14);
+ expect(measures.padding).toBeGreaterThanOrEqual(22);
+ expect(measures.actionHeight).toBeGreaterThanOrEqual(44);
+ expect(measures.cardHeight).toBeGreaterThanOrEqual(280);
+ await page.screenshot({path:'test-screenshots/mobile-balanced-spacing.png',fullPage:true,animations:'disabled'});
+});
+
+test('final content accuracy: email draft is not misrepresented as sent',async({page})=>{
+ await page.goto('/students.html');
+ const text=await page.locator('main').innerText();
+ expect(text).not.toContain('Your enquiry has been sent.');
+ const html=await page.locator('main').innerHTML();
+ expect(html).not.toContain('تم إرسال طلبك.');
+ await page.goto('/contact.html');
+ const contact=await page.locator('main').textContent();
+ expect(contact).not.toContain('never shared');
+ expect(contact).toContain('further agreement');
+ await page.goto('/privacy.html');
+ const privacy=await page.locator('main').innerText();
+ expect(privacy).toContain('if enabled');
 });

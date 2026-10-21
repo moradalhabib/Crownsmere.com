@@ -366,3 +366,47 @@ form, .field input, .field textarea, .field select, .std-field input, .std-field
   #approach .facts div { padding-block: 14px; }
   #approach .facts div + div { margin-top: 0; }
 }
+
+
+/* Mobile navigation: accessible touch targets and reduced motion.
+   Avoid long reveal animations and prevent background scroll while the overlay is open. */
+@media (max-width: 1099px) {
+  html.menu-open { overflow: hidden; }
+  .hd-menu { min-height: 44px; min-width: 44px; justify-content: center; }
+  .menu { overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .menu li a { min-height: 48px; align-items: center; }
+  .menu a:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: -4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu { transition: none !important; }
+  .hd-menu i::before, .hd-menu i::after { transition: none !important; }
+}
+
+
+/* Balanced mobile rhythm: reduce empty sections, not readable content.
+   Research-aligned with WCAG 2.2 target size and responsive reading patterns. */
+@media (max-width: 700px) {
+  .section { padding-block: clamp(42px, 7vw, 54px); }
+  .quick-entrances { padding-block: 42px 48px; }
+  .quick-entrances .quick-heading { margin-bottom: 24px; }
+  .quick-entrances .quick-heading p { font-size: 18px; line-height: 1.55; }
+  .quick-grid { gap: 16px; }
+  .quick-card, .quick-card:last-child { min-height: 285px; }
+  .quick-card-inner { padding: 24px; gap: 10px; }
+  .quick-card h3 { font-size: clamp(34px, 8.8vw, 42px); line-height: 1.08; }
+  .quick-card p { font-size: 17px; line-height: 1.48; }
+  .quick-card .quick-go { min-height: 44px; display: inline-flex; align-items: center; }
+  .services-list .service { padding-block: 38px; gap: 10px; }
+  .services-list .service h2 { line-height: 1.1; }
+  .services-list .service .lede { line-height: 1.5; }
+  .services-list .service li { padding-block: 12px; line-height: 1.5; }
+  .service-photo-band { gap: 20px; padding-bottom: 36px; }
+  #approach.section { padding-block: 48px; }
+  #approach .section-head { margin-bottom: 25px; }
+  #approach .statement .cols { gap: 20px; }
+  #approach .facts { margin-top: 32px; }
+  .journey-pin { padding-block: 42px; }
+  .journey-track { gap: 15px; }
+  .journey-track .step-card { padding: 22px; }
+  .student-stage .std-actions .btn, .std-fallback-actions .btn, .contact-mail-backup .btn { min-height: 48px; }
+}
