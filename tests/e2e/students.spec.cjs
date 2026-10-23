@@ -1,5 +1,12 @@
 const {test,expect}=require('@playwright/test');
 
+// Capture the prepared email instead of launching a mail app. The pages call
+// window.crownsmereOpenDraft when it exists; without it, Firefox in CI blocks on its
+// "choose an application" prompt for mailto: links.
+test.beforeEach(async ({page}) => {
+  await page.addInitScript(() => { window.crownsmereOpenDraft = url => { window.__openedDraft = url; }; });
+});
+
 /* No emails are actually sent during testing.
  * The complete mailto draft is checked in both languages before publication. */
 const pageUrl={en:'/students.html',ar:'/students-ar.html'};
@@ -58,6 +65,7 @@ for(const lang of ['en','ar']){
     await expect(form.locator('.std-status')).toContainText(lang==='ar'?'البريد':'email');
     await expect(form.locator('.std-sent')).toBeHidden();
     const href=await form.locator('[data-email-fallback]').getAttribute('href');
+    expect(await page.evaluate(()=>window.__openedDraft)).toBe(href); // the mail app opens this same draft
     const url=new URL(href);
     expect(url.protocol).toBe('mailto:');
     expect(url.pathname).toBe('alaa.qadir@crownsmere.com');

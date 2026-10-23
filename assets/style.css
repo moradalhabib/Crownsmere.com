@@ -573,11 +573,12 @@ h2 { font-size: clamp(32px, 2.6vw + 20px, 52px); }
 .contact-copy-label { display: grid; gap: 8px; margin-top: 12px; font-weight: 600; font-size: 14px; }
 .hp, .std-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
-/* Webmail alternatives: computers only, where mailto: links often open nothing */
-.webmail { display: none; flex-wrap: wrap; align-items: center; gap: 10px; margin: 4px 0 8px; font-size: 14px; color: var(--ink-2); }
+/* Webmail alternatives for computers, where mailto: links often open nothing. Touch screens
+   (phones, tablets) open their own mail app, so they skip these. */
+.webmail { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 4px 0 8px; font-size: 14px; color: var(--ink-2); }
 .webmail span { flex-basis: 100%; }
 .webmail .btn { min-height: 44px; padding: 0 18px; font-size: 14px; }
-@media (hover: hover) and (pointer: fine) { .webmail { display: flex; } }
+@media (pointer: coarse) { .webmail { display: none; } }
 
 /* ---------- Fees and client comments (shown once filled in, see tools/build.py) ---------- */
 .fee-list { display: grid; margin: 0; border-top: 1px solid var(--line-strong); }

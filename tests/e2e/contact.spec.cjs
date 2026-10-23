@@ -1,4 +1,11 @@
 const {test,expect}=require('@playwright/test');
+
+// Capture the prepared email instead of launching a mail app. The pages call
+// window.crownsmereOpenDraft when it exists; without it, Firefox in CI blocks on its
+// "choose an application" prompt for mailto: links.
+test.beforeEach(async ({page}) => {
+  await page.addInitScript(() => { window.crownsmereOpenDraft = url => { window.__openedDraft = url; }; });
+});
 /* The contact brief becomes a reviewed email, not an automatically sent website form. */
 async function complete(page){
   await page.goto('/contact.html');
@@ -29,6 +36,7 @@ test('general website brief opens a well-organised email draft, not a third-part
   await expect(form).not.toHaveClass(/sent/);
   await expect(form.locator('.form-status')).toContainText('email');
   const href=await backup.locator('[data-contact-email]').getAttribute('href');
+  expect(await page.evaluate(()=>window.__openedDraft)).toBe(href); // the mail app opens this same draft
   const url=new URL(href);
   expect(url.protocol).toBe('mailto:');
   expect(url.pathname).toBe('alaa.qadir@crownsmere.com');
@@ -61,6 +69,7 @@ test('general contact form blocks missing consent and invalid phone',async({page
   await form.locator('input[name="phone"]').fill('invalid');
   await form.locator('button[type="submit"]').click();
   await expect(form.locator('.contact-mail-backup')).toBeHidden();
+  expect(await page.evaluate(()=>window.__openedDraft)).toBeUndefined();
   await form.locator('input[name="phone"]').fill('+447700900123');
   await form.locator('input[name="consent"]').check();
   await form.locator('button[type="submit"]').click();

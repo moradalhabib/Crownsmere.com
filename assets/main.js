@@ -69,9 +69,13 @@
       }
     });
     menu.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
-    window.addEventListener("resize", function () {
-      if (!phone.matches && root.classList.contains("menu-open")) setMenu(false);
-    });
+    // Close the phone menu if the window becomes desktop width (some browsers update the media
+    // query after the resize event, so check the width and listen for the query changing too).
+    var closeOnDesktop = function () {
+      if ((!phone.matches || window.innerWidth >= 1000) && root.classList.contains("menu-open")) setMenu(false);
+    };
+    window.addEventListener("resize", closeOnDesktop);
+    if (phone.addEventListener) phone.addEventListener("change", closeOnDesktop);
   }
 
   /* ---------- Keep keyboard focus clear of the sticky header and quick-contact bar ----------
@@ -304,6 +308,8 @@
     if (mailBackup) mailBackup.hidden = false;
     say("Your email is ready. Review it in your mail app and press Send.");
     // Opened straight from the visitor's tap, so mobile browsers allow it.
-    try { window.location.href = draft; } catch (err) { /* The visible email link and copy option remain. */ }
+    // window.crownsmereOpenDraft lets the browser tests capture the draft instead of opening a mail app.
+    try { (window.crownsmereOpenDraft || function (url) { window.location.href = url; })(draft); }
+    catch (err) { /* The visible email link and copy option remain. */ }
   });
 })();

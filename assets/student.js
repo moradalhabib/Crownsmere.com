@@ -245,7 +245,8 @@ document.querySelectorAll(".student-form").forEach(function(form){
    ?"رسالتك جاهزة. راجعها واضغط إرسال في تطبيق البريد الإلكتروني."
    :"Your email is ready. Review it and press Send in your email app.");
   if(draft){
-   try { window.location.href=draft; }
+   // window.crownsmereOpenDraft lets the browser tests capture the draft instead of opening a mail app.
+   try { (window.crownsmereOpenDraft||function(url){window.location.href=url;})(draft); }
    catch(error) { /* Keep the visible Open email / Copy options. */ }
   }
  });
