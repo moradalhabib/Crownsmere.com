@@ -24,7 +24,9 @@ permissions:
 jobs:
   student-e2e:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # Three browsers are installed and tested one after another. On slow days GitHub's package
+    # mirrors alone have taken over 25 minutes, which stopped the job before WebKit and Firefox ran.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
