@@ -40,7 +40,7 @@ for(const lang of ['en','ar']){
     }
     await expect(page.locator('form.student-form[data-form-lang="'+lang+'"]')).toHaveAttribute('action','mailto:alaa.qadir@crownsmere.com');
     await expect(panel.locator('button[type="submit"]')).toContainText(lang==='ar'?'البريد الإلكتروني':'email');
-    await expect(page.locator('.actionbar a[href^="#"]')).toHaveAttribute('href','#'+lang+'-form');
+    await expect(page.locator('.tabbar a[aria-current="page"]')).toHaveAttribute('href',pageUrl[lang].slice(1));
     await expect(panel.locator('.student-advice')).toContainText(lang==='ar'?'قانون حقوق المستأجرين':'Renters’ Rights Act 2025');
     await page.locator('.student-language-bar a[hreflang="'+other+'"]').click();
     await expect(page).toHaveURL(new RegExp(pageUrl[other].replace('.','\\.')+'$'));

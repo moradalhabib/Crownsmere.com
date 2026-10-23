@@ -7,88 +7,32 @@
   root.classList.remove("no-js");
   root.classList.add("js");
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var phone = window.matchMedia("(max-width: 999px)");
 
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
   });
 
-  /* ---------- Header and quick-contact bar ----------
-     On phones the header slides away while scrolling down and returns on the way up,
-     and the quick-contact bar appears once the opening view has been scrolled past. */
+  /* ---------- Header ----------
+     The header stays put; a hairline appears under it once the page has scrolled. On phones and
+     tablets the tab bar along the bottom (plain links) is the navigation, so it needs no script. */
   var hd = document.querySelector(".hd");
-  var lastY = window.scrollY;
   function onScroll() {
-    var y = window.scrollY;
-    if (hd) {
-      hd.classList.toggle("is-scrolled", y > 8);
-      var menuOpen = root.classList.contains("menu-open");
-      if (phone.matches && y > 170 && y > lastY + 1 && !menuOpen && !hd.contains(document.activeElement)) {
-        hd.classList.add("is-hidden-on-scroll");
-      } else if (!phone.matches || y < 120 || y < lastY - 1) {
-        hd.classList.remove("is-hidden-on-scroll");
-      }
-    }
-    root.classList.toggle("show-bar", y > Math.min(420, window.innerHeight * 0.5));
-    lastY = y;
+    if (hd) hd.classList.toggle("is-scrolled", window.scrollY > 8);
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* ---------- Mobile menu ---------- */
-  var menuBtn = document.querySelector(".hd-menu");
-  var menu = document.getElementById("menu");
-  if (menuBtn && menu) {
-    var label = menuBtn.querySelector("span");
-    var focusables = function () {
-      return [menuBtn].concat(Array.prototype.slice.call(menu.querySelectorAll("a[href], button")));
-    };
-    var setMenu = function (open) {
-      root.classList.toggle("menu-open", open);
-      menuBtn.setAttribute("aria-expanded", String(open));
-      label.textContent = open ? "Close" : "Menu";
-      if (open) menu.removeAttribute("inert"); else menu.setAttribute("inert", "");
-    };
-    menu.setAttribute("inert", "");
-    menuBtn.addEventListener("click", function () {
-      var open = !root.classList.contains("menu-open");
-      setMenu(open);
-      if (open) focusables()[1].focus({ preventScroll: true });
-    });
-    document.addEventListener("keydown", function (e) {
-      if (!root.classList.contains("menu-open")) return;
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setMenu(false);
-        menuBtn.focus({ preventScroll: true });
-      } else if (e.key === "Tab") {
-        // The open menu covers the page, so keep focus inside it (the close button included).
-        var items = focusables(), first = items[0], last = items[items.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    });
-    menu.addEventListener("click", function (e) { if (e.target.closest("a")) setMenu(false); });
-    // Close the phone menu if the window becomes desktop width (some browsers update the media
-    // query after the resize event, so check the width and listen for the query changing too).
-    var closeOnDesktop = function () {
-      if ((!phone.matches || window.innerWidth >= 1000) && root.classList.contains("menu-open")) setMenu(false);
-    };
-    window.addEventListener("resize", closeOnDesktop);
-    if (phone.addEventListener) phone.addEventListener("change", closeOnDesktop);
-  }
-
-  /* ---------- Keep keyboard focus clear of the sticky header and quick-contact bar ----------
+  /* ---------- Keep keyboard focus clear of the sticky header and the tab bar ----------
      WCAG 2.2 (2.4.11). The page's scroll padding handles this in most browsers; Safari can still
      leave a focused control under a bar. Only for keyboard (Tab) navigation, and checked once
      scrolling has stopped, so it never moves the page under a tap or fights a smooth scroll. */
-  var quickBar = document.querySelector(".actionbar");
+  var tabBar = document.querySelector(".tabbar");
   var focusTimer = 0, tabbing = false;
   document.addEventListener("keydown", function (e) { if (e.key === "Tab") tabbing = true; });
   document.addEventListener("pointerdown", function () { tabbing = false; });
   document.addEventListener("focusin", function (e) {
     var el = e.target;
-    if (!tabbing || [hd, menu, quickBar].some(function (x) { return x && x.contains(el); })) return;
+    if (!tabbing || [hd, tabBar].some(function (x) { return x && x.contains(el); })) return;
     clearTimeout(focusTimer);
     var seenY = -1, still = 0, waited = 0;
     var check = function () {
@@ -97,9 +41,9 @@
       if (still < 3 && (waited += 40) < 1500) { focusTimer = setTimeout(check, 40); return; }
       if (document.activeElement !== el) return;
       var r = el.getBoundingClientRect();
-      var top = hd ? hd.offsetHeight : 0; // the header returns when scrolling up, so allow for it
-      var bottom = quickBar && quickBar.getClientRects().length
-        ? Math.min(window.innerHeight, quickBar.getBoundingClientRect().top) : window.innerHeight;
+      var top = hd ? hd.offsetHeight : 0;
+      var bottom = tabBar && tabBar.getClientRects().length
+        ? Math.min(window.innerHeight, tabBar.getBoundingClientRect().top) : window.innerHeight;
       if (r.top < top) window.scrollBy(0, r.top - top - 12);
       else if (r.bottom > bottom) window.scrollBy(0, Math.min(r.bottom - bottom + 12, r.top - top - 12));
     };
