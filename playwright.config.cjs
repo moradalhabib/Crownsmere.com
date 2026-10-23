@@ -10,6 +10,9 @@ module.exports = defineConfig({
     baseURL: 'http://127.0.0.1:8765',
     browserName: 'chromium',
     headless: true,
+    // Animations off, so a click never races a sliding bar or a fading section.
+    // One test turns motion back on to check that every animated section still appears.
+    reducedMotion: 'reduce',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure'
   },

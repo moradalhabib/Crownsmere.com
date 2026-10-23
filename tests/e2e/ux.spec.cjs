@@ -129,6 +129,21 @@ test('instant navigation: the prefetch rules are allowed by the content security
   expect(violations).toEqual([]);
 });
 
+test('with motion on, every section that fades in ends up visible', async ({page}) => {
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  for (const url of ['/', '/services.html', '/about.html', '/contact.html']) {
+    await page.goto(url);
+    await expect(page.locator('html')).toHaveClass(/reveal-on/);
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += 300) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 60)); }
+    });
+    await expect.poll(() => page.locator('[data-reveal]:not(.in)').count(), {message: url}).toBe(0);
+    await page.waitForTimeout(900); // the fade takes 0.8s
+    const faint = await page.locator('[data-reveal]').evaluateAll(els => els.filter(el => parseFloat(getComputedStyle(el).opacity) < 0.99).length);
+    expect(faint, url).toBe(0);
+  }
+});
+
 test('every link, section link and image on every page works', async ({page, request}) => {
   const all = [...pages.map(([u]) => u), '/404.html'];
   const status = new Map(), idsOn = new Map(), broken = [];
