@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
 <title>Crownsmere Estate | Buy, Sell & Rent London Property</title>
 <meta name="description" content="Crownsmere Estate offers personal London property search, private sales, lettings and international student rental assistance. Speak to property consultant Alaa Qadir.">
-<meta name="theme-color" content="#f6f0e4">
+<meta name="theme-color" content="#faf7f1">
 <link rel="canonical" href="https://crownsmere.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Crownsmere Estate">
@@ -28,241 +28,119 @@
 <link rel="icon" href="assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
+<link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/eb-garamond.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/cinzel.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/img/townhouse.webp" as="image" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="stylesheet" href="assets/experience.css">
-<link rel="stylesheet" href="assets/mobile-header.css">
-<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "RealEstateAgent", "@id": "https://crownsmere.com/#business", "name": "Crownsmere Estate", "description": "A private, by-request property search and consultancy service in prime London: clients share a brief and Alaa Qadir finds the right property, on and off the market.", "url": "https://crownsmere.com/", "email": "hello@crownsmere.com", "image": "https://crownsmere.com/assets/img/townhouse.jpg", "logo": "https://crownsmere.com/assets/img/monogram.png", "areaServed": [{"@type": "City", "name": "London"}, {"@type": "Place", "name": "Mayfair"}, {"@type": "Place", "name": "Belgravia"}, {"@type": "Place", "name": "Knightsbridge"}, {"@type": "Place", "name": "Chelsea"}, {"@type": "Place", "name": "Kensington"}, {"@type": "Place", "name": "Holland Park"}, {"@type": "Place", "name": "Notting Hill"}, {"@type": "Place", "name": "Marylebone"}, {"@type": "Place", "name": "St John’s Wood"}, {"@type": "Place", "name": "Hampstead"}], "address": {"@type": "PostalAddress", "addressLocality": "London", "addressCountry": "GB"}, "employee": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant", "worksFor": {"@id": "https://crownsmere.com/#business"}}, "slogan": "A more personal London.", "knowsAbout": ["Prime London property", "Property search", "Off-market property", "Private property sales", "Lettings", "Property investment"]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does it work?", "acceptedAnswer": {"@type": "Answer", "text": "You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."}}, {"@type": "Question", "name": "Why are there no properties listed on this website?", "acceptedAnswer": {"@type": "Answer", "text": "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."}}, {"@type": "Question", "name": "Are you a buying agent?", "acceptedAnswer": {"@type": "Answer", "text": "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give independent advice."}}, {"@type": "Question", "name": "What does “off-market” mean?", "acceptedAnswer": {"@type": "Answer", "text": "A property whose owner prefers to sell or let quietly, without public advertising. These homes are reached through a discreet network of owners, agents and advisers rather than through property portals."}}, {"@type": "Question", "name": "Can you help me sell or let my own property?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. I can introduce your property privately to qualified buyers or tenants, without a public listing unless you would like one."}}, {"@type": "Question", "name": "Which areas do you cover?", "acceptedAnswer": {"@type": "Answer", "text": "Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask."}}, {"@type": "Question", "name": "I live overseas. Can you still help?", "acceptedAnswer": {"@type": "Answer", "text": "Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person."}}, {"@type": "Question", "name": "Is my enquiry confidential?", "acceptedAnswer": {"@type": "Answer", "text": "Completely. Your brief and your details are used only to help you, and are shared with relevant partners only with your further agreement. See the privacy notice for details."}}, {"@type": "Question", "name": "How are fees agreed?", "acceptedAnswer": {"@type": "Answer", "text": "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."}}]}, {"@context": "https://schema.org", "@type": "WebSite", "name": "Crownsmere Estate", "url": "https://crownsmere.com/", "inLanguage": "en-GB", "publisher": {"@id": "https://crownsmere.com/#business"}}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "RealEstateAgent", "@id": "https://crownsmere.com/#business", "name": "Crownsmere Estate", "description": "A private, by-request property search and consultancy service in prime London: clients share a brief and Alaa Qadir finds the right property, on and off the market.", "url": "https://crownsmere.com/", "email": "hello@crownsmere.com", "image": "https://crownsmere.com/assets/img/townhouse.jpg", "logo": "https://crownsmere.com/assets/img/monogram.png", "areaServed": [{"@type": "City", "name": "London"}, {"@type": "Place", "name": "Mayfair"}, {"@type": "Place", "name": "Belgravia"}, {"@type": "Place", "name": "Knightsbridge"}, {"@type": "Place", "name": "Chelsea"}, {"@type": "Place", "name": "Kensington"}, {"@type": "Place", "name": "Holland Park"}, {"@type": "Place", "name": "Notting Hill"}, {"@type": "Place", "name": "Marylebone"}, {"@type": "Place", "name": "St John’s Wood"}, {"@type": "Place", "name": "Hampstead"}], "address": {"@type": "PostalAddress", "addressLocality": "London", "addressCountry": "GB"}, "employee": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant", "worksFor": {"@id": "https://crownsmere.com/#business"}}, "slogan": "A more personal London.", "knowsAbout": ["Prime London property", "Property search", "Off-market property", "Private property sales", "Lettings", "Property investment", "International student lettings"]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does it work?", "acceptedAnswer": {"@type": "Answer", "text": "You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."}}, {"@type": "Question", "name": "Why are there no properties listed on this website?", "acceptedAnswer": {"@type": "Answer", "text": "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."}}, {"@type": "Question", "name": "Are you a buying agent?", "acceptedAnswer": {"@type": "Answer", "text": "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give independent advice."}}, {"@type": "Question", "name": "Which areas do you cover?", "acceptedAnswer": {"@type": "Answer", "text": "Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask."}}, {"@type": "Question", "name": "I live overseas. Can you still help?", "acceptedAnswer": {"@type": "Answer", "text": "Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person."}}, {"@type": "Question", "name": "How are fees agreed?", "acceptedAnswer": {"@type": "Answer", "text": "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."}}]}, {"@context": "https://schema.org", "@type": "WebSite", "name": "Crownsmere Estate", "url": "https://crownsmere.com/", "inLanguage": "en-GB", "publisher": {"@id": "https://crownsmere.com/#business"}}]</script>
 </head>
-<body class="home">
+<body class="page-home">
 <a class="skip" href="#main">Skip to content</a>
-<div class="progress" aria-hidden="true"></div>
 <header class="hd">
-  <a class="hd-mark" href="index.html" aria-label="Crownsmere Estate, home">
-    <picture><source type="image/webp" srcset="assets/img/monogram-sm.webp"><img src="assets/img/monogram-sm.png" alt="" width="165" height="259"></picture>
-    <span class="wm"><b>CROWNSMERE</b><small>Estate<span class="tl"> &middot; Private Property Consultancy</span></small></span>
-  </a>
-  <nav class="hd-nav" aria-label="Main"><div class="hd-l"><a class="nl caps" href="index.html" aria-current="page">Home</a><a class="nl caps" href="services.html">Services</a><a class="nl caps" href="about.html">About</a><a class="nl caps" href="students.html">Students</a></div><div class="hd-r"><a class="nl caps" href="contact.html">Contact</a><a class="btn btn-gold caps" href="contact.html">Start enquiry <span aria-hidden="true">&rarr;</span></a></div></nav>
-  <button class="hd-menu caps" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
+  <div class="wrap hd-in">
+    <a class="hd-mark" href="index.html" aria-label="Crownsmere Estate, home">
+      <picture><source type="image/webp" srcset="assets/img/monogram-sm.webp"><img src="assets/img/monogram-sm.png" alt="" width="165" height="259"></picture>
+      <span class="wm"><b>CROWNSMERE</b><small>Estate</small></span>
+    </a>
+    <nav class="hd-nav" aria-label="Main"><a href="services.html">Services</a><a href="about.html">About</a><a href="students.html">Students</a><a href="contact.html">Contact</a></nav>
+    <a class="btn btn-primary" href="contact.html" data-cta>Start enquiry</a>
+    <button class="hd-menu" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
+  </div>
 </header>
 <nav class="menu" id="menu" aria-label="Mobile">
   <ol>
-<li><a href="index.html" aria-current="page"><small>01</small>Home</a></li>
-<li><a href="services.html"><small>02</small>Services</a></li>
-<li><a href="about.html"><small>03</small>About</a></li>
-<li><a href="students.html"><small>04</small>Students</a></li>
-<li><a href="contact.html"><small>05</small>Contact</a></li>
+    <li><a href="index.html" aria-current="page">Home</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="students.html">Students</a></li>
+    <li><a href="contact.html">Contact</a></li>
   </ol>
-  <aside>
-    <div><div class="caps">Your brief</div><a href="contact.html">Share it in confidence</a></div>
-    <div><div class="caps">Email</div><a href="mailto:hello@crownsmere.com">hello@crownsmere.com</a></div>
-  </aside>
+  <div class="menu-foot">
+    <a class="btn btn-primary" href="contact.html">Share your brief<svg class="ic ic-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+    <a class="menu-mail" href="mailto:hello@crownsmere.com"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 6l9 7 9-7"/></svg>hello@crownsmere.com</a>
+  </div>
 </nav>
 <main id="main">
 
-<section class="home-showcase" aria-label="Crownsmere London property consultancy">
-  <picture class="showcase-picture">
-    <source type="image/webp" srcset="assets/img/townhouse.webp">
-    <img src="assets/img/townhouse.jpg" alt="An elegant white-stucco London townhouse" width="1055" height="687" fetchpriority="high">
-  </picture>
-  <div class="wrap showcase-inner">
-    <div class="showcase-copy">
-      <div class="showcase-eyebrow caps">Prime London &middot; Private Property Consultancy</div>
-      <h1>London property, <em>personally handled.</em></h1>
-      <p>Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a carefully guided property search and personal advice.</p>
-      <div class="showcase-actions">
-        <a class="btn btn-gold caps" href="contact.html">Tell us what you need <span aria-hidden="true">&rarr;</span></a>
-        <a class="showcase-secondary" href="students.html">International student? Get rental help <span aria-hidden="true">&rarr;</span></a>
-      </div>
-      <p class="showcase-footnote">Prime London &middot; By appointment &middot; Personal service</p>
+<section class="hero" aria-labelledby="hero-title">
+  <picture class="hero-media"><source type="image/webp" srcset="assets/img/townhouse.webp"><img src="assets/img/townhouse.jpg" alt="A white-stucco London townhouse with a black front door" width="1055" height="687" fetchpriority="high"></picture>
+  <div class="wrap hero-in">
+    <p class="eyebrow">Prime London property consultancy</p>
+    <h1 id="hero-title">London property, <em>personally handled.</em></h1>
+    <p class="hero-sub">Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a discreet, personal search, on and off the market.</p>
+    <div class="hero-actions">
+      <a class="btn btn-light" href="contact.html">Share your brief<svg class="ic ic-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <a class="hero-link" href="students.html">International student? Get rental help<svg class="ic ic-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
     </div>
   </div>
 </section>
 
-<section class="quick-entrances" aria-labelledby="quick-choices-heading">
+<section class="sec" aria-labelledby="help-title">
   <div class="wrap">
-    <div class="quick-heading">
-      <div class="eyebrow caps">How can we help?</div>
-      <h2 id="quick-choices-heading">Find your way <em>forward.</em></h2>
-      <p>Select what you're looking for. We'll guide you towards the right next step, with a personal response rather than a long property catalogue.</p>
-    </div>
-    <div class="quick-grid">
-      <a class="quick-card" href="contact.html" aria-label="Buy or find a London property, share your requirements">
-        <picture><source type="image/webp" srcset="assets/img/colonnade.webp"><img src="assets/img/colonnade.jpg" alt="Elegant London residential street" width="563" height="398" loading="lazy" decoding="async"></picture>
-        <div class="quick-card-inner">
-          <span class="quick-tag">BUY &middot; INVEST</span>
-          <h3>Find a London home</h3>
-          <p>A personal property search, including opportunities not publicly listed.</p>
-          <span class="quick-go">Start your search &rarr;</span>
-        </div>
-      </a>
-      <a class="quick-card" href="services.html#sell" aria-label="Sell or let your property with Crownsmere">
-        <picture><source type="image/webp" srcset="assets/img/interior.webp"><img src="assets/img/interior.jpg" alt="An elegant London apartment interior" width="826" height="463" loading="lazy" decoding="async"></picture>
-        <div class="quick-card-inner">
-          <span class="quick-tag">SELL &middot; LET</span>
-          <h3>Your property, carefully represented</h3>
-          <p>Discreet introductions, trusted relationships and thoughtful negotiation.</p>
-          <span class="quick-go">Explore services &rarr;</span>
-        </div>
-      </a>
-      <a class="quick-card" href="students.html" aria-label="International students, request London rental and guarantor assistance">
-        <picture><source type="image/webp" srcset="assets/img/westminster.webp"><img src="assets/img/westminster.jpg" alt="Central London and Westminster viewed from a city apartment" width="420" height="480" loading="lazy" decoding="async"></picture>
-        <div class="quick-card-inner">
-          <span class="quick-tag">INTERNATIONAL STUDENTS</span>
-          <h3>Studying in London?</h3>
-          <p>Find a rental home and explore options without a UK guarantor.</p>
-          <span class="quick-go">Get student assistance &rarr;</span>
-        </div>
-      </a>
-    </div>
-    <p class="quick-imagery-note">Images illustrate London properties and neighbourhoods, not guaranteed available listings.</p>
+    <div class="sec-head" data-reveal><p class="eyebrow">How can we help?</p><h2 id="help-title">Find your way <em>forward.</em></h2></div>
+    <div class="paths" data-reveal><a class="path" href="contact.html"><picture><source type="image/webp" srcset="assets/img/colonnade.webp"><img src="assets/img/colonnade.jpg" alt="A white-stucco London street with columned porches" width="563" height="398" loading="lazy" decoding="async"></picture><div class="path-body"><span class="path-tag">Buy &middot; Rent &middot; Invest</span><h3>Find a London home</h3><p>A personal search, including homes that are never publicly listed.</p></div><svg class="ic path-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></a><a class="path" href="services.html#sell"><picture><source type="image/webp" srcset="assets/img/interior.webp"><img src="assets/img/interior.jpg" alt="An elegant London drawing room with tall windows" width="826" height="463" loading="lazy" decoding="async"></picture><div class="path-body"><span class="path-tag">Sell &middot; Let</span><h3>Sell or let, discreetly</h3><p>Quiet introductions to qualified buyers and tenants.</p></div><svg class="ic path-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></a><a class="path" href="students.html"><picture><source type="image/webp" srcset="assets/img/westminster.webp"><img src="assets/img/westminster.jpg" alt="Big Ben and Westminster seen through tall French windows" width="420" height="480" loading="lazy" decoding="async"></picture><div class="path-body"><span class="path-tag">Students</span><h3>Studying in London?</h3><p>Rental help, even without a UK guarantor.</p></div><svg class="ic path-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg></a></div>
+    <p class="fine">Photographs illustrate London homes and neighbourhoods, not available listings.</p>
   </div>
 </section>
 
-<section class="section" id="approach">
+<section class="sec sec-alt" id="how" aria-labelledby="how-title">
   <div class="wrap">
-    <div class="section-head">
-      <div class="section-mark caps"><b>I.</b>The Approach</div>
-      <h2 data-reveal data-split>A personal approach to <em>London property.</em></h2>
-    </div>
-    <div class="statement">
-      <div class="copy">
-        <p class="lede dropcap" data-highlight>Crownsmere Estate is not a typical estate agency. Rather than selling whatever happens to be on the books, I work from your brief, searching personally to find what is genuinely right for you.</p>
-        <div class="cols" data-reveal>
-          <p>Each client is taken on individually, and each search is shaped around their life, their timing and their priorities. You deal with me directly, from the first conversation to the day you collect the keys.</p>
-          <p>Many of London&rsquo;s finest homes change hands quietly, without ever being advertised. Through a discreet network of owners, agents and advisers, I can open doors that never appear online.</p>
-        </div>
-        <div class="signature" data-reveal><b>Alaa Qadir</b><span class="caps">Senior Property Consultant</span></div>
-      </div>
-    </div>
-    <div class="facts" data-reveal>
-      <div><strong>By request</strong><span class="caps">Every search starts with your brief</span></div>
-      <div><strong>One-to-one</strong><span class="caps">You deal directly with me</span></div>
-      <div><strong>Off-market</strong><span class="caps">Homes that are never advertised</span></div>
-    </div>
+    <div class="sec-head" data-reveal><p class="eyebrow">How it works</p><h2 id="how-title">From your brief <em>to the keys.</em></h2></div>
+    <ol class="steps" data-reveal><li><span class="step-n" aria-hidden="true">1</span><div><h3>Share your brief</h3><p>A private conversation about what you are looking for, why, and when. No detail is too small.</p></div></li><li><span class="step-n" aria-hidden="true">2</span><div><h3>See a curated shortlist</h3><p>I search personally, on and off the market, and check every property before you see it.</p></div></li><li><span class="step-n" aria-hidden="true">3</span><div><h3>View, negotiate, complete</h3><p>Accompanied viewings, calm negotiation and support through to completion, and long after.</p></div></li></ol>
   </div>
 </section>
 
-<section class="section tight" id="services">
-  <div class="wrap">
-    <div class="orn orn-sec" aria-hidden="true" data-reveal><i></i><svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/><circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/><path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg><i></i></div>
-    <div class="section-head">
-      <div class="section-mark caps"><b>II.</b>How I Can Help</div>
-      <h2 data-reveal data-split>Whatever you are looking for, <em>found personally.</em></h2>
+<section class="sec" id="why" aria-labelledby="why-title">
+  <div class="wrap split">
+    <div class="split-copy" data-reveal>
+      <p class="eyebrow">Why Crownsmere</p>
+      <h2 id="why-title">Not a typical <em>estate agency.</em></h2>
+      <p>Rather than selling whatever happens to be on the books, I work from your brief and search personally for what is genuinely right for you. Each client is taken on individually, and you deal with me directly, from the first conversation to the day you collect the keys.</p>
+      <p class="sig"><b>Alaa Qadir</b><span>Senior Property Consultant</span></p>
     </div>
-    <ol class="ledger"><li data-reveal><a href="services.html#buy" data-cursor="Explore"><span class="num">01</span><h3>Buy</h3><p>Tell me what you are looking for. I search personally, on and off the market, and bring you only what fits.</p><span class="go" aria-hidden="true">&rarr;</span></a></li><li data-reveal><a href="services.html#sell" data-cursor="Explore"><span class="num">02</span><h3>Sell</h3><p>A discreet, private sale to qualified buyers from my network, without the noise of a public listing.</p><span class="go" aria-hidden="true">&rarr;</span></a></li><li data-reveal><a href="services.html#let" data-cursor="Explore"><span class="num">03</span><h3>Let</h3><p>The right home to rent, or the right tenant for your property, found quietly and personally.</p><span class="go" aria-hidden="true">&rarr;</span></a></li><li data-reveal><a href="services.html#invest" data-cursor="Explore"><span class="num">04</span><h3>Invest</h3><p>Investment opportunities sourced to your brief, including those that never reach the open market.</p><span class="go" aria-hidden="true">&rarr;</span></a></li><li data-reveal><a href="services.html#advisory" data-cursor="Explore"><span class="num">05</span><h3>Advisory</h3><p>Independent, impartial advice whenever you need a trusted second opinion.</p><span class="go" aria-hidden="true">&rarr;</span></a></li></ol>
+    <ul class="facts" data-reveal><li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><div><h3>One-to-one</h3><p>You deal directly with me. No call centre, no hand-offs.</p></div></li><li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4M12 15v2"/></svg><div><h3>Off-market access</h3><p>A discreet network opens doors to homes that never appear online.</p></div></li><li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><div><h3>Complete discretion</h3><p>Your search, your plans and your details stay private.</p></div></li></ul>
   </div>
 </section>
 
-<section class="journey" id="process" aria-label="How it works">
-  <div class="journey-pin">
-    <div class="journey-track">
-      <div class="journey-intro">
-        <div class="section-mark caps"><b>III.</b>How It Works</div>
-        <h2>From your brief <em>to the keys.</em></h2>
-        <p>A private, unhurried process, shaped entirely around you.</p>
-        <a class="link caps" href="contact.html">Share your brief <span class="arrow" aria-hidden="true">&rarr;</span></a>
-      </div>
-      <article class="step-card"><span class="n">01</span><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></div><div><h3>Your Brief</h3><p>A private conversation about what you are looking for, why, and when. No detail is too small.</p></div></article><article class="step-card"><span class="n">02</span><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.4-4.4"/></svg></div><div><h3>The Search</h3><p>I search personally, on and off the market, drawing on a discreet network of owners, agents and advisers.</p></div></article><article class="step-card"><span class="n">03</span><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h5"/></svg></div><div><h3>A Curated Shortlist</h3><p>You see only what genuinely fits. Every property is checked first, so your time is never wasted.</p></div></article><article class="step-card"><span class="n">04</span><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.6 14.3A5.5 5.5 0 0 1 21 20"/></svg></div><div><h3>Private Viewings</h3><p>Viewings arranged around you and accompanied personally, with an honest opinion on every property.</p></div></article><article class="step-card"><span class="n">05</span><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 21h10M4 7h16M4 7l-2.5 6h5zM20 7l-2.5 6h5z"/></svg></div><div><h3>Negotiation</h3><p>Calm, strategic negotiation on your behalf, to secure the right property on the right terms.</p></div></article><article class="step-card"><span class="n">06</span><div><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12 20 3M16.5 6.5 19 9M14.5 8.5 16.5 10.5"/></svg></div><div><h3>The Keys, and Beyond</h3><p>I stay with you through to completion, and remain on hand long after the keys are yours.</p></div></article>
-    </div>
-    <div class="journey-progress" aria-hidden="true"><i></i></div>
+<section class="sec sec-alt" id="areas" aria-labelledby="areas-title">
+  <div class="wrap sec-split">
+    <div class="sec-head" data-reveal><p class="eyebrow">Where I search</p><h2 id="areas-title">Prime London, <em>street by street.</em></h2><p class="lede">Not sure which neighbourhood suits you? Helping you choose is part of the search.</p></div>
+    <ul class="tags" data-reveal><li>Mayfair</li><li>Belgravia</li><li>Knightsbridge</li><li>Chelsea</li><li>Kensington</li><li>Holland Park</li><li>Notting Hill</li><li>Marylebone</li><li>St John&rsquo;s Wood</li><li>Hampstead</li><li class="tags-more">and further afield</li></ul>
   </div>
 </section>
 
-<section class="section briefs-sec" id="briefs">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-mark caps"><b>IV.</b>Briefs I Take On</div>
-      <div><h2 data-reveal data-split>Every search begins <em>with a brief.</em></h2><p class="lede" data-reveal>A few examples of the kinds of briefs I take on. Turn a card to see how I would approach it.</p></div>
-    </div>
-    <ul class="briefs" data-cursor="Flip"><li class="brief" data-reveal><div class="brief-inner"><div class="brief-face brief-front"><div class="brief-top caps"><span>Buy</span><span>No. 01</span></div><h3>Kensington or Holland Park</h3><p>A family house with a garden, within walking distance of good schools, for a family relocating in the summer.</p><button type="button" class="brief-flip caps" data-flip>How I would approach it <span aria-hidden="true">&#8635;</span></button></div><div class="brief-face brief-back" aria-hidden="true"><div class="brief-top caps"><span>How I would approach it</span><span>No. 01</span></div><p>Map the school catchments first, then approach owners on the quieter garden squares directly, including those who have not yet thought of selling.</p><button type="button" class="brief-flip caps" data-flip tabindex="-1">Back to the brief <span aria-hidden="true">&#8634;</span></button></div></div></li><li class="brief" data-reveal><div class="brief-inner"><div class="brief-face brief-front"><div class="brief-top caps"><span>Buy</span><span>No. 02</span></div><h3>Near Hyde Park</h3><p>A lateral apartment with a lift and porter, viewed first by video, for a client living overseas.</p><button type="button" class="brief-flip caps" data-flip>How I would approach it <span aria-hidden="true">&#8635;</span></button></div><div class="brief-face brief-back" aria-hidden="true"><div class="brief-top caps"><span>How I would approach it</span><span>No. 02</span></div><p>A shortlist filmed and checked in person before you travel, so that a single visit to London is enough to decide.</p><button type="button" class="brief-flip caps" data-flip tabindex="-1">Back to the brief <span aria-hidden="true">&#8634;</span></button></div></div></li><li class="brief" data-reveal><div class="brief-inner"><div class="brief-face brief-front"><div class="brief-top caps"><span>Sell privately</span><span>No. 03</span></div><h3>Belgravia</h3><p>A quiet sale of a stucco townhouse, without a public listing or a board outside.</p><button type="button" class="brief-flip caps" data-flip>How I would approach it <span aria-hidden="true">&#8635;</span></button></div><div class="brief-face brief-back" aria-hidden="true"><div class="brief-top caps"><span>How I would approach it</span><span>No. 03</span></div><p>Introductions only to qualified, discreet buyers from my network, with every viewing strictly by appointment.</p><button type="button" class="brief-flip caps" data-flip tabindex="-1">Back to the brief <span aria-hidden="true">&#8634;</span></button></div></div></li><li class="brief" data-reveal><div class="brief-inner"><div class="brief-face brief-front"><div class="brief-top caps"><span>Let</span><span>No. 04</span></div><h3>Chelsea</h3><p>A furnished family home for a two-year let, close to the river and the King&rsquo;s Road.</p><button type="button" class="brief-flip caps" data-flip>How I would approach it <span aria-hidden="true">&#8635;</span></button></div><div class="brief-face brief-back" aria-hidden="true"><div class="brief-top caps"><span>How I would approach it</span><span>No. 04</span></div><p>Homes that fit the brief, including those not yet on the rental market, with the terms negotiated on your behalf.</p><button type="button" class="brief-flip caps" data-flip tabindex="-1">Back to the brief <span aria-hidden="true">&#8634;</span></button></div></div></li><li class="brief" data-reveal><div class="brief-inner"><div class="brief-face brief-front"><div class="brief-top caps"><span>Invest</span><span>No. 05</span></div><h3>Marylebone or Mayfair</h3><p>A pied-&agrave;-terre that holds its value, ready to move into, with steady rental demand.</p><button type="button" class="brief-flip caps" data-flip>How I would approach it <span aria-hidden="true">&#8635;</span></button></div><div class="brief-face brief-back" aria-hidden="true"><div class="brief-top caps"><span>How I would approach it</span><span>No. 05</span></div><p>Every option weighed on fundamentals, from street-level demand to the building&rsquo;s history, with an honest view on each.</p><button type="button" class="brief-flip caps" data-flip tabindex="-1">Back to the brief <span aria-hidden="true">&#8634;</span></button></div></div></li></ul>
-    <p class="briefs-note caps" data-reveal>Illustrative examples &middot; Every real search is confidential</p>
+<section class="sec" id="questions" aria-labelledby="faq-title">
+  <div class="wrap sec-split">
+    <div class="sec-head" data-reveal><p class="eyebrow">Questions</p><h2 id="faq-title">Good questions, <em>plainly answered.</em></h2></div>
+    <div class="faq" data-reveal><details class="faq-item"><summary><span>How does it work?</span><svg class="ic faq-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></summary><div class="faq-a"><p>You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit.</p></div></details><details class="faq-item"><summary><span>Why are there no properties listed on this website?</span><svg class="ic faq-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></summary><div class="faq-a"><p>Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window.</p></div></details><details class="faq-item"><summary><span>Are you a buying agent?</span><svg class="ic faq-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></summary><div class="faq-a"><p>When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give independent advice.</p></div></details><details class="faq-item"><summary><span>Which areas do you cover?</span><svg class="ic faq-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></summary><div class="faq-a"><p>Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask.</p></div></details><details class="faq-item"><summary><span>I live overseas. Can you still help?</span><svg class="ic faq-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></summary><div class="faq-a"><p>Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person.</p></div></details><details class="faq-item"><summary><span>How are fees agreed?</span><svg class="ic faq-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></summary><div class="faq-a"><p>Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins.</p></div></details></div>
   </div>
 </section>
 
-
-<section class="band">
-  <img class="ghost" src="assets/img/monogram.png" alt="" width="330" height="518" loading="lazy" decoding="async">
-  <blockquote>
-    <div class="orn" aria-hidden="true" data-reveal><i></i><svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/><circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/><path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg><i></i></div>
-    <p class="display">You share the brief. <em>I find the property.</em></p>
-    <cite class="caps">Discretion &middot; Expertise &middot; Results</cite>
-  </blockquote>
-</section>
-
-<section class="section" id="areas">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-mark caps"><b>V.</b>Where I Search</div>
-      <div><h2 data-reveal data-split>Prime London, <em>street by street.</em></h2><p class="lede" data-reveal>Not sure which neighbourhood suits you? Helping you choose is part of the search.</p></div>
+<section class="sec cta" aria-labelledby="cta-title">
+  <div class="wrap" data-reveal>
+    <p class="eyebrow">By request</p>
+    <h2 id="cta-title">Tell me what <em>you are looking for.</em></h2>
+    <p class="lede">Whether you are searching for a home, an investment, or a discreet buyer for your own property, every engagement begins with a private conversation.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="contact.html">Share your brief<svg class="ic ic-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-ghost" href="mailto:hello@crownsmere.com">Email hello@crownsmere.com</a>
     </div>
-    <div class="matcher" data-reveal><div class="matcher-head"><span class="caps">What matters to you?</span><button type="button" class="matcher-clear caps" hidden>Clear</button></div><div class="chips" role="group" aria-label="What matters to you?"><button type="button" class="chip" data-tag="green" aria-pressed="false">Green space</button><button type="button" class="chip" data-tag="park" aria-pressed="false">Near Hyde Park</button><button type="button" class="chip" data-tag="village" aria-pressed="false">Village feel</button><button type="button" class="chip" data-tag="family" aria-pressed="false">Family houses</button><button type="button" class="chip" data-tag="stucco" aria-pressed="false">Classic stucco</button><button type="button" class="chip" data-tag="dining" aria-pressed="false">Shops &amp; dining</button><button type="button" class="chip" data-tag="river" aria-pressed="false">By the river</button><button type="button" class="chip" data-tag="quiet" aria-pressed="false">Quiet streets</button></div><p class="matcher-out" aria-live="polite">Choose what matters to you, and the neighbourhoods that suit you will light up on the map.</p></div><div class="areas-wrap"><figure class="map-fig" data-reveal><div class="map" id="map" data-pins="[{&quot;slug&quot;: &quot;mayfair&quot;, &quot;name&quot;: &quot;Mayfair&quot;, &quot;n&quot;: &quot;01&quot;, &quot;lat&quot;: 51.51, &quot;lng&quot;: -0.147}, {&quot;slug&quot;: &quot;belgravia&quot;, &quot;name&quot;: &quot;Belgravia&quot;, &quot;n&quot;: &quot;02&quot;, &quot;lat&quot;: 51.4975, &quot;lng&quot;: -0.153}, {&quot;slug&quot;: &quot;knightsbridge&quot;, &quot;name&quot;: &quot;Knightsbridge&quot;, &quot;n&quot;: &quot;03&quot;, &quot;lat&quot;: 51.4995, &quot;lng&quot;: -0.165}, {&quot;slug&quot;: &quot;chelsea&quot;, &quot;name&quot;: &quot;Chelsea&quot;, &quot;n&quot;: &quot;04&quot;, &quot;lat&quot;: 51.488, &quot;lng&quot;: -0.168}, {&quot;slug&quot;: &quot;kensington&quot;, &quot;name&quot;: &quot;Kensington&quot;, &quot;n&quot;: &quot;05&quot;, &quot;lat&quot;: 51.498, &quot;lng&quot;: -0.191}, {&quot;slug&quot;: &quot;holland-park&quot;, &quot;name&quot;: &quot;Holland Park&quot;, &quot;n&quot;: &quot;06&quot;, &quot;lat&quot;: 51.507, &quot;lng&quot;: -0.206}, {&quot;slug&quot;: &quot;notting-hill&quot;, &quot;name&quot;: &quot;Notting Hill&quot;, &quot;n&quot;: &quot;07&quot;, &quot;lat&quot;: 51.515, &quot;lng&quot;: -0.2}, {&quot;slug&quot;: &quot;marylebone&quot;, &quot;name&quot;: &quot;Marylebone&quot;, &quot;n&quot;: &quot;08&quot;, &quot;lat&quot;: 51.519, &quot;lng&quot;: -0.153}, {&quot;slug&quot;: &quot;st-johns-wood&quot;, &quot;name&quot;: &quot;St John’s Wood&quot;, &quot;n&quot;: &quot;09&quot;, &quot;lat&quot;: 51.534, &quot;lng&quot;: -0.174}, {&quot;slug&quot;: &quot;hampstead&quot;, &quot;name&quot;: &quot;Hampstead&quot;, &quot;n&quot;: &quot;10&quot;, &quot;lat&quot;: 51.553, &quot;lng&quot;: -0.178}]" role="region" aria-label="Map of the prime London neighbourhoods searched"><a class="map-fallback caps" href="https://www.openstreetmap.org/#map=13/51.5070/-0.1650" rel="noopener">View prime London on OpenStreetMap</a></div><figcaption class="caps">Hover a neighbourhood to find it on the map</figcaption></figure><ul class="areas"><li class="area" data-area="mayfair" data-tags="dining park" data-reveal><button type="button" class="area-btn" aria-label="Show Mayfair on the map"><span class="an-n">01</span><span class="an">Mayfair</span><span class="ad">Georgian townhouses and lateral apartments between Park Lane and Bond Street.</span></button></li><li class="area" data-area="belgravia" data-tags="stucco park quiet" data-reveal><button type="button" class="area-btn" aria-label="Show Belgravia on the map"><span class="an-n">02</span><span class="an">Belgravia</span><span class="ad">White stucco squares, embassies and cobbled mews behind Hyde Park Corner.</span></button></li><li class="area" data-area="knightsbridge" data-tags="park dining stucco" data-reveal><button type="button" class="area-btn" aria-label="Show Knightsbridge on the map"><span class="an-n">03</span><span class="an">Knightsbridge</span><span class="ad">Garden squares and mansion blocks moments from Hyde Park.</span></button></li><li class="area" data-area="chelsea" data-tags="river dining family" data-reveal><button type="button" class="area-btn" aria-label="Show Chelsea on the map"><span class="an-n">04</span><span class="an">Chelsea</span><span class="ad">Period houses, garden squares and the King&rsquo;s Road, down to the river.</span></button></li><li class="area" data-area="kensington" data-tags="family green stucco" data-reveal><button type="button" class="area-btn" aria-label="Show Kensington on the map"><span class="an-n">05</span><span class="an">Kensington</span><span class="ad">Grand stucco villas and mansion flats around Kensington Gardens.</span></button></li><li class="area" data-area="holland-park" data-tags="family green quiet stucco" data-reveal><button type="button" class="area-btn" aria-label="Show Holland Park on the map"><span class="an-n">06</span><span class="an">Holland Park</span><span class="ad">Detached and semi-detached villas on wide, quiet, tree-lined avenues.</span></button></li><li class="area" data-area="notting-hill" data-tags="village dining stucco family" data-reveal><button type="button" class="area-btn" aria-label="Show Notting Hill on the map"><span class="an-n">07</span><span class="an">Notting Hill</span><span class="ad">Pastel terraces and private communal gardens with a village feel.</span></button></li><li class="area" data-area="marylebone" data-tags="village dining green" data-reveal><button type="button" class="area-btn" aria-label="Show Marylebone on the map"><span class="an-n">08</span><span class="an">Marylebone</span><span class="ad">Georgian streets and a village high street beside Regent&rsquo;s Park.</span></button></li><li class="area" data-area="st-johns-wood" data-tags="family green quiet" data-reveal><button type="button" class="area-btn" aria-label="Show St John’s Wood on the map"><span class="an-n">09</span><span class="an">St John&rsquo;s Wood</span><span class="ad">Villas with gardens, close to Regent&rsquo;s Park and Primrose Hill.</span></button></li><li class="area" data-area="hampstead" data-tags="village green family quiet" data-reveal><button type="button" class="area-btn" aria-label="Show Hampstead on the map"><span class="an-n">10</span><span class="an">Hampstead</span><span class="ad">Village lanes, Georgian houses and the open Heath.</span></button></li></ul></div>
-  </div>
-</section>
-
-<section class="section tight" id="why">
-  <div class="wrap">
-    <div class="orn orn-sec" aria-hidden="true" data-reveal><i></i><svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/><circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/><path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg><i></i></div>
-    <div class="section-head">
-      <div class="section-mark caps"><b>VI.</b>Why Crownsmere</div>
-      <h2 data-reveal data-split>Discretion. Expertise. <em>Results.</em></h2>
-    </div>
-    <div class="pillars-wrap">
-      <div class="pillars"><div class="pillar" data-reveal><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><h3>Personal Representation</h3><p>You deal directly with me, from the first conversation to the final signature. No call centre, no junior negotiators, no hand-offs.</p></div><div class="pillar" data-reveal><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 0 1 8 0v4M12 15v2"/></svg><h3>Off-Market Access</h3><p>Many of London&rsquo;s finest homes change hands quietly. A discreet network of owners, agents and advisers opens doors that never appear online.</p></div><div class="pillar" data-reveal><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><h3>Prime London Insight</h3><p>In-depth, neighbourhood-level knowledge across Prime and Super Prime London, built through experience and long-standing relationships.</p></div><div class="pillar" data-reveal><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 21h10M4 7h16M4 7l-2.5 6h5zM20 7l-2.5 6h5z"/></svg><h3>Skilled Negotiation</h3><p>Calm, strategic negotiation to achieve the best possible outcome, backed by objectivity and a deep understanding of the market.</p></div></div>
-      <figure class="pillars-media reveal-img" data-reveal>
-        <div class="mat"><div class="frame"><picture><source type="image/webp" srcset="assets/img/door.webp"><img src="assets/img/door.jpg" alt="A classic London townhouse entrance" width="433" height="610" loading="lazy" decoding="async"></picture></div></div>
-        <blockquote>The finest homes rarely need to be advertised.</blockquote>
-      </figure>
-    </div>
-  </div>
-</section>
-
-<section class="section tight" id="questions">
-  <div class="wrap">
-    <div class="orn orn-sec" aria-hidden="true" data-reveal><i></i><svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/><circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/><path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg><i></i></div>
-    <div class="section-head">
-      <div class="section-mark caps"><b>VII.</b>Questions</div>
-      <h2 data-reveal data-split>Good questions, <em>plainly answered.</em></h2>
-    </div>
-    <div class="faq"><details class="faq-item" data-reveal><summary><span>How does it work?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit.</p></div></details><details class="faq-item" data-reveal><summary><span>Why are there no properties listed on this website?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window.</p></div></details><details class="faq-item" data-reveal><summary><span>Are you a buying agent?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give independent advice.</p></div></details><details class="faq-item" data-reveal><summary><span>What does &ldquo;off-market&rdquo; mean?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>A property whose owner prefers to sell or let quietly, without public advertising. These homes are reached through a discreet network of owners, agents and advisers rather than through property portals.</p></div></details><details class="faq-item" data-reveal><summary><span>Can you help me sell or let my own property?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>Yes. I can introduce your property privately to qualified buyers or tenants, without a public listing unless you would like one.</p></div></details><details class="faq-item" data-reveal><summary><span>Which areas do you cover?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask.</p></div></details><details class="faq-item" data-reveal><summary><span>I live overseas. Can you still help?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person.</p></div></details><details class="faq-item" data-reveal><summary><span>Is my enquiry confidential?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>Completely. Your brief and your details are used only to help you, and are shared with relevant partners only with your further agreement. See the <a href="privacy.html">privacy notice</a> for details.</p></div></details><details class="faq-item" data-reveal><summary><span>How are fees agreed?</span><i aria-hidden="true"></i></summary><div class="faq-a"><p>Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins.</p></div></details></div>
-  </div>
-</section>
-
-<section class="section invite">
-  <div class="wrap">
-    <div class="orn" aria-hidden="true" data-reveal><i></i><svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/><circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/><path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg><i></i></div>
-    <div class="eyebrow caps" data-reveal>By request</div>
-    <h2 class="display" data-reveal>Tell me what <em>you are looking for.</em></h2>
-    <p class="lede" data-reveal>Whether you are searching for a home, an investment, or a discreet buyer for your own property, every engagement begins with a private conversation.</p>
-    <div class="btn-row" data-reveal>
-      <a class="btn btn-gold caps" href="contact.html">Share your brief <span aria-hidden="true">&rarr;</span></a>
-      <a class="btn caps" href="mailto:hello@crownsmere.com">Email hello@crownsmere.com</a>
-    </div>
-    <div class="contact-line" data-reveal><span>By appointment</span><span>London, United Kingdom</span></div>
   </div>
 </section>
 </main>
-<div class="skyline-wrap"><picture><source type="image/webp" srcset="assets/img/skyline.webp"><img class="skyline" src="assets/img/skyline.jpg" alt="" width="1055" height="181" loading="lazy" decoding="async"></picture></div>
 <footer class="ft">
-  <div class="wrap">
-    <div class="ft-top">
-      <div class="ft-brand">
-        <div class="mk"><picture><source type="image/webp" srcset="assets/img/monogram-sm.webp"><img src="assets/img/monogram-sm.png" alt="" width="165" height="259" loading="lazy" decoding="async"></picture><div><b>CROWNSMERE</b><small>Estate &middot; Private Property Consultancy</small></div></div>
-        <p>A more personal London.</p>
-      </div>
-      <div><h2 class="caps">Explore</h2><ul><li><a href="index.html">Home</a></li><li><a href="services.html">Services</a></li><li><a href="about.html">About</a></li><li><a href="students.html">Students</a></li><li><a href="contact.html">Contact</a></li></ul></div>
-      <div><h2 class="caps">Services</h2><ul><li><a href="services.html#buy">Buy</a></li><li><a href="services.html#sell">Sell</a></li><li><a href="services.html#let">Let</a></li><li><a href="services.html#invest">Invest</a></li><li><a href="services.html#advisory">Advisory</a></li></ul></div>
-      <div><h2 class="caps">Contact</h2><ul><li><a href="contact.html">Share your brief</a></li><li><a href="mailto:hello@crownsmere.com">hello@crownsmere.com</a></li><li>London, United Kingdom</li></ul></div>
+  <div class="ft-skyline" aria-hidden="true"><picture><source type="image/webp" srcset="assets/img/skyline.webp"><img src="assets/img/skyline.jpg" alt="" width="1055" height="181" loading="lazy" decoding="async"></picture></div>
+  <div class="wrap ft-in">
+    <div class="ft-brand">
+      <a class="ft-mark" href="index.html" aria-label="Crownsmere Estate, home"><picture><source type="image/webp" srcset="assets/img/monogram-sm.webp"><img src="assets/img/monogram-sm.png" alt="" width="165" height="259" loading="lazy" decoding="async"></picture><span class="wm"><b>CROWNSMERE</b><small>Estate</small></span></a>
+      <p>A more personal London. Private property consultancy, by appointment.</p>
+      <a class="ft-mail" href="mailto:hello@crownsmere.com">hello@crownsmere.com</a>
     </div>
-    <div class="orn orn-ft" aria-hidden="true" data-reveal><i></i><svg class="crown" viewBox="0 0 40 26" aria-hidden="true" focusable="false"><path d="M9 19.5 6.4 8.6l7.3 5.2L20 4.6l6.3 9.2 7.3-5.2L31 19.5z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M9 22.3h22" stroke="currentColor" stroke-width="1.1"/><circle cx="6.2" cy="6.6" r="1.5" fill="currentColor"/><circle cx="20" cy="2.4" r="1.7" fill="currentColor"/><circle cx="33.8" cy="6.6" r="1.5" fill="currentColor"/><path d="m20 14.2 1.6 2.2-1.6 2.2-1.6-2.2z" fill="currentColor"/></svg><i></i></div>
-    <div class="ft-motto" aria-hidden="true">DISCRETION &middot; EXPERTISE &middot; RESULTS</div>
-    <div class="ft-bottom caps"><span>&copy; <span data-year>2026</span> Crownsmere Estate</span><a href="privacy.html">Privacy notice</a><span>People &middot; Property &middot; Perspective</span><a href="#main">Back to top &uarr;</a></div>
+    <nav class="ft-nav" aria-label="Footer"><ul><li><a href="services.html">Services</a></li><li><a href="about.html">About</a></li><li><a href="students.html">Students</a></li><li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy</a></li></ul></nav>
+    <p class="ft-legal">&copy; <span data-year>2026</span> Crownsmere Estate &middot; London, United Kingdom</p>
   </div>
 </footer>
-<nav class="actionbar caps" aria-label="Quick contact"><a href="mailto:hello@crownsmere.com"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg><span>Email</span></a><a href="contact.html"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h5"/></svg><span>Share your brief</span></a></nav>
+<nav class="actionbar" aria-label="Quick contact"><a class="actionbar-mail" href="mailto:hello@crownsmere.com" aria-label="Email hello@crownsmere.com"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 6l9 7 9-7"/></svg><span>Email</span></a><a class="btn btn-primary" href="contact.html">Share your brief<svg class="ic ic-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></nav>
 <script src="assets/main.js"></script>
 </body>
 </html>
