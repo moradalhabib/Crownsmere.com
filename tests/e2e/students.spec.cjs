@@ -101,7 +101,9 @@ for(const lang of ['en','ar']){
     await page.goto(pageUrl[lang]);
     const form=page.locator('form.student-form[data-form-lang="'+lang+'"]');
     await form.locator('.student-stage.is-active [data-next]').click();
+    await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','1');
     await form.locator('.student-stage.is-active [data-next]').click();
+    await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','2');
     await form.locator('input[name="name"]').fill('Test Person');
     await form.locator('input[name="email"]').fill('qa-test@example.org');
     await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
@@ -139,7 +141,9 @@ test('on a computer the prepared student email can also open in Gmail or Outlook
  await page.goto('/students.html');
  const form=page.locator('form.student-form[data-form-lang="en"]');
  await form.locator('.student-stage.is-active [data-next]').click();
+ await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','1');
  await form.locator('.student-stage.is-active [data-next]').click();
+ await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','2');
  await form.locator('input[name="name"]').fill('Webmail QA');
  await form.locator('input[name="email"]').fill('qa-webmail@example.org');
  await form.locator('input[name="consent"]').check();

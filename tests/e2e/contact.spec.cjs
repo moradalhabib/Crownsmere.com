@@ -63,7 +63,9 @@ test('general contact form blocks missing consent and invalid phone',async({page
   const form=page.locator('form.letter-form');
   await form.locator('input[name="request"][value="Buy a home"]').check();
   await form.locator('.step.on [data-next]').click();
+  await expect(form.locator('.step.on')).toHaveAttribute('data-step','2');
   await form.locator('.step.on [data-next]').click();
+  await expect(form.locator('.step.on')).toHaveAttribute('data-step','3');
   await form.locator('input[name="name"]').fill('Crownsmere QA');
   await form.locator('input[name="email"]').fill('qa-contact@example.org');
   await form.locator('input[name="phone"]').fill('invalid');

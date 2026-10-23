@@ -17,7 +17,7 @@ BRAND = "Crownsmere Estate"
 EMAIL = "hello@crownsmere.com"
 # Enquiry forms prepare an email to Alaa, copied to EMAIL. The visitor sends it from their own mail app.
 ALAA = "alaa.qadir@crownsmere.com"
-UPDATED = "22 October 2026"
+UPDATED = "23 October 2026"
 UPDATED_ISO = "2026-10-23"
 
 # ---------------------------------------------------------------- business details (nothing shows until filled in)
@@ -25,6 +25,9 @@ UPDATED_ISO = "2026-10-23"
 # redress scheme, client money protection, published letting fees). Fill in only facts confirmed in
 # writing (Companies House, the redress scheme, HMRC); anything left as None or empty is not shown.
 BUSINESS = {
+    "trading_name": BRAND,
+    "principal": "Alaa Qadir, Senior Property Consultant",
+    "contact": EMAIL,
     "legal_name": None,                 # e.g. "Crownsmere Estate Ltd", or the sole trader's name
     "company_number": None,             # Companies House number, for a limited company
     "registered_in": None,              # e.g. "England and Wales"
@@ -214,6 +217,12 @@ def registration():
     """The company and regulatory line in the footer, built only from details filled in above."""
     b = BUSINESS
     parts = []
+    if b["trading_name"]:
+        parts.append(f'Trading name: {b["trading_name"]}')
+    if b["principal"]:
+        parts.append(f'Principal: {b["principal"]}')
+    if b["contact"]:
+        parts.append(f'Contact: <a href="mailto:{b["contact"]}">{b["contact"]}</a>')
     if b["legal_name"]:
         parts.append(b["legal_name"])
     if b["company_number"]:
@@ -279,8 +288,8 @@ SERVICES = [
      ["Opportunities sourced to your brief, including off-market", "Neighbourhood-level analysis of yield and growth",
       "Review of existing holdings", "A long-term strategy around your goals"]),
     ("05", "Advisory", "advisory",
-     "Independent, impartial advice whenever you need a trusted perspective.",
-     ["Impartial second opinions", "Guidance on timing, pricing and positioning",
+     "Honest, experienced advice whenever you need a trusted perspective.",
+     ["Candid second opinions", "Guidance on timing, pricing and positioning",
       "Advice on offers and options", "Support for complex or sensitive situations, in complete confidence"]),
 ]
 
@@ -299,7 +308,7 @@ FAQ = {
     "listings": ("Why are there no properties listed on this website?",
                  "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."),
     "agent": ("Are you a buying agent?",
-              "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give independent advice."),
+              "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give you a second opinion."),
     "areas": ("Which areas do you cover?",
               "Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask."),
     "overseas": ("I live overseas. Can you still help?",
@@ -518,7 +527,7 @@ services_body = f'''
 {cta("Shall we <em>begin?</em>")}'''
 
 page("services.html", f"Property Search, Private Sales & Lettings | {BRAND}",
-     "Buying, private sales, lettings, investment and independent property advice in prime London, delivered personally and discreetly by Crownsmere Estate.",
+     "Buying, private sales, lettings, investment and property advice in prime London, delivered personally and discreetly by Crownsmere Estate.",
      services_body)
 
 # ---------------------------------------------------------------- about: Alaa Qadir's profile
@@ -975,7 +984,7 @@ privacy_body = f'''
     <p class="updated">Last updated {UPDATED}</p>
 
     <h2>Who we are</h2>
-    <p>{BRAND} is a private property consultancy based in London, United Kingdom. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact us about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
+    <p>{BRAND} is a private property consultancy based in London, United Kingdom. Its principal is {BUSINESS["principal"]}. For the purposes of UK data protection law, {BRAND} is the controller of the personal information described here. You can contact us about privacy at any time at <a href="mailto:{EMAIL}">{EMAIL}</a>.</p>
 
     <h2>What we collect</h2>
     <p>Only what you choose to share: your name, email address and telephone number, how and when you prefer to be contacted, and the details of your request (for example the kind of property you are looking for, preferred areas, budget and timeframe). Student enquiries may also include your university, your housing and guarantor situation and whether you have found a property. If you write to us or call, we also keep that correspondence. Please do not submit passport details, bank statements or identity documents through these public enquiry forms.</p>

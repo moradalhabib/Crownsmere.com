@@ -19,6 +19,15 @@ const viewports = [
   {name:'desktop-1440',width:1440,height:900}
 ];
 
+/* On phones the quick-contact bar slides in once the page has scrolled. Playwright scrolls a link
+ * into view and checks nothing covers it, but the page can show the bar just after that check, so
+ * the tap lands on the bar instead (seen in Firefox). Centre the link, let the page settle, then tap. */
+async function tapBelowTheFold(link) {
+  await link.evaluate(el => el.scrollIntoView({block: 'center'}));
+  await link.page().evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
+  await link.click();
+}
+
 /* Visitors complained the site was far too long on phones (the home page was
  * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
 const phoneLength = {home:5400, services:5000, about:5100, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
@@ -196,14 +205,14 @@ test('home: photo first impression and three clear routes', async ({page}) => {
   await expect(page.locator('.fine')).toContainText('not available listings');
   const tall = await paths.evaluateAll(els => els.map(el => el.getBoundingClientRect().height));
   for (const h of tall) expect(h).toBeLessThan(150);
-  await page.locator('.path[href="students.html"]').click();
+  await tapBelowTheFold(page.locator('.path[href="students.html"]'));
   await expect(page).toHaveURL(/students\.html/);
 });
 
 test('about: Alaa Qadir profile covers how she works, with nothing invented', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
-  await page.locator('#why a.more[href="about.html"]').click();
+  await tapBelowTheFold(page.locator('#why a.more[href="about.html"]'));
   await expect(page).toHaveURL(/about\.html$/);
   await expect(page).toHaveTitle(/Alaa Qadir/);
   await expect(page.locator('h1')).toContainText('Alaa');
@@ -230,6 +239,14 @@ test('services: each service has its own section and the jump links reach them',
   await page.locator('.jump a[href="#invest"]').click();
   await expect(page.locator('#invest h2')).toBeInViewport();
   await expect(page.locator('.callout a[href="students.html"]')).toBeVisible();
+});
+
+test('no page calls the advice impartial or independent', async ({page}) => {
+  // Crownsmere is paid by commission, sometimes by the other side of a deal.
+  for (const [url] of pages) {
+    await page.goto(url);
+    expect(await page.locator('main').innerText(), url).not.toMatch(/impartial|independent advice/i);
+  }
 });
 
 test('mobile header slides away on scroll down and returns on scroll up', async ({page}) => {
