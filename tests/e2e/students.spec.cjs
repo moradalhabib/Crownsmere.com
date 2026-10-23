@@ -18,6 +18,13 @@ async function nextStep(form,step){
   }).toPass({timeout:20000});
 }
 
+/* Tick a radio button or checkbox, ticking again if the tap is lost (seen in WebKit on GitHub's
+ * runners, straight after the page scrolls). check() only ever ticks, so a retry cannot untick it,
+ * and a control that never ticks still fails the test. */
+async function tick(input){
+  await expect(async()=>{await input.check({timeout:5000});}).toPass({timeout:20000});
+}
+
 /* No emails are actually sent during testing.
  * The complete mailto draft is checked in both languages before publication. */
 const pageUrl={en:'/students.html',ar:'/students-ar.html'};
@@ -54,12 +61,12 @@ for(const lang of ['en','ar']){
     await page.goto(pageUrl[lang]);
     const form=page.locator('form.student-form[data-form-lang="'+lang+'"]');
     await expect(form.locator('.student-stage.is-active')).toHaveAttribute('data-student-step','0');
-    await form.locator('input[name="service"][value="Apartment and guarantor help"]').check();
+    await tick(form.locator('input[name="service"][value="Apartment and guarantor help"]'));
     await form.locator('input[name="university"]').fill('Imperial College London');
     await form.locator('select[name="monthly_budget"]').selectOption('GBP 2500-4000');
     await form.locator('select[name="move_timeframe"]').selectOption('Within 1-3 months');
     await nextStep(form,1);
-    await form.locator('input[name="guarantor_status"][value="No UK guarantor"]').check();
+    await tick(form.locator('input[name="guarantor_status"][value="No UK guarantor"]'));
     await form.locator('select[name="property_found"]').selectOption('Already found a property');
     await form.locator('input[name="preferred_areas"]').fill('Kensington, Chelsea');
     await form.locator('textarea[name="additional_notes"]').fill('Furnished flat near campus.');
@@ -67,8 +74,8 @@ for(const lang of ['en','ar']){
     await form.locator('input[name="name"]').fill('Crownsmere QA Student');
     await form.locator('input[name="email"]').fill('qa-student@example.org');
     await form.locator('input[name="phone"]').fill('+447700900123');
-    await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
-    await form.locator('input[name="consent"]').check();
+    await tick(form.locator('input[name="preferred_contact"][value="WhatsApp"]'));
+    await tick(form.locator('input[name="consent"]'));
     await form.locator('button[type="submit"]').click();
     await expect(form.locator('.std-fallback')).toBeVisible();
     await expect(form.locator('.std-status')).toContainText(lang==='ar'?'البريد':'email');
@@ -113,12 +120,12 @@ for(const lang of ['en','ar']){
     await nextStep(form,2);
     await form.locator('input[name="name"]').fill('Test Person');
     await form.locator('input[name="email"]').fill('qa-test@example.org');
-    await form.locator('input[name="preferred_contact"][value="WhatsApp"]').check();
+    await tick(form.locator('input[name="preferred_contact"][value="WhatsApp"]'));
     await form.locator('button[type="submit"]').click();
     await expect(form.locator('.std-fallback')).toBeHidden();
     await expect(form.locator('.std-status')).not.toBeEmpty();
     await form.locator('input[name="phone"]').fill('not-a-phone');
-    await form.locator('input[name="consent"]').check();
+    await tick(form.locator('input[name="consent"]'));
     await form.locator('button[type="submit"]').click();
     await expect(form.locator('.std-fallback')).toBeHidden();
     await form.locator('input[name="phone"]').fill('+447700900123');
@@ -151,7 +158,7 @@ test('on a computer the prepared student email can also open in Gmail or Outlook
  await nextStep(form,2);
  await form.locator('input[name="name"]').fill('Webmail QA');
  await form.locator('input[name="email"]').fill('qa-webmail@example.org');
- await form.locator('input[name="consent"]').check();
+ await tick(form.locator('input[name="consent"]'));
  await form.locator('button[type="submit"]').click();
  await expect(form.locator('.webmail')).toBeVisible();
  const gmail=new URL(await form.locator('[data-webmail="gmail"]').getAttribute('href'));

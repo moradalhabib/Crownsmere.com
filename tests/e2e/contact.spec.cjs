@@ -17,13 +17,20 @@ async function nextStep(form, step) {
   }).toPass({timeout: 20000});
 }
 
+/* Tick a radio button or checkbox, ticking again if the tap is lost (seen in WebKit on GitHub's
+ * runners, straight after the page scrolls). check() only ever ticks, so a retry cannot untick it,
+ * and a control that never ticks still fails the test. */
+async function tick(input) {
+  await expect(async () => { await input.check({timeout: 5000}); }).toPass({timeout: 20000});
+}
+
 /* The contact brief becomes a reviewed email, not an automatically sent website form. */
 async function complete(page){
   await page.goto('/contact.html');
   const form=page.locator('form.letter-form');
   await expect(form).toBeVisible();
   await expect(form).toHaveAttribute('action','mailto:alaa.qadir@crownsmere.com');
-  await form.locator('input[name="request"][value="Rent a home"]').check();
+  await tick(form.locator('input[name="request"][value="Rent a home"]'));
   await nextStep(form, 2);
   await form.locator('textarea[name="brief"]').fill('Furnished two-bedroom flat in Chelsea.');
   await form.locator('input[name="areas"]').fill('Chelsea');
@@ -31,7 +38,7 @@ async function complete(page){
   await form.locator('input[name="name"]').fill('Crownsmere QA Contact');
   await form.locator('input[name="email"]').fill('qa-contact@example.org');
   await form.locator('input[name="phone"]').fill('+447700900123');
-  await form.locator('input[name="consent"]').check();
+  await tick(form.locator('input[name="consent"]'));
   return form;
 }
 
@@ -70,7 +77,7 @@ test('general website brief opens a well-organised email draft, not a third-part
 test('general contact form blocks missing consent and invalid phone',async({page})=>{
   await page.goto('/contact.html');
   const form=page.locator('form.letter-form');
-  await form.locator('input[name="request"][value="Buy a home"]').check();
+  await tick(form.locator('input[name="request"][value="Buy a home"]'));
   await nextStep(form, 2);
   await nextStep(form, 3);
   await form.locator('input[name="name"]').fill('Crownsmere QA');
@@ -80,7 +87,7 @@ test('general contact form blocks missing consent and invalid phone',async({page
   await expect(form.locator('.contact-mail-backup')).toBeHidden();
   expect(await page.evaluate(()=>window.__openedDraft)).toBeUndefined();
   await form.locator('input[name="phone"]').fill('+447700900123');
-  await form.locator('input[name="consent"]').check();
+  await tick(form.locator('input[name="consent"]'));
   await form.locator('button[type="submit"]').click();
   await expect(form.locator('.contact-mail-backup')).toBeVisible();
 });
