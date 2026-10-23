@@ -237,7 +237,12 @@ test('fees: how Crownsmere is paid is stated plainly, and no page claims to be i
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
   const faq = page.locator('details', {hasText: 'How is Crownsmere paid?'});
+  // Centre the question and let the quick-contact bar appear first. Otherwise the bar can slide in
+  // between Playwright's check and its tap (seen in Firefox) and take the tap to the contact page.
+  await faq.evaluate(el => el.scrollIntoView({block: 'center'}));
+  await expect(page.locator('html')).toHaveClass(/show-bar/);
   await faq.locator('summary').click();
+  await expect(faq).toHaveAttribute('open', '');
   await faq.locator('a[href="services.html#fees"]').click();
   await expect(page).toHaveURL(/services\.html#fees$/);
   const fees = page.locator('#fees');
