@@ -130,12 +130,14 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB"):
         ld.append({"@context": "https://schema.org", "@type": "WebSite", "name": BRAND, "url": f"{SITE}/",
                    "inLanguage": "en-GB", "publisher": {"@id": f"{SITE}/#business"}})
     og_desc = og_desc or desc
+    amp = lambda t: re.sub(r"&(?![a-zA-Z]+;|#[0-9]+;)", "&amp;", t)  # a bare "&" in text must be "&amp;"
+    title, desc, og_desc = amp(title), amp(desc), amp(og_desc)
     slug = "home" if path == "index.html" else path.replace(".html", "")
     preload = ('<link rel="preload" href="assets/img/townhouse.avif" as="image" type="image/avif" fetchpriority="high">\n'
                if path == "index.html" else "")
     extra_css = '<link rel="stylesheet" href="assets/student.css">\n' if path.startswith("students") else ""
     alternates = "".join(f'<link rel="alternate" hreflang="{l}" href="{SITE}/{u}">\n' for l, u in ALTERNATES.get(path, []))
-    return f'''<!doctype html>
+    return f'''<!DOCTYPE html>
 <html lang="en-GB" class="no-js">
 <head>
 <meta charset="utf-8">
@@ -624,7 +626,7 @@ contact_body = f'''
           <h2 class="step-title" tabindex="-1">Tell me about it.</h2>
           <div class="field"><label for="f-brief">Your brief <span class="opt">(optional)</span></label><textarea id="f-brief" name="brief" rows="4" maxlength="3000" placeholder="The kind of property, size, must-haves, anything that matters to you"></textarea></div>
           <div class="field-row">
-            <div class="field"><label for="f-area">Preferred areas <span class="opt">(optional)</span></label><input id="f-area" name="areas" placeholder="e.g. Belgravia, Chelsea"></div>
+            <div class="field"><label for="f-area">Preferred areas <span class="opt">(optional)</span></label><input id="f-area" type="text" name="areas" placeholder="e.g. Belgravia, Chelsea"></div>
             <div class="field"><label for="f-budget">Budget or value <span class="opt">(optional)</span></label><select id="f-budget" name="budget_or_value">{options(["Prefer not to say", "Under &pound;1m", "&pound;1m to &pound;2.5m", "&pound;2.5m to &pound;5m", "&pound;5m to &pound;10m", "Over &pound;10m", "Monthly rent (lettings)"])}</select></div>
           </div>
           {step_actions(2)}
@@ -632,7 +634,7 @@ contact_body = f'''
 
         <div class="step" data-step="3">
           <h2 class="step-title" tabindex="-1">How may I reach you?</h2>
-          <div class="field"><label for="f-name">Full name</label><input id="f-name" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="f-name">Full name</label><input id="f-name" type="text" name="name" autocomplete="name" required></div>
           <div class="field-row">
             <div class="field"><label for="f-email">Email address</label><input id="f-email" type="email" name="email" autocomplete="email" inputmode="email" required></div>
             <div class="field"><label for="f-tel">Telephone</label><input id="f-tel" type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="+44" required></div>
@@ -698,7 +700,7 @@ STUDENT = {
         note="Initial enquiries are free. Guarantor approval and landlord acceptance are never guaranteed.",
         form_h="Start your enquiry",
         form_p="A free initial enquiry. Your mail app will open with a prepared message to Alaa.",
-        language="English", progress_label="Application steps",
+        language="English",
         progress=["Your plans", "Your situation", "Your details"],
         s0="What are you looking for?", service_legend="What help do you need? *",
         service=[("Apartment and guarantor help", "Find an apartment and explore guarantor options"),
@@ -748,7 +750,7 @@ STUDENT = {
         note="الاستفسار الأولي مجاني. تخضع الموافقة على الضمان وقبول المالك لشروط الجهات المعنية.",
         form_h="ابدأ طلب المساعدة",
         form_p="استفسار أولي مجاني. سيفتح البريد الإلكتروني برسالة موجهة إلى علا لمراجعتها وإرسالها.",
-        language="Arabic", progress_label="مراحل الطلب",
+        language="Arabic",
         progress=["احتياجاتك", "وضعك الحالي", "بيانات التواصل"],
         s0="ما نوع المساعدة التي تحتاجها؟", service_legend="ما المساعدة المطلوبة؟ *",
         service=[("Apartment and guarantor help", "البحث عن شقة واستكشاف خيارات الضمان"),
@@ -821,31 +823,31 @@ def student_panel(lang):
         <input type="hidden" name="source" value="crownsmere.com/students">
         <input type="hidden" name="language" value="{s["language"]}">
         <div class="std-hp" aria-hidden="true"><label for="{lang}-hp">Leave empty</label><input id="{lang}-hp" name="_honey" type="text" tabindex="-1" autocomplete="off"></div>
-        <ol class="student-progress" aria-label="{s["progress_label"]}">{progress}</ol>
+        <ol class="student-progress">{progress}</ol>
         <div class="student-stage" data-student-step="0">
           <h3 tabindex="-1">{s["s0"]}</h3>
           <fieldset class="std-field"><legend>{s["service_legend"]}</legend>{radios("service", s["service"])}</fieldset>
           <div class="std-row">
-            <label class="std-field" for="{lang}-university">{s["university"]}<input id="{lang}-university" type="text" name="university" maxlength="120" placeholder="{s["university_ph"]}"></label>
-            <label class="std-field" for="{lang}-budget">{s["budget"]}<select id="{lang}-budget" name="monthly_budget" required>{opts(s["budget_opts"])}</select></label>
+            <label class="std-field">{s["university"]}<input id="{lang}-university" type="text" name="university" maxlength="120" placeholder="{s["university_ph"]}"></label>
+            <label class="std-field">{s["budget"]}<select id="{lang}-budget" name="monthly_budget" required>{opts(s["budget_opts"])}</select></label>
           </div>
-          <label class="std-field" for="{lang}-when">{s["when"]}<select id="{lang}-when" name="move_timeframe" required>{opts(s["when_opts"])}</select></label>
+          <label class="std-field">{s["when"]}<select id="{lang}-when" name="move_timeframe" required>{opts(s["when_opts"])}</select></label>
           <div class="std-actions"><span></span>{nxt}</div>
         </div>
         <div class="student-stage" data-student-step="1">
           <h3 tabindex="-1">{s["s1"]}</h3>
           <fieldset class="std-field"><legend>{s["guarantor_legend"]}</legend>{radios("guarantor_status", s["guarantor"])}</fieldset>
-          <label class="std-field" for="{lang}-property">{s["property"]}<select id="{lang}-property" name="property_found">{opts(s["property_opts"])}</select></label>
-          <label class="std-field" for="{lang}-areas">{s["areas"]}<input id="{lang}-areas" type="text" name="preferred_areas" maxlength="160" placeholder="{s["areas_ph"]}"></label>
-          <label class="std-field" for="{lang}-notes">{s["notes"]}<textarea id="{lang}-notes" name="additional_notes" rows="3" maxlength="750" placeholder="{s["notes_ph"]}"></textarea></label>
+          <label class="std-field">{s["property"]}<select id="{lang}-property" name="property_found">{opts(s["property_opts"])}</select></label>
+          <label class="std-field">{s["areas"]}<input id="{lang}-areas" type="text" name="preferred_areas" maxlength="160" placeholder="{s["areas_ph"]}"></label>
+          <label class="std-field">{s["notes"]}<textarea id="{lang}-notes" name="additional_notes" rows="3" maxlength="750" placeholder="{s["notes_ph"]}"></textarea></label>
           <div class="std-actions">{back}{nxt}</div>
         </div>
         <div class="student-stage" data-student-step="2">
           <h3 tabindex="-1">{s["s2"]}</h3>
-          <label class="std-field" for="{lang}-name">{s["name"]}<input id="{lang}-name" name="name" autocomplete="name" maxlength="120" required></label>
+          <label class="std-field">{s["name"]}<input id="{lang}-name" type="text" name="name" autocomplete="name" maxlength="120" required></label>
           <div class="std-row">
-            <label class="std-field" for="{lang}-email">{s["email"]}<input id="{lang}-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="150" required></label>
-            <label class="std-field" for="{lang}-phone">{s["phone"]}<input id="{lang}-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="35" placeholder="+44"></label>
+            <label class="std-field">{s["email"]}<input id="{lang}-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="150" required></label>
+            <label class="std-field">{s["phone"]}<input id="{lang}-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="35" placeholder="+44"></label>
           </div>
           <fieldset class="std-field"><legend>{s["contact_legend"]}</legend><div class="std-pills">{radios("preferred_contact", s["contact"], required=False, small=True)}</div></fieldset>
           <label class="std-consent"><input type="checkbox" name="consent" value="Yes" required><span>{s["consent"]}</span></label>

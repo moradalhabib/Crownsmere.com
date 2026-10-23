@@ -149,7 +149,8 @@ test('on a computer the prepared student email can also open in Gmail or Outlook
  await expect(form.locator('[data-webmail="gmail"]')).toHaveAttribute('rel',/noopener/);
 });
 
-test('phones (touch screens) skip the webmail buttons and open their own mail app',async({browser})=>{
+test('phones (touch screens) skip the webmail buttons and open their own mail app',async({browser,browserName})=>{
+ test.skip(browserName==='firefox','Firefox cannot emulate a phone (isMobile)');
  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const page=await ctx.newPage();
  for(const path of ['/students.html','/contact.html']){

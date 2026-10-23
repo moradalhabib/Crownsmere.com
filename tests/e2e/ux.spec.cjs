@@ -25,7 +25,7 @@ const phoneLength = {home:5400, services:5000, about:4200, students:3000, 'stude
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
-    test(name + ' • ' + vp.name + ': readable layout, no sideways scrolling', async ({page}) => {
+    test(name + ' • ' + vp.name + ': readable layout, no sideways scrolling', async ({page, browserName}) => {
       await page.setViewportSize(vp);
       const errors = [];
       page.on('pageerror', e => errors.push(e.message));
@@ -65,7 +65,7 @@ for (const [url,name] of pages) {
       if (['iphone-390', 'desktop-1440'].includes(vp.name)) {
         await page.emulateMedia({reducedMotion: 'reduce'});
         await page.reload();
-        await page.screenshot({path: 'test-screenshots/' + name + '-' + vp.name + '.png', fullPage: true, animations: 'disabled'});
+        await page.screenshot({path: 'test-screenshots/' + browserName + '-' + name + '-' + vp.name + '.png', fullPage: true, animations: 'disabled'});
       }
     });
   }
@@ -85,15 +85,15 @@ test('every page loads only from crownsmere.com: no third-party requests', async
   expect(outside).toEqual([]);
 });
 
-test('keyboard focus is never hidden behind the header or quick-contact bar (WCAG 2.2)', async ({page}) => {
-  // The browser keeps focus clear of the fixed bars using the page's scroll padding.
-  await page.setViewportSize({width:390,height:844});
-  await page.emulateMedia({reducedMotion: 'reduce'});
-  for (const url of ['/', '/services.html', '/students.html', '/contact.html']) {
+for (const url of ['/', '/services.html', '/students.html', '/contact.html']) {
+  test('keyboard focus is never hidden behind the header or quick-contact bar (WCAG 2.2) ' + url, async ({page}) => {
+    await page.setViewportSize({width:390,height:844});
+    await page.emulateMedia({reducedMotion: 'reduce'});
     await page.goto(url);
     const hidden = [];
     for (let i = 0; i < 40; i++) {
       await page.keyboard.press('Tab');
+      await page.waitForTimeout(250); // any correction runs once scrolling has stopped
       const state = await page.evaluate(() => {
         const el = document.activeElement;
         if (!el || el === document.body || el.closest('.hd, .menu, .actionbar, .skip')) return null;
@@ -104,9 +104,9 @@ test('keyboard focus is never hidden behind the header or quick-contact bar (WCA
       });
       if (state) hidden.push(state);
     }
-    expect(hidden, url).toEqual([]);
-  }
-});
+    expect(hidden).toEqual([]);
+  });
+}
 
 test('photos are served as AVIF where supported, with WebP and JPEG fallbacks', async ({page, browserName}) => {
   await page.goto('/');
@@ -123,13 +123,47 @@ test('instant navigation: the prefetch rules are allowed by the content security
   await page.goto('/');
   const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
   const rules = await page.locator('script[type="speculationrules"]').textContent();
-  const digest = await page.evaluate(async text => {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-    return btoa(String.fromCharCode(...new Uint8Array(buf)));
-  }, rules);
+  const digest = require('crypto').createHash('sha256').update(rules).digest('base64');
   expect(csp).toContain("'sha256-" + digest + "'");
   expect(JSON.parse(rules).prefetch[0].eagerness).toBe('moderate');
   expect(violations).toEqual([]);
+});
+
+test('every link, section link and image on every page works', async ({page, request}) => {
+  const all = [...pages.map(([u]) => u), '/404.html'];
+  const status = new Map(), idsOn = new Map(), broken = [];
+  const check = async path => {
+    if (!status.has(path)) {
+      const res = await request.get(path);
+      status.set(path, res.status());
+      if (res.headers()['content-type']?.includes('text/html')) idsOn.set(path, [...(await res.text()).matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));
+    }
+    return status.get(path);
+  };
+  for (const url of all) {
+    await page.goto(url);
+    // Scroll through so lazy images load.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += 500) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); }
+    });
+    await page.waitForFunction(() => [...document.images].every(i => i.complete), null, {timeout: 15000});
+    const found = await page.evaluate(() => ({
+      links: [...document.querySelectorAll('a[href]')].map(a => a.href),
+      files: [...document.querySelectorAll('img[src], source[srcset], link[rel~="icon"], link[rel="apple-touch-icon"], link[rel="manifest"], link[rel="stylesheet"], script[src]')]
+        .map(el => el.src || el.href || new URL(el.getAttribute('srcset'), location.href).href),
+      unloaded: [...document.images].filter(i => !i.complete || i.naturalWidth === 0).map(i => i.getAttribute('src'))
+    }));
+    broken.push(...found.unloaded.map(src => url + ': image did not load ' + src));
+    for (const href of [...found.links, ...found.files]) {
+      const u = new URL(href);
+      if (u.origin !== new URL(page.url()).origin) continue; // email and webmail links
+      const path = u.pathname === '/' ? '/index.html' : u.pathname;
+      if (await check(path) !== 200) { broken.push(url + ' -> ' + u.pathname + ' (' + status.get(path) + ')'); continue; }
+      const id = decodeURIComponent(u.hash.slice(1));
+      if (id && !(idsOn.get(path) || []).includes(id)) broken.push(url + ' -> ' + u.pathname + u.hash + ' (no such section)');
+    }
+  }
+  expect([...new Set(broken)]).toEqual([]);
 });
 
 test('home: photo first impression and three clear routes', async ({page}) => {

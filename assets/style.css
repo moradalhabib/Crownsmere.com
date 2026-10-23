@@ -577,6 +577,8 @@ h2 { font-size: clamp(32px, 2.6vw + 20px, 52px); }
 .js .actionbar { transform: translateY(110%); }
 .js.show-bar .actionbar { transform: none; }
 .menu-open .actionbar { transform: translateY(110%) !important; }
+/* Out of the way while the visitor fills in a form field. */
+body:has(:is(input, select, textarea):focus) .actionbar { transform: translateY(110%) !important; }
 body:not(.page-contact) .ft { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
 @media (min-width: 1000px) {
   .actionbar { display: none; }

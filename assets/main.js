@@ -74,6 +74,31 @@
     });
   }
 
+  /* ---------- Keep keyboard focus clear of the sticky header and quick-contact bar ----------
+     WCAG 2.2 (2.4.11). The page's scroll padding handles this in most browsers; Safari can still
+     leave a focused control under a bar. Checked only once scrolling has stopped, so it never
+     fights a smooth scroll. */
+  var quickBar = document.querySelector(".actionbar");
+  var focusTimer = 0;
+  document.addEventListener("focusin", function (e) {
+    var el = e.target;
+    if ([hd, menu, quickBar].some(function (x) { return x && x.contains(el); })) return;
+    clearTimeout(focusTimer);
+    var seenY = -1, still = 0, waited = 0;
+    var check = function () {
+      still = window.scrollY === seenY ? still + 1 : 0;
+      seenY = window.scrollY;
+      if (still < 3 && (waited += 40) < 1500) { focusTimer = setTimeout(check, 40); return; }
+      var r = el.getBoundingClientRect();
+      var top = hd ? hd.offsetHeight : 0; // the header returns when scrolling up, so allow for it
+      var bottom = quickBar && quickBar.getClientRects().length
+        ? Math.min(window.innerHeight, quickBar.getBoundingClientRect().top) : window.innerHeight;
+      if (r.top < top) window.scrollBy(0, r.top - top - 12);
+      else if (r.bottom > bottom) window.scrollBy(0, Math.min(r.bottom - bottom + 12, r.top - top - 12));
+    };
+    focusTimer = setTimeout(check, 40);
+  });
+
   /* ---------- Gentle reveal as sections come into view ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
   if ("IntersectionObserver" in window && !reduce && revealEls.length) {
