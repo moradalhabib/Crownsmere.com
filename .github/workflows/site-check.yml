@@ -69,7 +69,7 @@ jobs:
           if grep -q 'http-equiv="Content-Security-Policy"' <<<"$home"; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
 
           echo "== Pages"
-          for p in / /services.html /about.html /students.html /students-ar.html /contact.html /privacy.html /assets/style.css /assets/student.css /assets/main.js /assets/student.js /assets/fonts/inter-latin.woff2 /assets/img/townhouse.avif /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg; do
+          for p in / /services.html /buy.html /sell.html /rent.html /invest.html /advisory.html /about.html /students.html /students-ar.html /contact.html /privacy.html /assets/style.css /assets/student.css /assets/main.js /assets/student.js /assets/fonts/inter-latin.woff2 /assets/img/townhouse.avif /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg; do
             code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 200 ]; then ok "$p ($code)"; else bad "$p returned $code"; fi
           done

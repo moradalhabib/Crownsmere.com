@@ -6,23 +6,39 @@ const {test,expect}=require('@playwright/test');
 test.beforeEach(async ({page}) => {
   await page.addInitScript(() => { window.crownsmereOpenDraft = url => { window.__openedDraft = url; }; });
 });
+/* Tap "Next" until the form shows the given step. On GitHub's runners a tap straight after the
+ * form has scrolled is now and then lost. Tapping again only while the step is unchanged can never
+ * skip one, and a Next button that never works still fails the test. */
+async function nextStep(form, step) {
+  const current = form.locator('.step.on');
+  await expect(async () => {
+    if (await current.getAttribute('data-step') === String(step - 1)) await current.locator('[data-next]').click({timeout: 5000});
+    await expect(current).toHaveAttribute('data-step', String(step), {timeout: 1500});
+  }).toPass({timeout: 20000});
+}
+
+/* Tick a radio button or checkbox, ticking again if the tap is lost (seen in WebKit on GitHub's
+ * runners, straight after the page scrolls). check() only ever ticks, so a retry cannot untick it,
+ * and a control that never ticks still fails the test. */
+async function tick(input) {
+  await expect(async () => { await input.check({timeout: 5000}); }).toPass({timeout: 20000});
+}
+
 /* The contact brief becomes a reviewed email, not an automatically sent website form. */
 async function complete(page){
   await page.goto('/contact.html');
   const form=page.locator('form.letter-form');
   await expect(form).toBeVisible();
   await expect(form).toHaveAttribute('action','mailto:alaa.qadir@crownsmere.com');
-  await form.locator('input[name="request"][value="Rent a home"]').check();
-  await form.locator('.step.on [data-next]').click();
-  await expect(form.locator('.step.on')).toHaveAttribute('data-step','2');
+  await tick(form.locator('input[name="request"][value="Rent a home"]'));
+  await nextStep(form, 2);
   await form.locator('textarea[name="brief"]').fill('Furnished two-bedroom flat in Chelsea.');
   await form.locator('input[name="areas"]').fill('Chelsea');
-  await form.locator('.step.on [data-next]').click();
-  await expect(form.locator('.step.on')).toHaveAttribute('data-step','3');
+  await nextStep(form, 3);
   await form.locator('input[name="name"]').fill('Crownsmere QA Contact');
   await form.locator('input[name="email"]').fill('qa-contact@example.org');
   await form.locator('input[name="phone"]').fill('+447700900123');
-  await form.locator('input[name="consent"]').check();
+  await tick(form.locator('input[name="consent"]'));
   return form;
 }
 
@@ -61,11 +77,9 @@ test('general website brief opens a well-organised email draft, not a third-part
 test('general contact form blocks missing consent and invalid phone',async({page})=>{
   await page.goto('/contact.html');
   const form=page.locator('form.letter-form');
-  await form.locator('input[name="request"][value="Buy a home"]').check();
-  await form.locator('.step.on [data-next]').click();
-  await expect(form.locator('.step.on')).toHaveAttribute('data-step','2');
-  await form.locator('.step.on [data-next]').click();
-  await expect(form.locator('.step.on')).toHaveAttribute('data-step','3');
+  await tick(form.locator('input[name="request"][value="Buy a home"]'));
+  await nextStep(form, 2);
+  await nextStep(form, 3);
   await form.locator('input[name="name"]').fill('Crownsmere QA');
   await form.locator('input[name="email"]').fill('qa-contact@example.org');
   await form.locator('input[name="phone"]').fill('invalid');
@@ -73,7 +87,7 @@ test('general contact form blocks missing consent and invalid phone',async({page
   await expect(form.locator('.contact-mail-backup')).toBeHidden();
   expect(await page.evaluate(()=>window.__openedDraft)).toBeUndefined();
   await form.locator('input[name="phone"]').fill('+447700900123');
-  await form.locator('input[name="consent"]').check();
+  await tick(form.locator('input[name="consent"]'));
   await form.locator('button[type="submit"]').click();
   await expect(form.locator('.contact-mail-backup')).toBeVisible();
 });

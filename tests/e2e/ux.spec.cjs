@@ -3,6 +3,11 @@ const { test, expect } = require('@playwright/test');
 const pages = [
   ['/', 'home'],
   ['/services.html', 'services'],
+  ['/buy.html', 'buy'],
+  ['/sell.html', 'sell'],
+  ['/rent.html', 'rent'],
+  ['/invest.html', 'invest'],
+  ['/advisory.html', 'advisory'],
   ['/about.html', 'about'],
   ['/students.html', 'students'],
   ['/students-ar.html', 'students-ar'],
@@ -19,9 +24,8 @@ const viewports = [
   {name:'desktop-1440',width:1440,height:900}
 ];
 
-/* On phones the quick-contact bar slides in once the page has scrolled. Playwright scrolls a link
- * into view and checks nothing covers it, but the page can show the bar just after that check, so
- * the tap lands on the bar instead (seen in Firefox). Centre the link, let the page settle, then tap. */
+/* A tap straight after a scroll is now and then lost on GitHub's runners.
+ * Centre the link, let the page settle, then tap. */
 async function tapBelowTheFold(link) {
   await link.evaluate(el => el.scrollIntoView({block: 'center'}));
   await link.page().evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
@@ -29,8 +33,10 @@ async function tapBelowTheFold(link) {
 }
 
 /* Visitors complained the site was far too long on phones (the home page was
- * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
-const phoneLength = {home:5400, services:5000, about:5100, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
+ * 16 screens). These are the most each page may measure on a 390 x 844 phone.
+ * The home page is a short front door; each service has its own short page. */
+const phoneLength = {home:2500, services:3700, buy:2700, sell:1900, rent:3300, invest:1900, advisory:1900,
+                     about:5300, students:3000, 'students-ar':3200, contact:2900, privacy:4800};
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
@@ -58,15 +64,13 @@ for (const [url,name] of pages) {
       expect(metrics.header).toBeLessThanOrEqual(80);
       expect(errors, JSON.stringify({name, vp, errors})).toEqual([]);
       if (vp.width < 1000) {
-        const menu = page.locator('.hd-menu');
-        await expect(menu).toBeVisible();
-        await menu.click();
-        await expect(page.locator('.menu a[href="students.html"]')).toBeVisible();
-        await menu.click();
-        await expect(page.locator('.menu')).toBeHidden();
+        // Phones and tablets: the tab bar is the navigation, always on screen.
+        await expect(page.locator('.tabbar a')).toHaveCount(5);
+        await expect(page.locator('.tabbar')).toBeInViewport();
+        await expect(page.locator('.hd-nav')).toBeHidden();
       } else {
         await expect(page.locator('.hd-nav a[href="students.html"]')).toBeVisible();
-        await expect(page.locator('.hd-menu')).toBeHidden();
+        await expect(page.locator('.tabbar')).toBeHidden();
       }
       if (vp.name === 'iphone-390') {
         expect(metrics.height, name + ' is ' + metrics.height + 'px tall on a phone').toBeLessThanOrEqual(phoneLength[name]);
@@ -94,8 +98,8 @@ test('every page loads only from crownsmere.com: no third-party requests', async
   expect(outside).toEqual([]);
 });
 
-for (const url of ['/', '/services.html', '/students.html', '/contact.html']) {
-  test('keyboard focus is never hidden behind the header or quick-contact bar (WCAG 2.2) ' + url, async ({page}) => {
+for (const url of ['/', '/services.html', '/rent.html', '/students.html', '/contact.html']) {
+  test('keyboard focus is never hidden behind the header or tab bar (WCAG 2.2) ' + url, async ({page}) => {
     await page.setViewportSize({width:390,height:844});
     await page.emulateMedia({reducedMotion: 'reduce'});
     await page.goto(url);
@@ -105,11 +109,11 @@ for (const url of ['/', '/services.html', '/students.html', '/contact.html']) {
       await page.waitForTimeout(250); // any correction runs once scrolling has stopped
       const state = await page.evaluate(() => {
         const el = document.activeElement;
-        if (!el || el === document.body || el.closest('.hd, .menu, .actionbar, .skip')) return null;
+        if (!el || el === document.body || el.closest('.hd, .tabbar, .skip')) return null;
         const r = el.getBoundingClientRect();
         const x = Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), y = r.top + r.height / 2;
         const top = y >= 0 && y < innerHeight ? document.elementFromPoint(x, y) : null;
-        return (!top || top.closest('.hd, .actionbar')) ? (el.textContent || el.name || el.tagName).trim().slice(0, 40) : null;
+        return (!top || top.closest('.hd, .tabbar')) ? (el.textContent || el.name || el.tagName).trim().slice(0, 40) : null;
       });
       if (state) hidden.push(state);
     }
@@ -140,7 +144,7 @@ test('instant navigation: the prefetch rules are allowed by the content security
 
 test('with motion on, every section that fades in ends up visible', async ({page}) => {
   await page.emulateMedia({reducedMotion: 'no-preference'});
-  for (const url of ['/', '/services.html', '/about.html', '/contact.html']) {
+  for (const url of ['/', '/services.html', '/rent.html', '/about.html', '/contact.html']) {
     await page.goto(url);
     await expect(page.locator('html')).toHaveClass(/reveal-on/);
     await page.evaluate(async () => {
@@ -190,37 +194,39 @@ test('every link, section link and image on every page works', async ({page, req
   expect([...new Set(broken)]).toEqual([]);
 });
 
-test('home: photo first impression and three clear routes', async ({page}) => {
+test('home: a short front door with a tile for each part of the site', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
   const hero = page.locator('.hero');
   await expect(hero.locator('h1')).toContainText('London property');
   await expect(hero.locator('a[href="contact.html"]')).toBeVisible();
-  await expect(hero.locator('a[href="students.html"]')).toBeVisible();
   await expect.poll(() => hero.locator('img').evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
-  const paths = page.locator('.path');
-  await expect(paths).toHaveCount(3);
-  const images = await page.locator('.path img').evaluateAll(els => els.map(el => el.getAttribute('src')));
-  expect(new Set(images).size).toBe(3);
+  const tiles = page.locator('.tile');
+  expect(await tiles.evaluateAll(els => els.map(el => el.getAttribute('href'))))
+    .toEqual(['buy.html', 'sell.html', 'rent.html', 'invest.html', 'students.html', 'about.html']);
+  // The first row of tiles starts on the opening screen, above the tab bar.
+  const first = await tiles.first().boundingBox();
+  const bar = await page.locator('.tabbar').boundingBox();
+  expect(first.y).toBeLessThan(bar.y - 60);
   await expect(page.locator('.fine')).toContainText('not available listings');
-  const tall = await paths.evaluateAll(els => els.map(el => el.getBoundingClientRect().height));
-  for (const h of tall) expect(h).toBeLessThan(150);
-  await tapBelowTheFold(page.locator('.path[href="students.html"]'));
+  await tapBelowTheFold(page.locator('.tile[href="students.html"]'));
   await expect(page).toHaveURL(/students\.html/);
 });
 
 test('about: Alaa Qadir profile covers how she works, with nothing invented', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
-  await tapBelowTheFold(page.locator('#why a.more[href="about.html"]'));
-  await expect(page).toHaveURL(/about\.html$/);
+  await expect(page.locator('.tile[href="about.html"]')).toContainText('Meet Alaa');
+  await page.goto('/about.html');
   await expect(page).toHaveTitle(/Alaa Qadir/);
   await expect(page.locator('h1')).toContainText('Alaa');
+  await expect(page.locator('#story-title')).toHaveText('Not a typical estate agency.');
   for (const quality of ['one-to-one service', 'Well connected', 'Direct negotiation', 'Client care', 'Complete discretion']) {
     await expect(page.locator('.card h3', {hasText: new RegExp(quality, 'i')})).toHaveCount(1);
   }
   await expect(page.locator('#tenants')).toContainText('negotiating directly with landlords');
-  await expect(page.locator('.whos .who')).toHaveCount(6);
+  expect(await page.locator('.whos .who').evaluateAll(els => els.map(el => el.getAttribute('href'))))
+    .toEqual(['buy.html', 'rent.html', 'sell.html', 'rent.html', 'invest.html', 'students.html']);
   // Figures and client comments appear only once real ones are supplied.
   await expect(page.locator('.stats')).toHaveCount(0);
   const ld = await page.locator('script[type="application/ld+json"]').textContent();
@@ -229,16 +235,30 @@ test('about: Alaa Qadir profile covers how she works, with nothing invented', as
   expect(profile.mainEntity.jobTitle).toBe('Senior Property Consultant');
 });
 
-test('services: each service has its own section and the jump links reach them', async ({page}) => {
+test('services: a tile for each service, and each service has its own page', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/services.html');
-  for (const id of ['buy','sell','let','invest','advisory']) {
-    await expect(page.locator('article.svc#' + id)).toHaveCount(1);
-    await expect(page.locator('.jump a[href="#' + id + '"]')).toHaveCount(1);
-  }
-  await page.locator('.jump a[href="#invest"]').click();
-  await expect(page.locator('#invest h2')).toBeInViewport();
+  const services = [['buy', 'buy.html', 'Buy'], ['sell', 'sell.html', 'Sell'], ['let', 'rent.html', 'Rent'],
+                    ['invest', 'invest.html', 'Invest'], ['advisory', 'advisory.html', 'Advisory']];
+  for (const [id, href] of services) await expect(page.locator('.tile#' + id)).toHaveAttribute('href', href);
+  await expect(page.locator('#process .steps li')).toHaveCount(3);
+  await expect(page.locator('#areas .tags li')).toHaveCount(11);
   await expect(page.locator('.callout a[href="students.html"]')).toBeVisible();
+  // Old links to a section of the services page still land on that service's tile.
+  await page.goto('/services.html#let');
+  await expect(page.locator('#let')).toBeInViewport();
+  for (const [i, [, href, name]] of services.entries()) {
+    await page.goto('/' + href);
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('.crumbs a[href="services.html"]')).toBeVisible();
+    await expect(page.locator('.crumbs [aria-current="page"]')).toHaveText(name);
+    await expect(page.locator('.tabbar a[href="services.html"]')).toHaveAttribute('aria-current', 'true');
+    await expect(page.locator('.pager a.more')).toHaveAttribute('href', services[(i + 1) % services.length][1]);
+    await expect(page.locator('.cta a[href="contact.html"]')).toBeVisible();
+    const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+    expect(ld.find(x => x['@type'] === 'Service').url).toBe('https://crownsmere.com/' + href);
+    expect(ld.find(x => x['@type'] === 'BreadcrumbList').itemListElement.map(x => x.name)).toEqual(['Home', 'Services', name]);
+  }
 });
 
 test('no page calls the advice impartial or independent', async ({page}) => {
@@ -249,58 +269,57 @@ test('no page calls the advice impartial or independent', async ({page}) => {
   }
 });
 
-test('mobile header slides away on scroll down and returns on scroll up', async ({page}) => {
+test('phones and tablets: the header and the tab bar stay on screen while scrolling', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/');
-  await page.evaluate(() => window.scrollTo({top: 1450, behavior: 'instant'}));
-  await expect(page.locator('.hd')).toHaveClass(/is-hidden-on-scroll/);
-  await page.evaluate(() => window.scrollTo({top: 1250, behavior: 'instant'}));
-  await expect(page.locator('.hd')).not.toHaveClass(/is-hidden-on-scroll/);
-  await expect(page.locator('.hd-menu')).toBeInViewport();
+  await page.goto('/services.html');
+  for (const top of [0, 1400, 600]) {
+    await page.evaluate(y => window.scrollTo({top: y, behavior: 'instant'}), top);
+    await expect(page.locator('.hd-mark')).toBeInViewport();
+    await expect(page.locator('.tabbar')).toBeInViewport();
+  }
 });
 
-test('quick-contact bar appears after the opening view, on phones only', async ({page}) => {
+test('tab bar: five tabs on every page, the current one marked, and each tab opens its page', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
+  const current = {'/': 'index.html', '/services.html': 'services.html', '/buy.html': 'services.html', '/about.html': 'about.html',
+                   '/students.html': 'students.html', '/contact.html': 'contact.html', '/privacy.html': null};
+  for (const [url, tab] of Object.entries(current)) {
+    await page.goto(url);
+    const marked = page.locator('.tabbar a[aria-current]');
+    if (tab) {
+      await expect(marked, url).toHaveCount(1);
+      await expect(marked, url).toHaveAttribute('href', tab);
+    } else {
+      await expect(marked, url).toHaveCount(0);
+    }
+  }
+  // Arabic labels, read right to left, on the Arabic student page.
+  await page.goto('/students-ar.html');
+  const ar = page.locator('.tabbar');
+  await expect(ar).toHaveAttribute('dir', 'rtl');
+  await expect(ar).toContainText('الرئيسية');
+  await expect(ar.locator('a[aria-current="page"]')).toHaveAttribute('href', 'students-ar.html');
+  // Each tab opens its page.
   await page.goto('/');
-  const bar = page.locator('.actionbar');
-  await expect(bar).not.toBeInViewport();
-  await page.evaluate(() => window.scrollTo({top: 900, behavior: 'instant'}));
-  await expect(bar).toBeInViewport();
-  await expect(bar.locator('a[href="contact.html"]')).toBeVisible();
-  await page.goto('/contact.html');
-  await expect(page.locator('.actionbar')).toHaveCount(0);
+  for (const href of ['services.html', 'about.html', 'students.html', 'contact.html', 'index.html']) {
+    await page.locator('.tabbar a[href="' + href + '"]').click();
+    await expect(page).toHaveURL(new RegExp(href.replace('.', '\\.') + '$'));
+  }
+  // On computers the header navigation takes over.
   await page.setViewportSize({width:1280,height:800});
-  await page.goto('/');
-  await expect(page.locator('.actionbar')).toBeHidden();
+  await expect(page.locator('.tabbar')).toBeHidden();
+  await expect(page.locator('.hd-nav')).toBeVisible();
 });
 
-test('mobile menu keeps keyboard focus inside and Escape returns it', async ({page}) => {
+test('the tab bar steps aside while a form field is being filled in', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
-  await page.goto('/');
-  const button = page.locator('.hd-menu');
-  await button.focus();
-  await page.keyboard.press('Enter');
-  await expect(button).toHaveAttribute('aria-expanded', 'true');
-  await expect(page.locator('.menu a').first()).toBeFocused();
-  await page.keyboard.press('Shift+Tab');
-  await expect(button).toBeFocused();
-  await page.keyboard.press('Shift+Tab');
-  await expect(page.locator('.menu a').last()).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(button).toBeFocused();
-  await page.keyboard.press('Escape');
-  await expect(button).toBeFocused();
-  await expect(button).toHaveAttribute('aria-expanded', 'false');
-  await expect(page.locator('.menu')).toHaveAttribute('inert', '');
-});
-
-test('mobile menu closes when the window becomes desktop width', async ({page}) => {
-  await page.setViewportSize({width:390,height:844});
-  await page.goto('/');
-  await page.locator('.hd-menu').click();
-  await expect(page.locator('.hd-menu')).toHaveAttribute('aria-expanded', 'true');
-  await page.setViewportSize({width:1440,height:900});
-  await expect(page.locator('.hd-menu')).toHaveAttribute('aria-expanded', 'false');
+  await page.goto('/contact.html');
+  const bar = page.locator('.tabbar');
+  await expect(bar).toBeInViewport();
+  await page.locator('#f-when').focus();
+  await expect(bar).not.toBeInViewport();
+  await page.locator('#f-when').blur();
+  await expect(bar).toBeInViewport();
 });
 
 test('accessibility basics: skip link, image text, labelled fields, touch targets', async ({page}) => {
@@ -313,7 +332,7 @@ test('accessibility basics: skip link, image text, labelled fields, touch target
     const unlabelled = await page.locator('main input:not([type="hidden"]):not([tabindex="-1"]), main select, main textarea').evaluateAll(els =>
       els.filter(el => !(el.labels && el.labels.length) && !el.closest('label')).map(el => el.name));
     expect(unlabelled, url).toEqual([]);
-    const small = await page.locator('.btn:visible, .hd-menu:visible, .choice span:visible, .path:visible').evaluateAll(els =>
+    const small = await page.locator('.btn:visible, .tabbar a:visible, .choice span:visible, .tile:visible').evaluateAll(els =>
       els.filter(el => el.getBoundingClientRect().height < 44).map(el => el.textContent.trim().slice(0, 30)));
     expect(small, url + ' touch targets').toEqual([]);
   }
@@ -323,8 +342,11 @@ test('without JavaScript the navigation and forms still work', async ({browser})
   const ctx = await browser.newContext({javaScriptEnabled: false, viewport: {width:390,height:844}});
   const page = await ctx.newPage();
   await page.goto('http://127.0.0.1:8765/');
-  await expect(page.locator('.menu a[href="services.html"]')).toBeVisible();
-  await expect(page.locator('.paths')).toBeVisible();
+  await expect(page.locator('.tabbar a[href="services.html"]')).toBeVisible();
+  await expect(page.locator('.tiles')).toBeVisible();
+  await page.locator('.tabbar a[href="services.html"]').click();
+  await expect(page).toHaveURL(/services\.html$/);
+  await expect(page.locator('.tile[href="rent.html"]')).toBeVisible();
   await page.goto('http://127.0.0.1:8765/contact.html');
   const form = page.locator('form.letter-form');
   await expect(form).toHaveAttribute('action', 'mailto:alaa.qadir@crownsmere.com');

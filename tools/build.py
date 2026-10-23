@@ -69,6 +69,10 @@ P = {
     "arrow": '<path d="M4 12h15M13 6l6 6-6 6"/>',
     "chevron": '<path d="M9 5l7 7-7 7"/>',
     "plus": '<path d="M12 5v14M5 12h14"/>',
+    "grid": '<rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>',
+    "cap": '<path d="M2 9.5 12 5l10 4.5-10 4.5z"/><path d="M6 11.3V16c0 1.4 2.7 3 6 3s6-1.6 6-3v-4.7M22 9.5V15"/>',
+    "tag": '<path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
+    "trend": '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
 }
 
 def ic(name, cls="ic"):
@@ -96,6 +100,10 @@ def btn(href, text, kind="primary", arrow=True, extra=""):
 
 # ---------------------------------------------------------------- chrome
 NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
+# The tab bar along the bottom of phones and tablets: (page, icon, label, Arabic label).
+TABS = [("index.html", "house", "Home", "الرئيسية"), ("services.html", "grid", "Services", "الخدمات"),
+        ("about.html", "person", "About", "عن علا"), ("students.html", "cap", "Students", "الطلاب"),
+        ("contact.html", "mail", "Contact", "تواصل")]
 
 ORG = {
     "@context": "https://schema.org", "@type": "RealEstateAgent", "@id": f"{SITE}/#business",
@@ -131,9 +139,12 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB"):
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = [ORG] + (extra_ld or [])
     if path in CRUMBS:
+        trail = [("Home", f"{SITE}/")]
+        if path in SECTION_OF:
+            trail.append((CRUMBS[SECTION_OF[path]], f"{SITE}/{SECTION_OF[path]}"))
+        trail.append((CRUMBS[path], canonical))
         ld.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
-            {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE}/"},
-            {"@type": "ListItem", "position": 2, "name": CRUMBS[path], "item": canonical}]})
+            {"@type": "ListItem", "position": n, "name": name, "item": url} for n, (name, url) in enumerate(trail, 1)]})
     if path == "index.html":
         ld.append({"@context": "https://schema.org", "@type": "WebSite", "name": BRAND, "url": f"{SITE}/",
                    "inLanguage": "en-GB", "publisher": {"@id": f"{SITE}/#business"}})
@@ -186,11 +197,16 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB"):
 <body class="page-{slug}">
 <a class="skip" href="#main">Skip to content</a>'''
 
-def header(current):
+def current_mark(href, current):
+    """aria-current for a navigation link: "page" on the page itself, "true" on its section
+    (Services while on a service page). The Arabic student page belongs to Students."""
     current = "students.html" if current == "students-ar.html" else current
-    cur = lambda h: ' aria-current="page"' if h == current else ""
-    links = "".join(f'<a href="{h}"{cur(h)}>{t}</a>' for h, t in NAV[1:])
-    items = "\n".join(f'    <li><a href="{h}"{cur(h)}>{t}</a></li>' for h, t in NAV)
+    if href == current:
+        return ' aria-current="page"'
+    return ' aria-current="true"' if SECTION_OF.get(current) == href else ""
+
+def header(current):
+    links = "".join(f'<a href="{h}"{current_mark(h, current)}>{t}</a>' for h, t in NAV[1:])
     return f'''
 <header class="hd">
   <div class="wrap hd-in">
@@ -200,18 +216,20 @@ def header(current):
     </a>
     <nav class="hd-nav" aria-label="Main">{links}</nav>
     {btn("contact.html", "Start enquiry", "primary", arrow=False, extra=' data-cta')}
-    <button class="hd-menu" type="button" aria-expanded="false" aria-controls="menu"><span>Menu</span><i aria-hidden="true"></i></button>
   </div>
-</header>
-<nav class="menu" id="menu" aria-label="Mobile">
-  <ol>
-{items}
-  </ol>
-  <div class="menu-foot">
-    {btn("contact.html", "Share your brief", "primary")}
-    <a class="menu-mail" href="mailto:{EMAIL}">{ic("mail")}{EMAIL}</a>
-  </div>
-</nav>'''
+</header>'''
+
+def tabbar(current, lang="en"):
+    """The main navigation on phones and tablets: five tabs, always on screen. Plain links, so it
+    works without JavaScript. On the Arabic student page the labels are Arabic and read right to left."""
+    ar = lang == "ar"
+    links = "".join(
+        f'<a href="{"students-ar.html" if ar and h == "students.html" else h}"{current_mark(h, current)}>{ic(i)}<span>{t_ar if ar else t}</span></a>'
+        for h, i, t, t_ar in TABS)
+    # Named apart from the header's "Main" navigation: only one of the two shows at any width,
+    # but landmark names must still be unique on the page.
+    attrs = ' aria-label="القائمة الرئيسية" lang="ar" dir="rtl"' if ar else ' aria-label="Main pages"'
+    return f'\n<nav class="tabbar"{attrs}>{links}</nav>'
 
 def registration():
     """The company and regulatory line in the footer, built only from details filled in above."""
@@ -240,13 +258,8 @@ def registration():
     parts += b["professional_bodies"]
     return f'<p class="ft-reg">{" &middot; ".join(parts)}</p>' if parts else ""
 
-def footer(current, quick_href="contact.html", quick_label="Share your brief", quick_lang=""):
+def footer(current, lang="en"):
     links = "".join(f'<li><a href="{h}">{t}</a></li>' for h, t in NAV[1:]) + '<li><a href="privacy.html">Privacy</a></li>'
-    lang = f' lang="{quick_lang}"' + (' dir="rtl"' if quick_lang == "ar" else "") if quick_lang else ""
-    bar = "" if current == "contact.html" else (
-        f'\n<nav class="actionbar" aria-label="Quick contact">'
-        f'<a class="actionbar-mail" href="mailto:{EMAIL}" aria-label="Email {EMAIL}">{ic("mail")}<span>Email</span></a>'
-        f'<a class="btn btn-primary" href="{quick_href}"{lang}>{quick_label}{ARROW}</a></nav>')
     return f'''
 <footer class="ft">
   <div class="ft-skyline" aria-hidden="true">{pic("skyline", "", 1055, 181)}</div>
@@ -260,38 +273,77 @@ def footer(current, quick_href="contact.html", quick_label="Share your brief", q
     <p class="ft-legal">&copy; <span data-year>2026</span> {BRAND} &middot; London, United Kingdom</p>
     {registration()}
   </div>
-</footer>{bar}
+</footer>{tabbar(current, lang)}
 <script src="assets/main.js"></script>'''
 
-def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", quick=("contact.html", "Share your brief"), og_locale="en_GB"):
+def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", lang="en", og_locale="en_GB"):
     html = (head(title, desc, fname, extra_ld, og_desc, og_locale) + header(fname) + '\n<main id="main">\n' + body + '\n</main>'
-            + footer(fname, *quick) + scripts + '\n</body>\n</html>\n')
+            + footer(fname, lang) + scripts + '\n</body>\n</html>\n')
     open(os.path.join(OUT, fname), "w").write(html)
     return html
 
 # ---------------------------------------------------------------- shared content
-SERVICES = [
-    ("01", "Buy", "buy",
-     "Tell me what you are looking for, and I will find it: on the market, off the market, or not yet on anyone&rsquo;s radar.",
-     ["A private briefing on your requirements", "A personal search, on and off the market",
-      "A curated shortlist, checked before you see it", "Accompanied viewings, negotiation and support to completion"]),
-    ("02", "Sell", "sell",
-     "A quiet, private sale. Your property is introduced only to qualified buyers, without the noise of a public listing.",
-     ["A confidential conversation about your plans", "Valuation advice and pricing strategy",
-      "Discreet introductions to qualified buyers, viewings by appointment", "No public listing unless you wish it"]),
-    ("03", "Let", "let",
-     "Whether you are looking for a home to rent or the right tenant for your property, the search is personal and discreet.",
-     ["A search for the right rental home, to your brief", "Or the right tenant for your property",
-      "Private, by-appointment viewings", "Negotiation of terms and clear communication throughout"]),
-    ("04", "Invest", "invest",
-     "Investment opportunities sourced to your criteria, including those that never reach the open market.",
-     ["Opportunities sourced to your brief, including off-market", "Neighbourhood-level analysis of yield and growth",
-      "Review of existing holdings", "A long-term strategy around your goals"]),
-    ("05", "Advisory", "advisory",
-     "Honest, experienced advice whenever you need a trusted perspective.",
-     ["Candid second opinions", "Guidance on timing, pricing and positioning",
-      "Advice on offers and options", "Support for complex or sensitive situations, in complete confidence"]),
+TENANT_HELP = [
+    "A search to your brief, on and off the market, including homes not yet advertised to rent",
+    "Accompanied viewings, with an honest view on every property",
+    "Direct negotiation of the rent, tenancy length, move-in date, furnishings and other terms",
+    "Clear guidance on deposits, rent in advance and what to expect before you commit",
 ]
+TENANT_INTRO = "When you ask Alaa to find you a home to rent, she represents you: searching, viewing and negotiating directly with landlords and their agents on your behalf, so you secure the right home on the right terms."
+
+# One page per service. "anchor" is the service's old section on services.html (services.html#let still
+# lands on Rent). "tile" is the short line on the home and services tiles; "groups" are the page's lists.
+SERVICES = [
+    dict(page="buy.html", anchor="buy", name="Buy", icon="house",
+         h1="Buy a home, <em>personally found.</em>", tile="A personal search, on and off the market.",
+         lede="Tell me what you are looking for, and I will find it: on the market, off the market, or not yet on anyone&rsquo;s radar.",
+         groups=[("What I do for you", "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf.",
+                  ["A private briefing on your requirements", "A personal search, on and off the market",
+                   "A curated shortlist, checked before you see it", "Accompanied viewings, negotiation and support to completion"])],
+         steps=True, cta="Tell me what <em>you are looking for.</em>",
+         kind="Property search for buyers", title="Buy a Home in Prime London: A Personal Property Search",
+         desc="Tell Alaa Qadir what you are looking for. A personal search for homes in prime London, on and off the market, with accompanied viewings and negotiation through to completion."),
+    dict(page="sell.html", anchor="sell", name="Sell", icon="tag",
+         h1="Sell, <em>quietly and privately.</em>", tile="A quiet, private sale.",
+         lede="A quiet, private sale. Your property is introduced only to qualified buyers, without the noise of a public listing.",
+         groups=[("What I do for you", "",
+                  ["A confidential conversation about your plans", "Valuation advice and pricing strategy",
+                   "Discreet introductions to qualified buyers, viewings by appointment", "No public listing unless you wish it"])],
+         steps=False, cta="Thinking of <em>a private sale?</em>",
+         kind="Private property sales", title="Sell Your London Property Privately",
+         desc="A quiet, private sale in prime London: valuation advice, pricing strategy and discreet introductions to qualified buyers, with no public listing unless you wish it."),
+    dict(page="rent.html", anchor="let", name="Rent", icon="key",
+         h1="Rent or let, <em>discreetly.</em>", tile="The right rental, or the right tenant.",
+         lede="Whether you are looking for a home to rent or the right tenant for your property, the search is personal and discreet.",
+         groups=[("If you are renting", TENANT_INTRO, TENANT_HELP),
+                 ("If you are letting your property", "",
+                  ["The right tenant for your property, found discreetly", "Private, by-appointment viewings",
+                   "Negotiation of terms and clear communication throughout"])],
+         steps=True, cta="Tell me what <em>you need.</em>",
+         kind="Lettings", title="Rent or Let in Prime London",
+         desc="Find a London home to rent, with Alaa Qadir negotiating directly with landlords for you, or the right tenant for your property, found discreetly."),
+    dict(page="invest.html", anchor="invest", name="Invest", icon="trend",
+         h1="Invest, <em>to your brief.</em>", tile="Opportunities sourced to your brief.",
+         lede="Investment opportunities sourced to your criteria, including those that never reach the open market.",
+         groups=[("What I do for you", "",
+                  ["Opportunities sourced to your brief, including off-market", "Neighbourhood-level analysis of yield and growth",
+                   "Review of existing holdings", "A long-term strategy around your goals"])],
+         steps=False, cta="Share your <em>investment brief.</em>",
+         kind="Property investment", title="Property Investment in Prime London",
+         desc="Investment opportunities in prime London sourced to your criteria, including off-market, with neighbourhood-level analysis of yield and growth and a long-term strategy."),
+    dict(page="advisory.html", anchor="advisory", name="Advisory", icon="speech",
+         h1="Advice, <em>in confidence.</em>", tile="Honest, experienced advice.",
+         lede="Honest, experienced advice whenever you need a trusted perspective.",
+         groups=[("What I do for you", "",
+                  ["Candid second opinions", "Guidance on timing, pricing and positioning",
+                   "Advice on offers and options", "Support for complex or sensitive situations, in complete confidence"])],
+         steps=False, cta="A second opinion, <em>in confidence.</em>",
+         kind="Property advice", title="Property Advice in Prime London",
+         desc="Honest, experienced property advice in prime London: candid second opinions, guidance on timing, pricing and positioning, and support for sensitive situations."),
+]
+# Each service page belongs to the Services section of the navigation and its breadcrumb trail.
+SECTION_OF = {s["page"]: "services.html" for s in SERVICES}
+CRUMBS.update({s["page"]: s["name"] for s in SERVICES})
 
 STEPS = [
     ("Share your brief", "A private conversation about what you are looking for, why, and when. No detail is too small."),
@@ -320,8 +372,7 @@ FAQ = {
 }
 if FEES:
     FAQ["fees"] = (FAQ["fees"][0], FAQ["fees"][1] + ' Our <a href="services.html#fees">published fees</a> are on the services page.')
-HOME_FAQ = ["how", "listings", "agent", "areas", "overseas", "fees"]
-CONTACT_FAQ = ["how", "private", "overseas", "fees"]
+CONTACT_FAQ = ["how", "listings", "agent", "areas", "overseas", "private", "fees"]
 
 def strip_tags(s):
     return re.sub(r"<[^>]+>", "", s).replace("&ldquo;", "“").replace("&rdquo;", "”").replace("&rsquo;", "’")
@@ -337,11 +388,14 @@ def sec_head(eyebrow, heading, lede="", hid=""):
     lede = f'<p class="lede">{lede}</p>' if lede else ""
     return f'<div class="sec-head" data-reveal><p class="eyebrow">{eyebrow}</p><h2{hid}>{heading}</h2>{lede}</div>'
 
-def page_hero(eyebrow, heading, lede=""):
+def page_hero(eyebrow, heading, lede="", crumb=""):
+    """The opening of an inner page. A service page shows a breadcrumb back to Services in place of the eyebrow."""
     lede = f'<p class="lede">{lede}</p>' if lede else ""
+    top = (f'<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="services.html">Services</a></li>'
+           f'<li aria-current="page">{crumb}</li></ol></nav>') if crumb else f'<p class="eyebrow">{eyebrow}</p>'
     return f'''<section class="page-hero">
   <div class="wrap">
-    <p class="eyebrow">{eyebrow}</p>
+    {top}
     <h1>{heading}</h1>
     {lede}
   </div>
@@ -351,6 +405,40 @@ def steps():
     items = "".join(f'<li><span class="step-n" aria-hidden="true">{i + 1}</span><div><h3>{t}</h3><p>{d}</p></div></li>'
                     for i, (t, d) in enumerate(STEPS))
     return f'<ol class="steps" data-reveal>{items}</ol>'
+
+def how_it_works(lede=""):
+    return f'''
+<section class="sec sec-alt" id="process" aria-labelledby="process-title">
+  <div class="wrap">
+    {sec_head("How it works", "From your brief <em>to the keys.</em>", lede, "process-title")}
+    {steps()}
+  </div>
+</section>'''
+
+def tiles(items, level=3, label=""):
+    """Links to the main parts of the site as tiles: (page, icon, title, short line, id)."""
+    label = f' aria-label="{label}"' if label else ""
+    cards = ""
+    for h, i, t, d, anchor in items:
+        anchor = f' id="{anchor}"' if anchor else ""
+        cards += (f'<a class="tile" href="{h}"{anchor}>{ic(i, "ic tile-ic")}'
+                  f'<h{level}>{t}</h{level}><p>{d}</p>{ic("chevron", "ic tile-go")}</a>')
+    return f'<nav class="tiles"{label} data-reveal>{cards}</nav>'
+
+def student_callout():
+    return f'''
+<section class="sec sec-tight">
+  <div class="wrap">
+    <div class="callout" data-reveal>
+      <div>
+        <p class="eyebrow">International student lettings</p>
+        <h2>Studying in London? <em>No UK guarantor?</em></h2>
+        <p>We can help you explore London rental homes and professional guarantor options.</p>
+      </div>
+      {btn("students.html", "Student assistance")}
+    </div>
+  </div>
+</section>'''
 
 def faq(keys):
     rows = "".join(
@@ -401,26 +489,10 @@ def cta(heading="Tell me what <em>you are looking for.</em>"):
   </div>
 </section>'''
 
-# ---------------------------------------------------------------- home
-PATHS = [
-    ("contact.html", "colonnade", "A white-stucco London street with columned porches", 563, 398,
-     "Buy &middot; Rent &middot; Invest", "Find a London home", "A personal search, including homes that are never publicly listed."),
-    ("services.html#sell", "interior", "An elegant London drawing room with tall windows", 826, 463,
-     "Sell &middot; Let", "Sell or let, discreetly", "Quiet introductions to qualified buyers and tenants."),
-    ("students.html", "westminster", "Big Ben and Westminster seen through tall French windows", 420, 480,
-     "Students", "Studying in London?", "Rental help, even without a UK guarantor."),
-]
-
-paths = "".join(
-    f'<a class="path" href="{h}">{pic(img, alt, w, hh)}<div class="path-body"><span class="path-tag">{tag}</span>'
-    f'<h3>{t}</h3><p>{d}</p></div>{ic("chevron", "ic path-go")}</a>'
-    for h, img, alt, w, hh, tag, t, d in PATHS)
-
-facts = "".join(f'<li>{ic(i)}<div><h3>{t}</h3><p>{d}</p></div></li>' for i, t, d in [
-    ("person", "One-to-one", "You deal directly with me. No call centre, no hand-offs."),
-    ("lock", "Off-market access", "A discreet network opens doors to homes that never appear online."),
-    ("shield", "Complete discretion", "Your search, your plans and your details stay private."),
-])
+# ---------------------------------------------------------------- home: a short front door to the rest of the site
+HOME_TILES = ([(sv["page"], sv["icon"], sv["name"], sv["tile"], "") for sv in SERVICES[:4]]
+              + [("students.html", "cap", "Students", "Rental help, even without a UK guarantor.", ""),
+                 ("about.html", "person", "Meet Alaa", "Your consultant, one to one.", "")])
 
 index_body = f'''
 <section class="hero" aria-labelledby="hero-title">
@@ -431,7 +503,6 @@ index_body = f'''
     <p class="hero-sub">Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a discreet, personal search, on and off the market.</p>
     <div class="hero-actions">
       {btn("contact.html", "Share your brief", "light")}
-      <a class="hero-link" href="students.html">International student? Get rental help{ARROW}</a>
     </div>
   </div>
 </section>
@@ -439,96 +510,72 @@ index_body = f'''
 <section class="sec" aria-labelledby="help-title">
   <div class="wrap">
     {sec_head("How can we help?", "Find your way <em>forward.</em>", hid="help-title")}
-    <div class="paths" data-reveal>{paths}</div>
+    {tiles(HOME_TILES, label="Explore")}
     <p class="fine">Photographs illustrate London homes and neighbourhoods, not available listings.</p>
   </div>
 </section>
-
-<section class="sec sec-alt" id="how" aria-labelledby="how-title">
-  <div class="wrap">
-    {sec_head("How it works", "From your brief <em>to the keys.</em>", hid="how-title")}
-    {steps()}
-  </div>
-</section>
-
-<section class="sec" id="why" aria-labelledby="why-title">
-  <div class="wrap split">
-    <div class="split-copy" data-reveal>
-      <p class="eyebrow">Why Crownsmere</p>
-      <h2 id="why-title">Not a typical <em>estate agency.</em></h2>
-      <p>Rather than selling whatever happens to be on the books, I work from your brief and search personally for what is genuinely right for you. Each client is taken on individually, and you deal with me directly, from the first conversation to the day you collect the keys.</p>
-      {signature()}
-      <a class="more" href="about.html">Meet Alaa{ARROW}</a>
-    </div>
-    <ul class="facts" data-reveal>{facts}</ul>
-  </div>
-</section>
 {testimonials()}
+{cta()}'''
 
-<section class="sec sec-alt" id="areas" aria-labelledby="areas-title">
+page("index.html", f"{BRAND} | Buy, Sell & Rent London Property",
+     "Crownsmere Estate offers personal London property search, private sales, lettings and international student rental assistance. Speak to property consultant Alaa Qadir.",
+     index_body)
+
+# ---------------------------------------------------------------- services: an overview, then one page per service
+SERVICE_TILES = [(sv["page"], sv["icon"], sv["name"], sv["tile"], sv["anchor"]) for sv in SERVICES]
+
+services_body = f'''
+{page_hero("Services", "By request. <em>Personally found.</em>", "A clearer way to buy, sell, rent or invest in London. Choose the service you need, and Alaa will guide you personally.")}
+
+<section class="sec sec-tight">
+  <div class="wrap">
+    {tiles(SERVICE_TILES, level=2, label="Services")}
+  </div>
+</section>
+{how_it_works("A private, unhurried process, shaped entirely around you.")}
+
+<section class="sec" id="areas" aria-labelledby="areas-title">
   <div class="wrap sec-split">
     {sec_head("Where I search", "Prime London, <em>street by street.</em>", "Not sure which neighbourhood suits you? Helping you choose is part of the search.", "areas-title")}
     <ul class="tags" data-reveal>{"".join(f"<li>{a}</li>" for a in AREAS)}<li class="tags-more">and further afield</li></ul>
   </div>
 </section>
-
-<section class="sec" id="questions" aria-labelledby="faq-title">
-  <div class="wrap sec-split">
-    {sec_head("Questions", "Good questions, <em>plainly answered.</em>", hid="faq-title")}
-    {faq(HOME_FAQ)}
-  </div>
-</section>
-{cta()}'''
-
-page("index.html", f"{BRAND} | Buy, Sell & Rent London Property",
-     "Crownsmere Estate offers personal London property search, private sales, lettings and international student rental assistance. Speak to property consultant Alaa Qadir.",
-     index_body, extra_ld=[faq_ld(HOME_FAQ)])
-
-# ---------------------------------------------------------------- services
-def svc(num, title, anchor, lede, points):
-    lis = "".join(f"<li>{ic('check')}<span>{p}</span></li>" for p in points)
-    return f'''<article class="svc" id="{anchor}" data-reveal>
-      <div class="svc-head"><span class="svc-n">{num}</span><h2>{title}</h2><p>{lede}</p></div>
-      <ul class="checks">{lis}</ul>
-    </article>'''
-
-jump = "".join(f'<a href="#{a}">{t}</a>' for n, t, a, d, p in SERVICES)
-
-services_body = f'''
-{page_hero("Services", "By request. <em>Personally found.</em>", "A clearer way to buy, sell, rent or invest in London. Choose the service you need, and Alaa will guide you personally.")}
-<nav class="jump wrap" aria-label="Services on this page">{jump}</nav>
-
-<section class="sec sec-tight">
-  <div class="wrap svc-list">
-    {"".join(svc(*s) for s in SERVICES)}
-  </div>
-</section>
-
-<section class="sec sec-tight">
-  <div class="wrap">
-    <div class="callout" data-reveal>
-      <div>
-        <p class="eyebrow">International student lettings</p>
-        <h2>Studying in London? <em>No UK guarantor?</em></h2>
-        <p>We can help you explore London rental homes and professional guarantor options.</p>
-      </div>
-      {btn("students.html", "Student assistance")}
-    </div>
-  </div>
-</section>
-
+{student_callout()}
 {fees()}
-<section class="sec sec-alt" id="process" aria-labelledby="process-title">
-  <div class="wrap">
-    {sec_head("How it works", "From your brief <em>to the keys.</em>", "A private, unhurried process, shaped entirely around you.", "process-title")}
-    {steps()}
-  </div>
-</section>
 {cta("Shall we <em>begin?</em>")}'''
 
 page("services.html", f"Property Search, Private Sales & Lettings | {BRAND}",
      "Buying, private sales, lettings, investment and property advice in prime London, delivered personally and discreetly by Crownsmere Estate.",
      services_body)
+
+def service_page(i, sv):
+    """A service's own page: what Alaa does, how it works where it applies, then the next service and contact."""
+    nxt = SERVICES[(i + 1) % len(SERVICES)]
+    groups = ""
+    for heading, intro, points in sv["groups"]:
+        intro = f"<p>{intro}</p>" if intro else ""
+        items = "".join(f"<li>{ic('check')}<span>{pt}</span></li>" for pt in points)
+        groups += f'<div class="svc-group" data-reveal><h2>{heading}</h2>{intro}<ul class="checks checks-lg">{items}</ul></div>'
+    body = f'''
+{page_hero("", sv["h1"], sv["lede"], crumb=sv["name"])}
+
+<section class="sec sec-tight">
+  <div class="wrap svc-groups">{groups}</div>
+</section>
+{how_it_works() if sv["steps"] else ""}
+{student_callout() if sv["page"] == "rent.html" else ""}
+<nav class="wrap pager" aria-label="More services">
+  {btn("services.html", "All services", "ghost", arrow=False)}
+  <a class="more" href="{nxt["page"]}">Next: {nxt["name"]}{ARROW}</a>
+</nav>
+{cta(sv["cta"])}'''
+    ld = {"@context": "https://schema.org", "@type": "Service", "name": sv["title"], "serviceType": sv["kind"],
+          "description": sv["desc"], "url": f"{SITE}/{sv['page']}", "provider": {"@id": f"{SITE}/#business"},
+          "areaServed": {"@type": "City", "name": "London"}}
+    page(sv["page"], f"{sv['title']} | {BRAND}", sv["desc"], body, extra_ld=[ld])
+
+for i, sv in enumerate(SERVICES):
+    service_page(i, sv)
 
 # ---------------------------------------------------------------- about: Alaa Qadir's profile
 QUALITIES = [
@@ -539,18 +586,12 @@ QUALITIES = [
     ("pin", "Prime London insight", "Street-by-street knowledge of Prime and Super Prime London, built over long-standing relationships."),
     ("shield", "Complete discretion", "Your plans and your details stay private, shared only with your agreement."),
 ]
-TENANT_HELP = [
-    "A search to your brief, on and off the market, including homes not yet advertised to rent",
-    "Accompanied viewings, with an honest view on every property",
-    "Direct negotiation of the rent, tenancy length, move-in date, furnishings and other terms",
-    "Clear guidance on deposits, rent in advance and what to expect before you commit",
-]
 AUDIENCES = [
-    ("services.html#buy", "Buyers", "A home or a pied-&agrave;-terre"),
-    ("services.html#let", "Tenants", "The right rental, negotiated for you"),
-    ("services.html#sell", "Owners selling", "A quiet, private sale"),
-    ("services.html#let", "Landlords", "The right tenant, found discreetly"),
-    ("services.html#invest", "Investors", "Opportunities sourced to your brief"),
+    ("buy.html", "Buyers", "A home or a pied-&agrave;-terre"),
+    ("rent.html", "Tenants", "The right rental, negotiated for you"),
+    ("sell.html", "Owners selling", "A quiet, private sale"),
+    ("rent.html", "Landlords", "The right tenant, found discreetly"),
+    ("invest.html", "Investors", "Opportunities sourced to your brief"),
     ("students.html", "International students", "Rentals and guarantor options"),
 ]
 
@@ -592,7 +633,8 @@ about_body = f'''
 
 <section class="sec sec-tight" aria-labelledby="story-title">
   <div class="wrap story-text" data-reveal>
-    <h2 id="story-title" class="visually-hidden">In Alaa&rsquo;s words</h2>
+    <p class="eyebrow">Why Crownsmere</p>
+    <h2 id="story-title">Not a typical <em>estate agency.</em></h2>
     <p class="lead">As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
     <p>Property is about people, not just buildings. I take on a small number of clients so that each one receives my full attention, honest advice and a search shaped entirely around them.</p>
     <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to the final signature, you deal directly with me, in complete confidence.</p>
@@ -612,7 +654,7 @@ about_body = f'''
     <div class="split-copy" data-reveal>
       <p class="eyebrow">For tenants</p>
       <h2 id="tenants-title">Renting, with someone <em>on your side.</em></h2>
-      <p>When you ask Alaa to find you a home to rent, she represents you: searching, viewing and negotiating directly with landlords and their agents on your behalf, so you secure the right home on the right terms.</p>
+      <p>{TENANT_INTRO}</p>
       <div class="btn-row">{btn("contact.html", "Share your rental brief")}</div>
     </div>
     <div data-reveal>
@@ -762,7 +804,7 @@ contact_body = f'''
 
 page("contact.html", f"Share Your Property Brief | {BRAND}",
      "Share your property brief with Crownsmere Estate. A private, by-request search for buying, renting, selling privately and investing in prime London.",
-     contact_body)
+     contact_body, extra_ld=[faq_ld(CONTACT_FAQ)])
 
 # ---------------------------------------------------------------- students (English and Arabic)
 # Each language has its own page (students.html, students-ar.html), linked by hreflang so search
@@ -967,13 +1009,13 @@ page("students.html", f"International Student Lettings & Guarantor Help | {BRAND
      extra_ld=[{"@context": "https://schema.org", "@type": "WebPage", "name": "International Student Lettings & Guarantor Help",
                 "url": f"{SITE}/students.html", "inLanguage": "en-GB"}],
      og_desc="Find London rentals and explore guarantor options. English and Arabic assistance for international students from Crownsmere Estate.",
-     scripts=STUDENT_SCRIPT, quick=("#en-form", "Start enquiry"))
+     scripts=STUDENT_SCRIPT)
 page("students-ar.html", f"مساعدة الطلاب الدوليين في الإيجار والضامن في لندن | {BRAND}",
      "ابحث عن سكن للإيجار في لندن واستكشف خيارات الضامن مع Crownsmere Estate. خدمة باللغة العربية للطلاب الدوليين.",
      students_body("ar"),
      extra_ld=[{"@context": "https://schema.org", "@type": "WebPage", "name": "مساعدة الطلاب الدوليين في الإيجار والضامن",
                 "url": f"{SITE}/students-ar.html", "inLanguage": "ar"}],
-     scripts=STUDENT_SCRIPT, quick=("#ar-form", "ابدأ الاستفسار", "ar"), og_locale="ar_AR")
+     scripts=STUDENT_SCRIPT, lang="ar", og_locale="ar_AR")
 
 # ---------------------------------------------------------------- privacy
 privacy_body = f'''
@@ -1051,8 +1093,8 @@ html = html.replace('<link rel="canonical" href="https://crownsmere.com/404.html
 open(os.path.join(OUT, "404.html"), "w").write(html)
 
 # ---------------------------------------------------------------- SEO files
-pages = [("", "1.0"), ("services.html", "0.9"), ("about.html", "0.8"), ("students.html", "0.9"), ("students-ar.html", "0.9"),
-         ("contact.html", "0.9"), ("privacy.html", "0.3")]
+pages = ([("", "1.0"), ("services.html", "0.9")] + [(sv["page"], "0.8") for sv in SERVICES]
+         + [("about.html", "0.8"), ("students.html", "0.9"), ("students-ar.html", "0.9"), ("contact.html", "0.9"), ("privacy.html", "0.3")])
 def sitemap_alternates(p):
     return "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{SITE}/{u}"/>' for l, u in ALTERNATES.get(p, []))
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
