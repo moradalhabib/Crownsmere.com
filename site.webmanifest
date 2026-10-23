@@ -4,8 +4,8 @@
   "description": "Private property search in prime London.",
   "start_url": "/",
   "display": "browser",
-  "background_color": "#f6f0e4",
-  "theme_color": "#f6f0e4",
+  "background_color": "#faf7f1",
+  "theme_color": "#faf7f1",
   "icons": [
     {
       "src": "/assets/img/apple-touch-icon.png",

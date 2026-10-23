@@ -1,4 +1,4 @@
-name: Student application end-to-end checks
+name: Website end-to-end checks
 
 on:
   push:
@@ -9,14 +9,11 @@ on:
       - improve/crownsmere-ux-mobile-20261021
   pull_request:
     paths:
-      - 'students.html'
-      - 'assets/student.css'
-      - 'assets/student.js'
-      - 'assets/style.css'
-      - 'assets/experience.css'
-      - 'assets/mobile-header.css'
-      - 'assets/main.js'
+      - '*.html'
+      - 'assets/**'
+      - 'tools/build.py'
       - 'tests/e2e/**'
+      - '.htmlvalidate.json'
       - 'playwright.config.cjs'
       - '.github/workflows/student-e2e.yml'
   workflow_dispatch:
@@ -27,30 +24,37 @@ permissions:
 jobs:
   student-e2e:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install Playwright test runner
-        run: npm install --no-save --no-audit --no-fund @playwright/test@1.56.1
+      - name: Install Playwright test runner and HTML validator
+        run: npm install --no-save --no-audit --no-fund --legacy-peer-deps @playwright/test@1.56.1 html-validate@10.17.0
+      - name: Validate the HTML of every page
+        run: npx html-validate *.html
       - name: Install Chromium dependencies
         run: npx playwright install --with-deps chromium
-      - name: Run student experience tests
+      - name: Run every website test in Chromium (layout, page length, links, forms, accessibility)
         run: |
           mkdir -p test-screenshots
           npx playwright test --config=playwright.config.cjs
-      - name: Install WebKit for iPhone-equivalent checks
-        run: npx playwright install --with-deps webkit
-      - name: Verify key iPhone user journeys in WebKit
-        run: |
-          npx playwright test --config=playwright.config.cjs --browser webkit --grep 'iphone-390|student page:|student form: all|general website brief opens|home: premium' --workers=1
+      # The later steps run even if an earlier one fails, so every browser engine is reported.
+      - name: Install WebKit and Firefox
+        if: ${{ !cancelled() }}
+        run: npx playwright install --with-deps webkit firefox
+      - name: Run every website test in WebKit (the Safari and iPhone engine)
+        if: ${{ !cancelled() }}
+        run: npx playwright test --config=playwright.config.cjs --browser webkit
+      - name: Run every website test in Firefox
+        if: ${{ !cancelled() }}
+        run: npx playwright test --config=playwright.config.cjs --browser firefox
       - name: Attach QA screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: crownsmere-student-e2e
+          name: crownsmere-e2e
           path: |
             playwright-report/
             test-results/

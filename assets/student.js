@@ -3,29 +3,11 @@
 "use strict";
 var bar=document.querySelector(".student-language-bar");
 if(!bar) return;
-var panels=Array.prototype.slice.call(document.querySelectorAll("[data-language-panel]"));
-var switches=Array.prototype.slice.call(document.querySelectorAll("[data-lang-switch]"));
-var qs=new URLSearchParams(window.location.search);
-var lang=qs.get("lang")==="ar"?"ar":"en";
-function setLanguage(value){
- lang=value==="ar"?"ar":"en";
- panels.forEach(function(panel){panel.hidden=panel.getAttribute("data-language-panel")!==lang;});
- switches.forEach(function(button){
-  var active=button.getAttribute("data-lang-switch")===lang;
-  button.classList.toggle("is-active",active);
-  button.setAttribute("aria-pressed",String(active));
- });
- // Keep navigation and the centred Crownsmere logo in their original LTR layout.
- // Each language panel already has its own lang and dir attributes.
- document.documentElement.lang="en-GB";
- document.documentElement.dir="ltr";
- var quickFormLink=document.querySelector(".actionbar a[href^=\"#\"]");
- if(quickFormLink) quickFormLink.setAttribute("href","#"+lang+"-form");
+// The Arabic page now has its own address; older links used students.html?lang=ar.
+if(new URLSearchParams(window.location.search).get("lang")==="ar"&&!document.querySelector('[data-language-panel="ar"]')){
+ window.location.replace("students-ar.html"+window.location.hash);
+ return;
 }
-switches.forEach(function(button){
- button.addEventListener("click",function(){setLanguage(button.getAttribute("data-lang-switch"));});
-});
-setLanguage(lang);
 document.querySelectorAll(".student-form").forEach(function(form){
  var stages=Array.prototype.slice.call(form.querySelectorAll("[data-student-step]"));
  var indicators=Array.prototype.slice.call(form.querySelectorAll("[data-step-indicator]"));
@@ -135,6 +117,13 @@ document.querySelectorAll(".student-form").forEach(function(form){
    :"Prepared using the student enquiry form at crownsmere.com/students.html";
   return introduction+"\n\n"+sections.filter(Boolean).join("\n\n")+"\n\n"+end+"\n\n"+origin;
  }
+ function webmailLinks(to,cc,subject,body){
+  // Desktop visitors often have no mail app set up, so offer the two big webmail services too.
+  var q=function(o){return Object.keys(o).map(function(k){return k+"="+encodeURIComponent(o[k]);}).join("&");};
+  var gmail=fallback.querySelector('[data-webmail="gmail"]'),outlook=fallback.querySelector('[data-webmail="outlook"]');
+  if(gmail)gmail.href="https://mail.google.com/mail/?"+q({view:"cm",fs:"1",to:to,cc:cc,su:subject,body:body});
+  if(outlook)outlook.href="https://outlook.live.com/mail/0/deeplink/compose?"+q({to:to,cc:cc,subject:subject,body:body});
+ }
  function showFallback(data){
   if(!fallback)return "";
   fallbackBody=enquirySummary(data);
@@ -147,6 +136,7 @@ document.querySelectorAll(".student-form").forEach(function(form){
    +"&subject="+encodeURIComponent(subject)
    +"&body="+encodeURIComponent(fallbackBody);
   if(emailLink)emailLink.setAttribute("href",mailto);
+  webmailLinks(fallbackEmail,archiveEmail,subject,fallbackBody);
   if(copyText)copyText.value="To: "+fallbackEmail+"\nCc: "+archiveEmail+"\nSubject: "+subject+"\n\n"+fallbackBody;
   if(copyFeedback)copyFeedback.textContent="";
   if(copyLabel)copyLabel.hidden=true;
@@ -255,7 +245,8 @@ document.querySelectorAll(".student-form").forEach(function(form){
    ?"رسالتك جاهزة. راجعها واضغط إرسال في تطبيق البريد الإلكتروني."
    :"Your email is ready. Review it and press Send in your email app.");
   if(draft){
-   try { window.location.href=draft; }
+   // window.crownsmereOpenDraft lets the browser tests capture the draft instead of opening a mail app.
+   try { (window.crownsmereOpenDraft||function(url){window.location.href=url;})(draft); }
    catch(error) { /* Keep the visible Open email / Copy options. */ }
   }
  });
