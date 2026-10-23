@@ -19,9 +19,8 @@ const viewports = [
   {name:'desktop-1440',width:1440,height:900}
 ];
 
-/* On phones the quick-contact bar slides in once the page has scrolled. Playwright scrolls a link
- * into view and checks nothing covers it, but the page can show the bar just after that check, so
- * the tap lands on the bar instead (seen in Firefox). Centre the link, let the page settle, then tap. */
+/* On phones the quick-contact bar slides in once the page has scrolled, and a tap straight after a
+ * scroll is now and then lost on GitHub's runners. Centre the link, let the page settle, then tap. */
 async function tapBelowTheFold(link) {
   await link.evaluate(el => el.scrollIntoView({block: 'center'}));
   await link.page().evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
