@@ -4,7 +4,7 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 
 ## Structure
 - `tools/build.py`: **the source of every page**, including both student pages. Edit the content there and run `python3 tools/build.py` (excluded from the website). The `rebuild-ux` workflow also regenerates the pages on every push to `main`.
-- **Business details to fill in** (top of `tools/build.py`): `BUSINESS` (company and regulatory details), `FEES` (published letting fees), `TESTIMONIALS` (real client comments), `PORTRAIT` (Alaa's photograph) and `TRACK_RECORD` (verified figures). Each shows on the site only once filled in. See `docs/research-2026-10.md` for why they matter.
+- **Business details to fill in** (top of `tools/build.py`): `BUSINESS` (company and regulatory details), `PAYMENT` (how Crownsmere is paid: commission only, shown on the services page), `FEES` (commission rates paid by landlords or tenants, which letting agents must publish), `TESTIMONIALS` (real client comments), `PORTRAIT` (Alaa's photograph) and `TRACK_RECORD` (verified figures). Each shows on the site only once filled in. See `docs/research-2026-10.md` for why they matter.
 - `index.html`: photo hero, three routes (find a home, sell or let, international students), how it works, why Crownsmere, neighbourhoods, questions and a closing call to action
 - `services.html`: buy, sell, let, invest and advisory, a student lettings callout, and how it works
 - `about.html`: Alaa Qadir's profile ("About Alaa"): her one-to-one service, network, direct negotiation for buyers and tenants, client care, who she works with, and her track record and client comments once supplied

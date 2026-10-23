@@ -20,8 +20,9 @@ const viewports = [
 ];
 
 /* Visitors complained the site was far too long on phones (the home page was
- * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
-const phoneLength = {home:5400, services:5000, about:5100, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
+ * 16 screens). These are the most each page may measure on a 390 x 844 phone.
+ * Services allows for the "How Crownsmere is paid" section that fee rules require. */
+const phoneLength = {home:5400, services:5400, about:5100, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
@@ -230,6 +231,26 @@ test('services: each service has its own section and the jump links reach them',
   await page.locator('.jump a[href="#invest"]').click();
   await expect(page.locator('#invest h2')).toBeInViewport();
   await expect(page.locator('.callout a[href="students.html"]')).toBeVisible();
+});
+
+test('fees: how Crownsmere is paid is stated plainly, and no page claims to be impartial', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  const faq = page.locator('details', {hasText: 'How is Crownsmere paid?'});
+  await faq.locator('summary').click();
+  await faq.locator('a[href="services.html#fees"]').click();
+  await expect(page).toHaveURL(/services\.html#fees$/);
+  const fees = page.locator('#fees');
+  await expect(fees.locator('h2')).toBeInViewport();
+  for (const term of ['Commission only', 'Agreed in writing first', 'Fair to tenants', 'No client money']) {
+    await expect(fees.locator('dt', {hasText: term})).toHaveCount(1);
+  }
+  await expect(fees).toContainText('told in writing who pays');
+  // Commission can come from the other side of a deal, so no page may call the advice impartial or independent.
+  for (const [url] of pages) {
+    await page.goto(url);
+    expect(await page.locator('main').innerText(), url).not.toMatch(/impartial|independent advice/i);
+  }
 });
 
 test('mobile header slides away on scroll down and returns on scroll up', async ({page}) => {
