@@ -35,22 +35,12 @@ BUSINESS = {
     "vat_number": None,
     "redress_scheme": None,             # e.g. "The Property Ombudsman"
     "redress_number": None,             # membership number
-    "client_money_protection": None,    # CMP scheme, only if client money is ever held (lettings). None held today.
+    "client_money_protection": None,    # CMP scheme, if client money is held (lettings)
     "aml_supervisor": None,             # e.g. "HM Revenue & Customs"
     "professional_bodies": [],          # e.g. ["Propertymark"]
 }
-# How Crownsmere is paid, as confirmed by the owner: commission only, paid by either side depending on
-# the deal, and no client money held. Shown on the services page (#fees) and summed up in the fees question.
-PAYMENT = [
-    ("Commission only", "No retainer or upfront fee. Crownsmere is paid only when a purchase, sale or tenancy goes through."),
-    ("Agreed in writing first", "The landlord or seller pays, or the client does, depending on the deal. Before any work begins, you are told in writing who pays and how much, and of any referral fee from anyone else involved."),
-    ("Fair to tenants", "Tenants are never asked for a fee the law does not allow."),
-    ("No client money", "Crownsmere never holds your money. Deposits, rent and purchase money go directly to the landlord, seller, their agent or a solicitor."),
-]
-# Letting agents in England must publish fees paid by landlords or tenants (including VAT, or how they
-# are worked out) on their own website. Each entry: (fee, amount as clients should read it), for example
-# ("Lettings commission, paid by the landlord", "8% of the rent for the first year, plus VAT (9.6% including VAT)").
-# Added under PAYMENT on the services page.
+# Letting agents in England must publish their fees (including VAT) on their own website.
+# Each entry: (service, fee as clients should read it). Shown on the services page when filled in.
 FEES = []
 # Real client comments only, with their permission: (quote, attribution such as "Buyer, Kensington").
 TESTIMONIALS = []
@@ -325,9 +315,11 @@ FAQ = {
                  "Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person."),
     "private": ("Is my enquiry confidential?",
                 "Completely. Your brief and your details are used only to help you, and are shared with relevant partners only with your further agreement. See the <a href=\"privacy.html\">privacy notice</a> for details."),
-    "fees": ("How is Crownsmere paid?",
-             "By commission only, and only when a deal goes through. There is no retainer or upfront fee. Depending on the deal, the commission is paid by the landlord or seller, or by the client, and you are told in writing who pays it and how much before any work begins. See <a href=\"services.html#fees\">how Crownsmere is paid</a>."),
+    "fees": ("How are fees agreed?",
+             "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."),
 }
+if FEES:
+    FAQ["fees"] = (FAQ["fees"][0], FAQ["fees"][1] + ' Our <a href="services.html#fees">published fees</a> are on the services page.')
 HOME_FAQ = ["how", "listings", "agent", "areas", "overseas", "fees"]
 CONTACT_FAQ = ["how", "private", "overseas", "fees"]
 
@@ -383,12 +375,14 @@ def testimonials():
 </section>'''
 
 def fees():
-    """How Crownsmere is paid, followed by any published fees in FEES."""
-    rows = "".join(f"<div><dt>{what}</dt><dd>{text}</dd></div>" for what, text in PAYMENT + FEES)
+    """Published fees, shown only once they have been added to FEES."""
+    if not FEES:
+        return ""
+    rows = "".join(f"<div><dt>{what}</dt><dd>{fee}</dd></div>" for what, fee in FEES)
     return f'''
 <section class="sec sec-tight" id="fees" aria-labelledby="fees-title">
   <div class="wrap sec-split">
-    {sec_head("Fees", "How Crownsmere <em>is paid.</em>", hid="fees-title")}
+    {sec_head("Fees", "Clear fees, <em>agreed in writing.</em>", hid="fees-title")}
     <dl class="fee-list" data-reveal>{rows}</dl>
   </div>
 </section>'''
@@ -623,7 +617,6 @@ about_body = f'''
     </div>
     <div data-reveal>
       <ul class="checks checks-lg">{tenant_help}</ul>
-      <p class="fine">Crownsmere works on commission only, and you are told in writing who pays it before the search begins. <a href="services.html#fees">How Crownsmere is paid</a>.</p>
       <p class="fine">Studying in London? <a href="students.html">Rental help, including professional guarantor options</a>.</p>
     </div>
   </div>

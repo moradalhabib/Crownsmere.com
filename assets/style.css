@@ -582,16 +582,10 @@ h2 { font-size: clamp(32px, 2.6vw + 20px, 52px); }
 
 /* ---------- Fees and client comments (shown once filled in, see tools/build.py) ---------- */
 .fee-list { display: grid; margin: 0; border-top: 1px solid var(--line-strong); }
-/* Phones: each term runs into its text as a bold lead-in, one line shorter per row. */
-.fee-list div { padding: 14px 0; border-bottom: 1px solid var(--line); }
-.fee-list dt { display: inline; font-weight: 600; }
-.fee-list dt::after { content: ". "; }
-.fee-list dd { display: inline; margin: 0; color: var(--ink-2); }
-@media (min-width: 700px) {
-  .fee-list div { display: grid; grid-template-columns: 1fr 1.4fr; gap: 4px 24px; padding: 16px 0; }
-  .fee-list dt, .fee-list dd { display: block; }
-  .fee-list dt::after { content: none; }
-}
+.fee-list div { display: grid; gap: 4px 24px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.fee-list dt { font-weight: 600; }
+.fee-list dd { margin: 0; color: var(--ink-2); }
+@media (min-width: 700px) { .fee-list div { grid-template-columns: 1fr 1.4fr; } }
 .quotes { display: grid; gap: 16px; }
 .quote { margin: 0; padding: 28px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); }
 .quote blockquote { margin: 0; font: italic 500 22px/1.4 var(--serif); }
