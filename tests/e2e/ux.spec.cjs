@@ -5,6 +5,7 @@ const pages = [
   ['/services.html', 'services'],
   ['/about.html', 'about'],
   ['/students.html', 'students'],
+  ['/students-ar.html', 'students-ar'],
   ['/contact.html', 'contact'],
   ['/privacy.html', 'privacy']
 ];
@@ -20,7 +21,7 @@ const viewports = [
 
 /* Visitors complained the site was far too long on phones (the home page was
  * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
-const phoneLength = {home:5400, services:5000, about:4200, students:2800, contact:2700, privacy:4800};
+const phoneLength = {home:5400, services:5000, about:4200, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
@@ -82,6 +83,53 @@ test('every page loads only from crownsmere.com: no third-party requests', async
     await page.waitForTimeout(150);
   }
   expect(outside).toEqual([]);
+});
+
+test('keyboard focus is never hidden behind the header or quick-contact bar (WCAG 2.2)', async ({page}) => {
+  // The browser keeps focus clear of the fixed bars using the page's scroll padding.
+  await page.setViewportSize({width:390,height:844});
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  for (const url of ['/', '/services.html', '/students.html', '/contact.html']) {
+    await page.goto(url);
+    const hidden = [];
+    for (let i = 0; i < 40; i++) {
+      await page.keyboard.press('Tab');
+      const state = await page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || el.closest('.hd, .menu, .actionbar, .skip')) return null;
+        const r = el.getBoundingClientRect();
+        const x = Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), y = r.top + r.height / 2;
+        const top = y >= 0 && y < innerHeight ? document.elementFromPoint(x, y) : null;
+        return (!top || top.closest('.hd, .actionbar')) ? (el.textContent || el.name || el.tagName).trim().slice(0, 40) : null;
+      });
+      if (state) hidden.push(state);
+    }
+    expect(hidden, url).toEqual([]);
+  }
+});
+
+test('photos are served as AVIF where supported, with WebP and JPEG fallbacks', async ({page, browserName}) => {
+  await page.goto('/');
+  const hero = page.locator('.hero img');
+  await expect.poll(() => hero.evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
+  await expect(page.locator('.hero source[type="image/avif"]')).toHaveCount(1);
+  await expect(page.locator('.hero source[type="image/webp"]')).toHaveCount(1);
+  if (browserName === 'chromium') expect(await hero.evaluate(e => e.currentSrc)).toMatch(/townhouse\.avif$/);
+});
+
+test('instant navigation: the prefetch rules are allowed by the content security policy', async ({page}) => {
+  const violations = [];
+  page.on('console', m => { if (/Content Security Policy/i.test(m.text())) violations.push(m.text()); });
+  await page.goto('/');
+  const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
+  const rules = await page.locator('script[type="speculationrules"]').textContent();
+  const digest = await page.evaluate(async text => {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return btoa(String.fromCharCode(...new Uint8Array(buf)));
+  }, rules);
+  expect(csp).toContain("'sha256-" + digest + "'");
+  expect(JSON.parse(rules).prefetch[0].eagerness).toBe('moderate');
+  expect(violations).toEqual([]);
 });
 
 test('home: photo first impression and three clear routes', async ({page}) => {
@@ -202,6 +250,7 @@ test('without JavaScript the navigation and forms still work', async ({browser})
 test('wording stays accurate: drafts are not called sent, consent and privacy text intact', async ({page}) => {
   await page.goto('/students.html');
   expect(await page.locator('main').innerText()).not.toContain('Your enquiry has been sent.');
+  await page.goto('/students-ar.html');
   expect(await page.locator('main').innerHTML()).not.toContain('تم إرسال طلبك.');
   await page.goto('/contact.html');
   const contact = await page.locator('main').textContent();

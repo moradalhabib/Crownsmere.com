@@ -216,7 +216,7 @@
     return "Dear Alaa,\n\n" + paras.join("\n\n") + "\n\nWith kind regards,\n" + name;
   };
 
-  /* If the mail app does not open, the visitor can open the draft again or copy it. */
+  /* If the mail app does not open, the visitor can open the draft again, use webmail, or copy it. */
   var mailBackup = form.querySelector(".contact-mail-backup");
   var backupLink = mailBackup && mailBackup.querySelector("[data-contact-email]");
   var backupCopy = mailBackup && mailBackup.querySelector("[data-contact-copy]");
@@ -268,6 +268,11 @@
     var draft = "mailto:" + recipient + "?cc=" + encodeURIComponent(copyRecipient) +
       "&subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
     if (backupLink) backupLink.href = draft;
+    var q = function (o) { return Object.keys(o).map(function (k) { return k + "=" + encodeURIComponent(o[k]); }).join("&"); };
+    var gmail = mailBackup && mailBackup.querySelector('[data-webmail="gmail"]');
+    var outlook = mailBackup && mailBackup.querySelector('[data-webmail="outlook"]');
+    if (gmail) gmail.href = "https://mail.google.com/mail/?" + q({ view: "cm", fs: "1", to: recipient, cc: copyRecipient, su: subject, body: body });
+    if (outlook) outlook.href = "https://outlook.live.com/mail/0/deeplink/compose?" + q({ to: recipient, cc: copyRecipient, subject: subject, body: body });
     if (backupField) backupField.value = "To: " + recipient + "\nCc: " + copyRecipient + "\nSubject: " + subject + "\n\n" + body;
     if (backupFeedback) backupFeedback.textContent = "";
     if (backupLabel) backupLabel.hidden = true;

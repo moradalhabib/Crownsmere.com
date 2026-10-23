@@ -40,6 +40,10 @@ test('general website brief opens a well-organised email draft, not a third-part
   expect(body).toContain('qa-contact@example.org');
   expect(body).toContain('+447700900123');
   expect(body).toContain('crownsmere.com/contact.html');
+  const gmail=new URL(await backup.locator('[data-webmail="gmail"]').getAttribute('href'));
+  expect(gmail.searchParams.get('to')).toBe('alaa.qadir@crownsmere.com');
+  expect(gmail.searchParams.get('cc')).toBe('hello@crownsmere.com');
+  expect(gmail.searchParams.get('body')).toContain('Furnished two-bedroom flat in Chelsea.');
   await backup.locator('[data-contact-copy]').click();
   await expect(backup.locator('[data-contact-feedback]')).not.toBeEmpty();
   await expect(form.locator('input[name="name"]')).toHaveValue('Crownsmere QA Contact');

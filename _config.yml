@@ -4,6 +4,7 @@ exclude:
   - mail-filter
   - tools
   - README.md
+  - docs
   - tests
   - playwright.config.cjs
   - node_modules

@@ -4,6 +4,8 @@ All page content lives in this file, including the bilingual student page.
 Edit it, then run:  python3 tools/build.py
 (Images, styles and scripts live in assets/.)
 """
+import base64
+import hashlib
 import json
 import os
 import re
@@ -16,7 +18,29 @@ EMAIL = "hello@crownsmere.com"
 # Enquiry forms prepare an email to Alaa, copied to EMAIL. The visitor sends it from their own mail app.
 ALAA = "alaa.qadir@crownsmere.com"
 UPDATED = "22 October 2026"
-UPDATED_ISO = "2026-10-22"
+UPDATED_ISO = "2026-10-23"
+
+# ---------------------------------------------------------------- business details (nothing shows until filled in)
+# UK rules ask estate and letting agents to show some of these on their own website (company details,
+# redress scheme, client money protection, published letting fees). Fill in only facts confirmed in
+# writing (Companies House, the redress scheme, HMRC); anything left as None or empty is not shown.
+BUSINESS = {
+    "legal_name": None,                 # e.g. "Crownsmere Estate Ltd", or the sole trader's name
+    "company_number": None,             # Companies House number, for a limited company
+    "registered_in": None,              # e.g. "England and Wales"
+    "registered_office": None,          # registered office address
+    "vat_number": None,
+    "redress_scheme": None,             # e.g. "The Property Ombudsman"
+    "redress_number": None,             # membership number
+    "client_money_protection": None,    # CMP scheme, if client money is held (lettings)
+    "aml_supervisor": None,             # e.g. "HM Revenue & Customs"
+    "professional_bodies": [],          # e.g. ["Propertymark"]
+}
+# Letting agents in England must publish their fees (including VAT) on their own website.
+# Each entry: (service, fee as clients should read it). Shown on the services page when filled in.
+FEES = []
+# Real client comments only, with their permission: (quote, attribution such as "Buyer, Kensington").
+TESTIMONIALS = []
 
 # ---------------------------------------------------------------- icons (24px line icons)
 P = {
@@ -44,11 +68,17 @@ def ic(name, cls="ic"):
 
 ARROW = ic("arrow", "ic ic-arrow")
 
+def sources(name):
+    """AVIF (smallest) and WebP sources for a photograph, best first."""
+    avif = os.path.exists(os.path.join(OUT, "assets", "img", name + ".avif"))
+    return ((f'<source type="image/avif" srcset="assets/img/{name}.avif">' if avif else "")
+            + f'<source type="image/webp" srcset="assets/img/{name}.webp">')
+
 def pic(name, alt, w, h, cls="", lazy=True, ext="jpg", priority=False):
-    """A <picture> with a WebP source and a JPEG/PNG fallback."""
+    """A <picture> with AVIF and WebP sources and a JPEG/PNG fallback."""
     attrs = f' class="{cls}"' if cls else ""
     load = (' fetchpriority="high"' if priority else "") if not lazy else ' loading="lazy" decoding="async"'
-    return (f'<picture><source type="image/webp" srcset="assets/img/{name}.webp">'
+    return (f'<picture>{sources(name)}'
             f'<img{attrs} src="assets/img/{name}.{ext}" alt="{alt}" width="{w}" height="{h}"{load}></picture>')
 
 LOGO = lambda lazy=False: pic("monogram-sm", "", 165, 259, lazy=lazy, ext="png")
@@ -70,13 +100,26 @@ ORG = {
                     "Notting Hill", "Marylebone", "St John’s Wood", "Hampstead"]],
     "address": {"@type": "PostalAddress", "addressLocality": "London", "addressCountry": "GB"},
     "employee": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant", "worksFor": {"@id": f"{SITE}/#business"}},
+    "contactPoint": {"@type": "ContactPoint", "contactType": "customer service", "email": EMAIL,
+                     "availableLanguage": ["English", "Arabic"]},
     "slogan": "A more personal London.",
     "knowsAbout": ["Prime London property", "Property search", "Off-market property", "Private property sales", "Lettings", "Property investment", "International student lettings"],
 }
 
-CRUMBS = {"services.html": "Services", "about.html": "About", "students.html": "Students", "contact.html": "Contact", "privacy.html": "Privacy notice"}
+CRUMBS = {"services.html": "Services", "about.html": "About", "students.html": "Students", "students-ar.html": "الطلاب",
+          "contact.html": "Contact", "privacy.html": "Privacy notice"}
 
-def head(title, desc, path, extra_ld=None, og_desc=None):
+# Pages in more than one language: each lists every version (hreflang), itself included.
+ALTERNATES = {p: [("en-GB", "students.html"), ("ar", "students-ar.html"), ("x-default", "students.html")]
+              for p in ("students.html", "students-ar.html")}
+
+# Chromium browsers fetch a page in the background when a visitor is about to open it (on hover or
+# press), so moving between pages feels instant. Same-site pages only. The CSP allows exactly this
+# block by its hash, so no other inline script can run.
+SPECULATION = '{"prefetch":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}'
+SPECULATION_HASH = "sha256-" + base64.b64encode(hashlib.sha256(SPECULATION.encode()).digest()).decode()
+
+def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB"):
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = [ORG] + (extra_ld or [])
     if path in CRUMBS:
@@ -88,25 +131,28 @@ def head(title, desc, path, extra_ld=None, og_desc=None):
                    "inLanguage": "en-GB", "publisher": {"@id": f"{SITE}/#business"}})
     og_desc = og_desc or desc
     slug = "home" if path == "index.html" else path.replace(".html", "")
-    preload = ('<link rel="preload" href="assets/img/townhouse.webp" as="image" type="image/webp" fetchpriority="high">\n'
+    preload = ('<link rel="preload" href="assets/img/townhouse.avif" as="image" type="image/avif" fetchpriority="high">\n'
                if path == "index.html" else "")
-    extra_css = '<link rel="stylesheet" href="assets/student.css">\n' if path == "students.html" else ""
+    extra_css = '<link rel="stylesheet" href="assets/student.css">\n' if path.startswith("students") else ""
+    alternates = "".join(f'<link rel="alternate" hreflang="{l}" href="{SITE}/{u}">\n' for l, u in ALTERNATES.get(path, []))
     return f'''<!doctype html>
 <html lang="en-GB" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' '{SPECULATION_HASH}'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; manifest-src 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="format-detection" content="telephone=no">
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#faf7f1">
+<meta name="color-scheme" content="light only">
 <link rel="canonical" href="{canonical}">
+{alternates}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{BRAND}">
-<meta property="og:locale" content="en_GB">
+<meta property="og:locale" content="{og_locale}">
 <meta property="og:url" content="{canonical}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{og_desc}">
@@ -124,12 +170,14 @@ def head(title, desc, path, extra_ld=None, og_desc=None):
 <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="assets/style.css">
-{extra_css}<script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
+{extra_css}<script type="speculationrules">{SPECULATION}</script>
+<script type="application/ld+json">{json.dumps(ld if len(ld) > 1 else ORG, ensure_ascii=False)}</script>
 </head>
 <body class="page-{slug}">
 <a class="skip" href="#main">Skip to content</a>'''
 
 def header(current):
+    current = "students.html" if current == "students-ar.html" else current
     cur = lambda h: ' aria-current="page"' if h == current else ""
     links = "".join(f'<a href="{h}"{cur(h)}>{t}</a>' for h, t in NAV[1:])
     items = "\n".join(f'    <li><a href="{h}"{cur(h)}>{t}</a></li>' for h, t in NAV)
@@ -155,12 +203,34 @@ def header(current):
   </div>
 </nav>'''
 
-def footer(current, quick_href="contact.html", quick_label="Share your brief"):
+def registration():
+    """The company and regulatory line in the footer, built only from details filled in above."""
+    b = BUSINESS
+    parts = []
+    if b["legal_name"]:
+        parts.append(b["legal_name"])
+    if b["company_number"]:
+        parts.append(f'Registered in {b["registered_in"] or "England and Wales"}, company no. {b["company_number"]}')
+    if b["registered_office"]:
+        parts.append(f'Registered office: {b["registered_office"]}')
+    if b["vat_number"]:
+        parts.append(f'VAT no. {b["vat_number"]}')
+    if b["redress_scheme"]:
+        parts.append(f'Member of {b["redress_scheme"]}' + (f' (no. {b["redress_number"]})' if b["redress_number"] else ""))
+    if b["client_money_protection"]:
+        parts.append(f'Client money protection: {b["client_money_protection"]}')
+    if b["aml_supervisor"]:
+        parts.append(f'Anti-money laundering supervision: {b["aml_supervisor"]}')
+    parts += b["professional_bodies"]
+    return f'<p class="ft-reg">{" &middot; ".join(parts)}</p>' if parts else ""
+
+def footer(current, quick_href="contact.html", quick_label="Share your brief", quick_lang=""):
     links = "".join(f'<li><a href="{h}">{t}</a></li>' for h, t in NAV[1:]) + '<li><a href="privacy.html">Privacy</a></li>'
+    lang = f' lang="{quick_lang}"' if quick_lang else ""
     bar = "" if current == "contact.html" else (
         f'\n<nav class="actionbar" aria-label="Quick contact">'
         f'<a class="actionbar-mail" href="mailto:{EMAIL}" aria-label="Email {EMAIL}">{ic("mail")}<span>Email</span></a>'
-        f'<a class="btn btn-primary" href="{quick_href}">{quick_label}{ARROW}</a></nav>')
+        f'<a class="btn btn-primary" href="{quick_href}"{lang}>{quick_label}{ARROW}</a></nav>')
     return f'''
 <footer class="ft">
   <div class="ft-skyline" aria-hidden="true">{pic("skyline", "", 1055, 181)}</div>
@@ -172,12 +242,13 @@ def footer(current, quick_href="contact.html", quick_label="Share your brief"):
     </div>
     <nav class="ft-nav" aria-label="Footer"><ul>{links}</ul></nav>
     <p class="ft-legal">&copy; <span data-year>2026</span> {BRAND} &middot; London, United Kingdom</p>
+    {registration()}
   </div>
 </footer>{bar}
 <script src="assets/main.js"></script>'''
 
-def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", quick=("contact.html", "Share your brief")):
-    html = (head(title, desc, fname, extra_ld, og_desc) + header(fname) + '\n<main id="main">\n' + body + '\n</main>'
+def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", quick=("contact.html", "Share your brief"), og_locale="en_GB"):
+    html = (head(title, desc, fname, extra_ld, og_desc, og_locale) + header(fname) + '\n<main id="main">\n' + body + '\n</main>'
             + footer(fname, *quick) + scripts + '\n</body>\n</html>\n')
     open(os.path.join(OUT, fname), "w").write(html)
     return html
@@ -245,6 +316,8 @@ FAQ = {
     "fees": ("How are fees agreed?",
              "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."),
 }
+if FEES:
+    FAQ["fees"] = (FAQ["fees"][0], FAQ["fees"][1] + ' Our <a href="services.html#fees">published fees</a> are on the services page.')
 HOME_FAQ = ["how", "listings", "agent", "areas", "overseas", "fees"]
 CONTACT_FAQ = ["how", "private", "overseas", "fees"]
 
@@ -286,6 +359,32 @@ def faq(keys):
 def signature(role="Senior Property Consultant"):
     return f'<p class="sig"><b>Alaa Qadir</b><span>{role}</span></p>'
 
+def testimonials():
+    """Client comments, shown only once real ones have been added to TESTIMONIALS."""
+    if not TESTIMONIALS:
+        return ""
+    items = "".join(f'<figure class="quote"><blockquote><p>{q}</p></blockquote><figcaption>{who}</figcaption></figure>' for q, who in TESTIMONIALS)
+    return f'''
+<section class="sec sec-alt" aria-labelledby="clients-title">
+  <div class="wrap">
+    {sec_head("In their words", "What clients <em>say.</em>", hid="clients-title")}
+    <div class="quotes" data-reveal>{items}</div>
+  </div>
+</section>'''
+
+def fees():
+    """Published fees, shown only once they have been added to FEES."""
+    if not FEES:
+        return ""
+    rows = "".join(f"<div><dt>{what}</dt><dd>{fee}</dd></div>" for what, fee in FEES)
+    return f'''
+<section class="sec sec-tight" id="fees" aria-labelledby="fees-title">
+  <div class="wrap sec-split">
+    {sec_head("Fees", "Clear fees, <em>agreed in writing.</em>", hid="fees-title")}
+    <dl class="fee-list" data-reveal>{rows}</dl>
+  </div>
+</section>'''
+
 def cta(heading="Tell me what <em>you are looking for.</em>"):
     return f'''
 <section class="sec cta" aria-labelledby="cta-title">
@@ -323,7 +422,7 @@ facts = "".join(f'<li>{ic(i)}<div><h3>{t}</h3><p>{d}</p></div></li>' for i, t, d
 
 index_body = f'''
 <section class="hero" aria-labelledby="hero-title">
-  <picture class="hero-media"><source type="image/webp" srcset="assets/img/townhouse.webp"><img src="assets/img/townhouse.jpg" alt="A white-stucco London townhouse with a black front door" width="1055" height="687" fetchpriority="high"></picture>
+  <picture class="hero-media">{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="A white-stucco London townhouse with a black front door" width="1055" height="687" fetchpriority="high"></picture>
   <div class="wrap hero-in">
     <p class="eyebrow">Prime London property consultancy</p>
     <h1 id="hero-title">London property, <em>personally handled.</em></h1>
@@ -361,6 +460,7 @@ index_body = f'''
     <ul class="facts" data-reveal>{facts}</ul>
   </div>
 </section>
+{testimonials()}
 
 <section class="sec sec-alt" id="areas" aria-labelledby="areas-title">
   <div class="wrap sec-split">
@@ -414,6 +514,7 @@ services_body = f'''
   </div>
 </section>
 
+{fees()}
 <section class="sec sec-alt" id="process" aria-labelledby="process-title">
   <div class="wrap">
     {sec_head("How it works", "From your brief <em>to the keys.</em>", "A private, unhurried process, shaped entirely around you.", "process-title")}
@@ -465,6 +566,14 @@ page("about.html", "About Crownsmere Estate | Prime London Property Consultancy"
      about_body)
 
 # ---------------------------------------------------------------- contact
+def webmail(label, gmail, outlook):
+    """Compose links for webmail users, filled in by the form scripts. Shown on computers only,
+    where mailto: often opens nothing; phones open their own mail app reliably."""
+    attrs = 'target="_blank" rel="noopener noreferrer"'
+    return (f'<div class="webmail"><span>{label}</span>'
+            f'<a class="btn btn-ghost" data-webmail="gmail" href="https://mail.google.com/mail/?view=cm&amp;fs=1" {attrs}>{gmail}</a>'
+            f'<a class="btn btn-ghost" data-webmail="outlook" href="https://outlook.live.com/mail/0/deeplink/compose" {attrs}>{outlook}</a></div>')
+
 def choice(name, val, checked=False, required=False):
     return f'<label class="choice"><input type="radio" name="{name}" value="{val}"{" checked" if checked else ""}{" required" if required else ""}><span>{val}</span></label>'
 
@@ -547,6 +656,7 @@ contact_body = f'''
             <a class="btn btn-primary" data-contact-email href="mailto:{EMAIL}">Open prepared email{ARROW}</a>
             <button class="btn btn-ghost" type="button" data-contact-copy>Copy my enquiry</button>
           </div>
+          {webmail("Use webmail instead:", "Open in Gmail", "Open in Outlook")}
           <p data-contact-feedback aria-live="polite"></p>
           <label class="contact-copy-label" hidden>Prepared enquiry<textarea rows="8" readonly data-contact-text></textarea></label>
         </div>
@@ -577,7 +687,8 @@ page("contact.html", f"Share Your Property Brief | {BRAND}",
      contact_body)
 
 # ---------------------------------------------------------------- students (English and Arabic)
-# Both languages are in the page; assets/student.js shows one and prepares the email.
+# Each language has its own page (students.html, students-ar.html), linked by hreflang so search
+# engines show Arabic speakers the Arabic page. assets/student.js runs the form and prepares the email.
 # Field names and option values stay in English so Alaa receives consistent emails.
 STUDENT = {
     "en": dict(
@@ -621,8 +732,10 @@ STUDENT = {
         fb_label="Alternative enquiry delivery", fb_h="Your email draft is ready",
         fb_p="Your completed application is ready in a professionally formatted email addressed to Alaa, with a copy to Crownsmere. Review it and press <strong>Send</strong> in your mail app. If no email app opens, use the buttons below; your answers remain on this page.",
         fb_open="Open prepared email", fb_copy="Copy completed enquiry", fb_text="Your completed enquiry",
+        webmail=("Use webmail instead:", "Open in Gmail", "Open in Outlook"),
         advice_h="Good to know",
-        advice=["This is a free initial enquiry, not a guarantor application or guarantee of acceptance.",
+        advice=["<strong>New since 1 May 2026:</strong> under the Renters&rsquo; Rights Act 2025, most private landlords in England can ask for no more than one month&rsquo;s rent before a new tenancy starts, so paying several months upfront is rarely an option now. A UK or professional guarantor is often the alternative. University halls and some purpose-built student accommodation follow different rules.",
+                "This is a free initial enquiry, not a guarantor application or guarantee of acceptance.",
                 "Professional guarantor providers decide eligibility and fees. The landlord or agent must agree to accept the proposed guarantor; approval is not guaranteed.",
                 "You can choose whether to use a professional guarantor provider. Crownsmere may receive a disclosed referral fee from partners.",
                 "Please do not upload or enter passports, bank statements or other sensitive identification details here."],
@@ -669,8 +782,10 @@ STUDENT = {
         fb_label="طريقة بديلة لإرسال الاستفسار", fb_h="رسالة طلبك جاهزة",
         fb_p="تم تجهيز طلبك في رسالة بريد إلكتروني منظمة موجهة إلى علا، مع إرسال نسخة إلى Crownsmere. راجع الرسالة واضغط <strong>إرسال</strong> من تطبيق البريد. إذا لم يفتح التطبيق، استخدم الأزرار أدناه وستبقى إجاباتك محفوظة هنا.",
         fb_open="فتح البريد المُجهّز", fb_copy="نسخ الطلب المكتمل", fb_text="تفاصيل طلبك",
+        webmail=("أو استخدم البريد عبر المتصفح:", "فتح في Gmail", "فتح في Outlook"),
         advice_h="معلومات مهمة",
-        advice=["هذا طلب مساعدة أولي مجاني، وليس طلب ضمان رسمي ولا وعداً بالموافقة.",
+        advice=["<strong>جديد منذ 1 مايو 2026:</strong> بموجب قانون حقوق المستأجرين لعام 2025، لا يجوز لمعظم الملاك في إنجلترا طلب أكثر من إيجار شهر واحد مقدماً قبل بدء عقد الإيجار الجديد، لذا لم يعد دفع إيجار عدة أشهر مقدماً خياراً متاحاً في الغالب، وأصبح الضامن المقيم في المملكة المتحدة أو الضامن المهني هو البديل المعتاد. تخضع السكنات الجامعية وبعض مساكن الطلاب المخصصة لقواعد مختلفة.",
+                "هذا طلب مساعدة أولي مجاني، وليس طلب ضمان رسمي ولا وعداً بالموافقة.",
                 "يحدد مقدم خدمة الضمان الأهلية والرسوم، ويجب أن يوافق المالك أو الوكيل على الضامن المقترح.",
                 "اختيار خدمة الضمان المهني يعود إليك. وقد تتلقى Crownsmere عمولة إحالة معلنة من بعض الشركاء.",
                 "يرجى عدم إدخال أرقام جواز السفر أو كشوف الحسابات البنكية أو بيانات الهوية الحساسة هنا."],
@@ -680,7 +795,6 @@ STUDENT = {
 
 def student_panel(lang):
     s = STUDENT[lang]
-    hidden = " hidden" if lang == "ar" else ""
     opts = lambda pairs: "".join(f'<option value="{v}">{t}</option>' for v, t in pairs)
     def radios(name, pairs, first_checked=True, required=True, small=False):
         cls = "std-radio std-radio-small" if small else "std-radio"
@@ -693,7 +807,7 @@ def student_panel(lang):
     back = f'<button class="btn btn-ghost" type="button" data-back>{s["back"]}</button>'
     st = s["status"]
     copy_dir = ' dir="auto"' if lang == "ar" else ""
-    return f'''<div class="student-language" data-language-panel="{lang}" lang="{lang}" dir="{s["dir"]}"{hidden}>
+    return f'''<div class="student-language" data-language-panel="{lang}" lang="{lang}" dir="{s["dir"]}">
   <div class="wrap stu">
     <div class="stu-intro">
       <p class="eyebrow">{s["eyebrow"]}</p>
@@ -746,6 +860,7 @@ def student_panel(lang):
             <a class="btn btn-primary std-email-link" data-email-fallback href="mailto:{ALAA}?cc=hello%40crownsmere.com">{s["fb_open"]} <span aria-hidden="true">{s["arrow"]}</span></a>
             <button class="btn btn-ghost" type="button" data-copy-fallback>{s["fb_copy"]}</button>
           </div>
+          {webmail(*s["webmail"])}
           <p class="std-copy-feedback" data-copy-feedback aria-live="polite"></p>
           <label class="std-copy-label" hidden>{s["fb_text"]}<textarea class="std-copy-text" data-copy-text rows="7" readonly{copy_dir}></textarea></label>
         </section>
@@ -759,21 +874,28 @@ def student_panel(lang):
   </div>
 </div>'''
 
-students_body = f'''
-<div class="student-language-bar wrap" role="group" aria-label="Choose language / اختر اللغة">
-  <div class="lang-switch"><button type="button" data-lang-switch="en" aria-pressed="true" class="is-active">English</button><button type="button" data-lang-switch="ar" aria-pressed="false" lang="ar">العربية</button></div>
-</div>
-{student_panel("en")}
-{student_panel("ar")}'''
+def students_body(lang):
+    cur = lambda l: ' aria-current="page"' if l == lang else ""
+    return f'''
+<nav class="student-language-bar wrap" aria-label="Language / اللغة">
+  <div class="lang-switch"><a href="students.html" hreflang="en" lang="en"{cur("en")}>English</a><a href="students-ar.html" hreflang="ar" lang="ar"{cur("ar")}>العربية</a></div>
+</nav>
+{student_panel(lang)}'''
 
-STUDENT_LD = {"@context": "https://schema.org", "@type": "WebPage", "name": "International Student Lettings & Guarantor Help",
-              "url": f"{SITE}/students.html", "inLanguage": ["en-GB", "ar"]}
-
+STUDENT_SCRIPT = '\n<script src="assets/student.js" defer></script>'
 page("students.html", f"International Student Lettings & Guarantor Help | {BRAND}",
-     "Find a London rental home and explore guarantor options with Crownsmere Estate. Bilingual English and Arabic enquiries for international students.",
-     students_body, extra_ld=[STUDENT_LD],
+     "Find a London rental home and explore guarantor options with Crownsmere Estate. English and Arabic enquiries for international students.",
+     students_body("en"),
+     extra_ld=[{"@context": "https://schema.org", "@type": "WebPage", "name": "International Student Lettings & Guarantor Help",
+                "url": f"{SITE}/students.html", "inLanguage": "en-GB"}],
      og_desc="Find London rentals and explore guarantor options. English and Arabic assistance for international students from Crownsmere Estate.",
-     scripts='\n<script src="assets/student.js" defer></script>', quick=("#en-form", "Start enquiry"))
+     scripts=STUDENT_SCRIPT, quick=("#en-form", "Start enquiry"))
+page("students-ar.html", f"مساعدة الطلاب الدوليين في الإيجار والضامن في لندن | {BRAND}",
+     "ابحث عن سكن للإيجار في لندن واستكشف خيارات الضامن مع Crownsmere Estate. خدمة باللغة العربية للطلاب الدوليين.",
+     students_body("ar"),
+     extra_ld=[{"@context": "https://schema.org", "@type": "WebPage", "name": "مساعدة الطلاب الدوليين في الإيجار والضامن",
+                "url": f"{SITE}/students-ar.html", "inLanguage": "ar"}],
+     scripts=STUDENT_SCRIPT, quick=("#ar-form", "ابدأ الاستفسار", "ar"), og_locale="ar_AR")
 
 # ---------------------------------------------------------------- privacy
 privacy_body = f'''
@@ -851,9 +973,13 @@ html = html.replace('<link rel="canonical" href="https://crownsmere.com/404.html
 open(os.path.join(OUT, "404.html"), "w").write(html)
 
 # ---------------------------------------------------------------- SEO files
-pages = [("", "1.0"), ("services.html", "0.9"), ("about.html", "0.8"), ("students.html", "0.9"), ("contact.html", "0.9"), ("privacy.html", "0.3")]
-sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
-    f"  <url><loc>{SITE}/{p}</loc><lastmod>{UPDATED_ISO}</lastmod><priority>{pr}</priority></url>\n" for p, pr in pages) + "</urlset>\n"
+pages = [("", "1.0"), ("services.html", "0.9"), ("about.html", "0.8"), ("students.html", "0.9"), ("students-ar.html", "0.9"),
+         ("contact.html", "0.9"), ("privacy.html", "0.3")]
+def sitemap_alternates(p):
+    return "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{SITE}/{u}"/>' for l, u in ALTERNATES.get(p, []))
+sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+           + "".join(f"  <url><loc>{SITE}/{p}</loc>{sitemap_alternates(p)}<lastmod>{UPDATED_ISO}</lastmod><priority>{pr}</priority></url>\n" for p, pr in pages)
+           + "</urlset>\n")
 open(os.path.join(OUT, "sitemap.xml"), "w").write(sitemap)
 open(os.path.join(OUT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 manifest = {
