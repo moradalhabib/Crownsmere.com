@@ -41,6 +41,11 @@ BUSINESS = {
 FEES = []
 # Real client comments only, with their permission: (quote, attribution such as "Buyer, Kensington").
 TESTIMONIALS = []
+# Alaa's profile (about.html). PORTRAIT is the file name of a professional photograph in assets/img
+# (e.g. "alaa-qadir" for alaa-qadir.jpg, with .webp/.avif versions), shown instead of the townhouse door.
+PORTRAIT = None
+# Verified figures only, e.g. ("12 years", "in prime London property"). Shown as a track record when filled in.
+TRACK_RECORD = []
 
 # ---------------------------------------------------------------- icons (24px line icons)
 P = {
@@ -87,7 +92,7 @@ def btn(href, text, kind="primary", arrow=True, extra=""):
     return f'<a class="btn btn-{kind}" href="{href}"{extra}>{text}{ARROW if arrow else ""}</a>'
 
 # ---------------------------------------------------------------- chrome
-NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About"), ("students.html", "Students"), ("contact.html", "Contact")]
+NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
 
 ORG = {
     "@context": "https://schema.org", "@type": "RealEstateAgent", "@id": f"{SITE}/#business",
@@ -106,7 +111,7 @@ ORG = {
     "knowsAbout": ["Prime London property", "Property search", "Off-market property", "Private property sales", "Lettings", "Property investment", "International student lettings"],
 }
 
-CRUMBS = {"services.html": "Services", "about.html": "About", "students.html": "Students", "students-ar.html": "الطلاب",
+CRUMBS = {"services.html": "Services", "about.html": "About Alaa Qadir", "students.html": "Students", "students-ar.html": "الطلاب",
           "contact.html": "Contact", "privacy.html": "Privacy notice"}
 
 # Pages in more than one language: each lists every version (hreflang), itself included.
@@ -228,7 +233,7 @@ def registration():
 
 def footer(current, quick_href="contact.html", quick_label="Share your brief", quick_lang=""):
     links = "".join(f'<li><a href="{h}">{t}</a></li>' for h, t in NAV[1:]) + '<li><a href="privacy.html">Privacy</a></li>'
-    lang = f' lang="{quick_lang}"' if quick_lang else ""
+    lang = f' lang="{quick_lang}"' + (' dir="rtl"' if quick_lang == "ar" else "") if quick_lang else ""
     bar = "" if current == "contact.html" else (
         f'\n<nav class="actionbar" aria-label="Quick contact">'
         f'<a class="actionbar-mail" href="mailto:{EMAIL}" aria-label="Email {EMAIL}">{ic("mail")}<span>Email</span></a>'
@@ -283,20 +288,6 @@ STEPS = [
     ("Share your brief", "A private conversation about what you are looking for, why, and when. No detail is too small."),
     ("See a curated shortlist", "I search personally, on and off the market, and check every property before you see it."),
     ("View, negotiate, complete", "Accompanied viewings, calm negotiation and support through to completion, and long after."),
-]
-
-PILLARS = [
-    ("person", "Personal representation", "You deal directly with me, from the first conversation to the final signature. No call centre, no junior negotiators, no hand-offs."),
-    ("lock", "Off-market access", "Many of London&rsquo;s finest homes change hands quietly. A discreet network of owners, agents and advisers opens doors that never appear online."),
-    ("pin", "Prime London insight", "Neighbourhood-level knowledge across Prime and Super Prime London, built through experience and long-standing relationships."),
-    ("scales", "Skilled negotiation", "Calm, strategic negotiation to achieve the best possible outcome, backed by objectivity and a deep understanding of the market."),
-]
-
-EXPECT = [
-    ("speech", "Clear communication", "Regular updates and honest feedback at every stage."),
-    ("person", "Tailored guidance", "Advice specific to your brief and your goals."),
-    ("shield", "Complete discretion", "Your search, your plans and your details stay private."),
-    ("heart", "Attentive support", "A responsive, hands-on approach from start to finish."),
 ]
 
 AREAS = ["Mayfair", "Belgravia", "Knightsbridge", "Chelsea", "Kensington", "Holland Park",
@@ -458,6 +449,7 @@ index_body = f'''
       <h2 id="why-title">Not a typical <em>estate agency.</em></h2>
       <p>Rather than selling whatever happens to be on the books, I work from your brief and search personally for what is genuinely right for you. Each client is taken on individually, and you deal with me directly, from the first conversation to the day you collect the keys.</p>
       {signature()}
+      <a class="more" href="about.html">Meet Alaa{ARROW}</a>
     </div>
     <ul class="facts" data-reveal>{facts}</ul>
   </div>
@@ -529,43 +521,118 @@ page("services.html", f"Property Search, Private Sales & Lettings | {BRAND}",
      "Buying, private sales, lettings, investment and independent property advice in prime London, delivered personally and discreetly by Crownsmere Estate.",
      services_body)
 
-# ---------------------------------------------------------------- about
-pillars = "".join(f'<div class="card" data-reveal>{ic(i)}<h3>{t}</h3><p>{d}</p></div>' for i, t, d in PILLARS)
-promises = "".join(f'<li>{ic(i)}<div><h3>{t}</h3><p>{d}</p></div></li>' for i, t, d in EXPECT)
+# ---------------------------------------------------------------- about: Alaa Qadir's profile
+QUALITIES = [
+    ("person", "A full one-to-one service", "You deal with Alaa directly, from the first conversation to the keys. No call centre, no hand-offs."),
+    ("people", "Well connected", "A discreet network of owners, agents and advisers opens doors to homes that never appear online."),
+    ("scales", "Direct negotiation, on your side", "Alaa negotiates with sellers, landlords and their agents for you: price or rent, terms and timing."),
+    ("heart", "Client care", "Honest updates at every stage, viewings arranged around you, and support after you move in."),
+    ("pin", "Prime London insight", "Street-by-street knowledge of Prime and Super Prime London, built over long-standing relationships."),
+    ("shield", "Complete discretion", "Your plans and your details stay private, shared only with your agreement."),
+]
+TENANT_HELP = [
+    "A search to your brief, on and off the market, including homes not yet advertised to rent",
+    "Accompanied viewings, with an honest view on every property",
+    "Direct negotiation of the rent, tenancy length, move-in date, furnishings and other terms",
+    "Clear guidance on deposits, rent in advance and what to expect before you commit",
+]
+AUDIENCES = [
+    ("services.html#buy", "Buyers", "A home or a pied-&agrave;-terre"),
+    ("services.html#let", "Tenants", "The right rental, negotiated for you"),
+    ("services.html#sell", "Owners selling", "A quiet, private sale"),
+    ("services.html#let", "Landlords", "The right tenant, found discreetly"),
+    ("services.html#invest", "Investors", "Opportunities sourced to your brief"),
+    ("students.html", "International students", "Rentals and guarantor options"),
+]
+
+qualities = "".join(f'<div class="card" data-reveal>{ic(i)}<h3>{t}</h3><p>{d}</p></div>' for i, t, d in QUALITIES)
+tenant_help = "".join(f"<li>{ic('check')}<span>{t}</span></li>" for t in TENANT_HELP)
+audiences = "".join(f'<a class="who" href="{h}"><b>{t}</b><span>{d}</span>{ic("chevron", "ic who-go")}</a>' for h, t, d in AUDIENCES)
+portrait = (pic(PORTRAIT, "Alaa Qadir, Senior Property Consultant at Crownsmere Estate", 800, 1000, lazy=False) if PORTRAIT
+            else pic("door", "A black-lacquered London front door with brass fittings beside white columns", 433, 610, lazy=False))
+
+def track_record():
+    """Verified figures, shown only once they have been added to TRACK_RECORD."""
+    if not TRACK_RECORD:
+        return ""
+    items = "".join(f"<div><dt>{label}</dt><dd>{figure}</dd></div>" for figure, label in TRACK_RECORD)
+    return f'''
+<section class="sec sec-tight" aria-labelledby="record-title">
+  <div class="wrap">
+    {sec_head("Track record", "Results, <em>quietly achieved.</em>", hid="record-title")}
+    <dl class="stats" data-reveal>{items}</dl>
+  </div>
+</section>'''
 
 about_body = f'''
-{page_hero("About", "Why <em>Crownsmere.</em>", "Work directly with Alaa Qadir on a property search shaped around your priorities.")}
+<section class="profile-hero">
+  <div class="wrap profile">
+    <div class="profile-copy">
+      <p class="eyebrow">Senior Property Consultant &middot; {BRAND}</p>
+      <h1>Alaa <em>Qadir.</em></h1>
+      <p class="lede">A one-to-one property consultant in prime London. Alaa finds, negotiates and secures homes for buyers and tenants, and represents owners who want a quiet, well-handled sale or let.</p>
+      <ul class="tags tags-sm"><li>One-to-one service</li><li>Prime London</li><li>Buyers, tenants and owners</li><li>Enquiries in English and Arabic</li></ul>
+      <div class="btn-row">
+        {btn("contact.html", "Share your brief")}
+        {btn(f"mailto:{EMAIL}", "Email Alaa", "ghost", arrow=False)}
+      </div>
+    </div>
+    <figure class="profile-media">{portrait}</figure>
+  </div>
+</section>
 
-<section class="sec sec-tight">
-  <div class="wrap story">
-    <figure class="story-media" data-reveal>{pic("door", "A black-lacquered London front door with brass fittings beside white columns", 433, 610)}</figure>
-    <div class="story-copy" data-reveal>
-      <p class="lead">As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
-      <p>Property is about people, not just buildings. I take on a small number of clients so that each one receives my full attention, honest advice and a search shaped entirely around them.</p>
-      <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to the final signature, you deal directly with me, in complete confidence.</p>
-      {signature(f"Senior Property Consultant &middot; {BRAND}")}
+<section class="sec sec-tight" aria-labelledby="story-title">
+  <div class="wrap story-text" data-reveal>
+    <h2 id="story-title" class="visually-hidden">In Alaa&rsquo;s words</h2>
+    <p class="lead">As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
+    <p>Property is about people, not just buildings. I take on a small number of clients so that each one receives my full attention, honest advice and a search shaped entirely around them.</p>
+    <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to the final signature, you deal directly with me, in complete confidence.</p>
+    {signature(f"Senior Property Consultant &middot; {BRAND}")}
+  </div>
+</section>
+
+<section class="sec sec-alt" aria-labelledby="working-title">
+  <div class="wrap">
+    {sec_head("Working with Alaa", "Personal, connected, <em>on your side.</em>", hid="working-title")}
+    <div class="cards cards-3">{qualities}</div>
+  </div>
+</section>
+
+<section class="sec" id="tenants" aria-labelledby="tenants-title">
+  <div class="wrap split">
+    <div class="split-copy" data-reveal>
+      <p class="eyebrow">For tenants</p>
+      <h2 id="tenants-title">Renting, with someone <em>on your side.</em></h2>
+      <p>When you ask Alaa to find you a home to rent, she represents you: searching, viewing and negotiating directly with landlords and their agents on your behalf, so you secure the right home on the right terms.</p>
+      <div class="btn-row">{btn("contact.html", "Share your rental brief")}</div>
+    </div>
+    <div data-reveal>
+      <ul class="checks checks-lg">{tenant_help}</ul>
+      <p class="fine">Studying in London? <a href="students.html">Rental help, including professional guarantor options</a>.</p>
     </div>
   </div>
 </section>
 
-<section class="sec sec-alt" aria-labelledby="difference-title">
+<section class="sec sec-alt" aria-labelledby="who-title">
   <div class="wrap">
-    {sec_head("The Crownsmere difference", "A more personal approach. <em>Better decisions.</em>", hid="difference-title")}
-    <div class="cards">{pillars}</div>
+    {sec_head("Who Alaa works with", "One consultant, <em>every side of the move.</em>", hid="who-title")}
+    <div class="whos" data-reveal>{audiences}</div>
   </div>
 </section>
+{track_record()}
+{testimonials()}
+{cta("Work with <em>Alaa.</em>")}'''
 
-<section class="sec" aria-labelledby="expect-title">
-  <div class="wrap">
-    {sec_head("What you can expect", "Four promises, <em>kept every time.</em>", hid="expect-title")}
-    <ul class="facts facts-4" data-reveal>{promises}</ul>
-  </div>
-</section>
-{cta()}'''
+PROFILE_LD = {"@context": "https://schema.org", "@type": "ProfilePage", "url": f"{SITE}/about.html",
+              "mainEntity": {"@type": "Person", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant",
+                             "worksFor": {"@id": f"{SITE}/#business"}, "workLocation": {"@type": "City", "name": "London"},
+                             "knowsAbout": ["Prime London property", "Property search", "Off-market property",
+                                            "Negotiation for buyers and tenants", "Private sales", "Lettings"],
+                             **({"image": f"{SITE}/assets/img/{PORTRAIT}.jpg"} if PORTRAIT else {})}}
 
-page("about.html", "About Crownsmere Estate | Prime London Property Consultancy",
-     "A personal, discreet property consultancy for prime London. Meet Alaa Qadir, Senior Property Consultant: off-market access and skilled negotiation.",
-     about_body)
+page("about.html", f"Alaa Qadir, Senior Property Consultant | {BRAND}",
+     "Meet Alaa Qadir: a one-to-one property consultant in prime London, well connected and negotiating directly for buyers and tenants, with discreet sales and lettings for owners.",
+     about_body, extra_ld=[PROFILE_LD])
 
 # ---------------------------------------------------------------- contact
 def webmail(label, gmail, outlook):

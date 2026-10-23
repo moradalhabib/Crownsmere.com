@@ -47,7 +47,7 @@ Sources: [ABA GPSolo, 2026](https://www.americanbar.org/groups/gpsolo/resources/
 ## 5. What only the business can supply (in priority order)
 1. **Regulatory and company details** in `BUSINESS`: legal name, company number and registered office (if a company), redress scheme and membership number, client money protection (if client money is held), AML supervisor, VAT number.
 2. **Letting fees** in `FEES`, if Crownsmere charges landlords or tenants for lettings work. A legal requirement for letting agents in England.
-3. **A professional photograph of Alaa** for the About page and home "Why Crownsmere" section: the most effective trust signal for a one-to-one service.
+3. **A professional photograph of Alaa** (`PORTRAIT`) for her profile page, and **verified figures** for `TRACK_RECORD` (for example years in prime London property, or homes found). A real face and real numbers are the strongest trust signals for a one-to-one service.
 4. **Real client testimonials** (with permission) in `TESTIMONIALS`, and a Google Business Profile to collect reviews.
 5. **Higher-resolution originals** of the photographs (the home photo is 1,055px wide and looks soft on large screens).
 6. **Arabic versions of the main pages**, written or reviewed by a native speaker.

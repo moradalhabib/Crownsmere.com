@@ -4,10 +4,10 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 
 ## Structure
 - `tools/build.py`: **the source of every page**, including both student pages. Edit the content there and run `python3 tools/build.py` (excluded from the website). The `rebuild-ux` workflow also regenerates the pages on every push to `main`.
-- **Business details to fill in** (top of `tools/build.py`): `BUSINESS` (company and regulatory details), `FEES` (published letting fees) and `TESTIMONIALS` (real client comments). Each shows on the site only once filled in. See `docs/research-2026-10.md` for why they matter.
+- **Business details to fill in** (top of `tools/build.py`): `BUSINESS` (company and regulatory details), `FEES` (published letting fees), `TESTIMONIALS` (real client comments), `PORTRAIT` (Alaa's photograph) and `TRACK_RECORD` (verified figures). Each shows on the site only once filled in. See `docs/research-2026-10.md` for why they matter.
 - `index.html`: photo hero, three routes (find a home, sell or let, international students), how it works, why Crownsmere, neighbourhoods, questions and a closing call to action
 - `services.html`: buy, sell, let, invest and advisory, a student lettings callout, and how it works
-- `about.html`: Alaa's approach, the Crownsmere difference and what clients can expect
+- `about.html`: Alaa Qadir's profile ("About Alaa"): her one-to-one service, network, direct negotiation for buyers and tenants, client care, who she works with, and her track record and client comments once supplied
 - `students.html` (English) and `students-ar.html` (Arabic), with `assets/student.css` and `assets/student.js`: international-student rental and guarantor-assistance enquiry, written up as an organised email to Alaa Qadir with hello@crownsmere.com copied. This is an initial enquiry, not a paid guarantor application. Each language has its own address, linked with `hreflang`; old `students.html?lang=ar` links redirect to the Arabic page.
 - `contact.html`: the three-step brief form, with what happens next and the direct email address
 - `privacy.html`: UK GDPR privacy notice (linked from the footer and the forms)
@@ -26,7 +26,7 @@ Visitors found the old site far too long on phones: the home page was 16 screens
 | --- | --- | --- |
 | Home | 13,523px (16 screens) | 4,946px (under 6) |
 | Services | 7,337px | 4,573px |
-| About | 6,273px | 3,799px |
+| About (now Alaa's profile) | 6,273px | 4,838px |
 | Students | 3,750px | 2,616px |
 | Contact | 3,190px | 2,316px |
 

@@ -21,7 +21,7 @@ const viewports = [
 
 /* Visitors complained the site was far too long on phones (the home page was
  * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
-const phoneLength = {home:5400, services:5000, about:4200, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
+const phoneLength = {home:5400, services:5000, about:5100, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
@@ -183,6 +183,26 @@ test('home: photo first impression and three clear routes', async ({page}) => {
   for (const h of tall) expect(h).toBeLessThan(150);
   await page.locator('.path[href="students.html"]').click();
   await expect(page).toHaveURL(/students\.html/);
+});
+
+test('about: Alaa Qadir profile covers how she works, with nothing invented', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  await page.locator('#why a.more[href="about.html"]').click();
+  await expect(page).toHaveURL(/about\.html$/);
+  await expect(page).toHaveTitle(/Alaa Qadir/);
+  await expect(page.locator('h1')).toContainText('Alaa');
+  for (const quality of ['one-to-one service', 'Well connected', 'Direct negotiation', 'Client care', 'Complete discretion']) {
+    await expect(page.locator('.card h3', {hasText: new RegExp(quality, 'i')})).toHaveCount(1);
+  }
+  await expect(page.locator('#tenants')).toContainText('negotiating directly with landlords');
+  await expect(page.locator('.whos .who')).toHaveCount(6);
+  // Figures and client comments appear only once real ones are supplied.
+  await expect(page.locator('.stats')).toHaveCount(0);
+  const ld = await page.locator('script[type="application/ld+json"]').textContent();
+  const profile = JSON.parse(ld).find(x => x['@type'] === 'ProfilePage');
+  expect(profile.mainEntity.name).toBe('Alaa Qadir');
+  expect(profile.mainEntity.jobTitle).toBe('Senior Property Consultant');
 });
 
 test('services: each service has its own section and the jump links reach them', async ({page}) => {
