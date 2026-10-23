@@ -19,8 +19,6 @@ const viewports = [
   {name:'desktop-1440',width:1440,height:900}
 ];
 
-/* Visitors complained the site was far too long on phones (the home page was
- * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
 /* On phones the quick-contact bar slides in once the page has scrolled. Playwright scrolls a link
  * into view and checks nothing covers it, but the page can show the bar just after that check, so
  * the tap lands on the bar instead (seen in Firefox). Centre the link, let the page settle, then tap. */
@@ -30,6 +28,8 @@ async function tapBelowTheFold(link) {
   await link.click();
 }
 
+/* Visitors complained the site was far too long on phones (the home page was
+ * 16 screens). These are the most each page may measure on a 390 x 844 phone. */
 const phoneLength = {home:5400, services:5000, about:5100, students:3000, 'students-ar':3200, contact:2700, privacy:4800};
 
 for (const [url,name] of pages) {
