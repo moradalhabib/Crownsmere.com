@@ -53,13 +53,16 @@
   /* ---------- Gentle reveal as sections come into view ---------- */
   var revealEls = document.querySelectorAll("[data-reveal]");
   if ("IntersectionObserver" in window && !reduce && revealEls.length) {
+    // This script is deferred, so the page may already be on screen: sections already in view stay
+    // as they are, and only those further down fade in.
+    revealEls.forEach(function (el) { if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("in"); });
     root.classList.add("reveal-on");
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
       });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
-    revealEls.forEach(function (el) { io.observe(el); });
+    revealEls.forEach(function (el) { if (!el.classList.contains("in")) io.observe(el); });
   }
 
   /* ---------- Brief form: three short steps, then a prepared email ----------

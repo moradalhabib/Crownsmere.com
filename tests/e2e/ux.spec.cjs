@@ -34,9 +34,10 @@ async function tapBelowTheFold(link) {
 
 /* Visitors complained the site was far too long on phones (the home page was
  * 16 screens). These are the most each page may measure on a 390 x 844 phone.
- * The home page is a short front door; each service has its own short page. */
-const phoneLength = {home:2500, services:3700, buy:2700, sell:1900, rent:3300, invest:1900, advisory:1900,
-                     about:5300, students:3000, 'students-ar':3200, contact:2900, privacy:4800};
+ * The home page is a short front door; each service has its own short page. The footer links to
+ * every page and each service page answers a few questions, for search engines as well as visitors. */
+const phoneLength = {home:2800, services:3900, buy:3400, sell:2450, rent:3900, invest:2400, advisory:2400,
+                     about:5500, students:3100, 'students-ar':3200, contact:3100, privacy:4800};
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
@@ -281,7 +282,7 @@ test('phones and tablets: the header and the tab bar stay on screen while scroll
 
 test('tab bar: five tabs on every page, the current one marked, and each tab opens its page', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
-  const current = {'/': 'index.html', '/services.html': 'services.html', '/buy.html': 'services.html', '/about.html': 'about.html',
+  const current = {'/': './', '/services.html': 'services.html', '/buy.html': 'services.html', '/about.html': 'about.html',
                    '/students.html': 'students.html', '/contact.html': 'contact.html', '/privacy.html': null};
   for (const [url, tab] of Object.entries(current)) {
     await page.goto(url);
@@ -301,9 +302,9 @@ test('tab bar: five tabs on every page, the current one marked, and each tab ope
   await expect(ar.locator('a[aria-current="page"]')).toHaveAttribute('href', 'students-ar.html');
   // Each tab opens its page.
   await page.goto('/');
-  for (const href of ['services.html', 'about.html', 'students.html', 'contact.html', 'index.html']) {
+  for (const href of ['services.html', 'about.html', 'students.html', 'contact.html', './']) {
     await page.locator('.tabbar a[href="' + href + '"]').click();
-    await expect(page).toHaveURL(new RegExp(href.replace('.', '\\.') + '$'));
+    await expect(page).toHaveURL(href === './' ? /:8765\/$/ : new RegExp(href.replace('.', '\\.') + '$'));
   }
   // On computers the header navigation takes over.
   await page.setViewportSize({width:1280,height:800});
@@ -353,6 +354,51 @@ test('without JavaScript the navigation and forms still work', async ({browser})
   await expect(form.locator('.step')).toHaveCount(3);
   await expect(form.locator('button[type="submit"]')).toBeVisible();
   await ctx.close();
+});
+
+test('search engines: titles, descriptions, canonical addresses, languages, structured data and links', async ({page, request}) => {
+  const titles = new Set(), descriptions = new Set();
+  for (const [url] of pages) {
+    await page.goto(url);
+    const canonical = 'https://crownsmere.com' + url;
+    const title = await page.title();
+    const description = await page.locator('meta[name="description"]').getAttribute('content');
+    // Short enough not to be cut off in results (Arabic script is denser, so its page is allowed more).
+    expect(title.length, url).toBeLessThanOrEqual(url === '/students-ar.html' ? 75 : 63);
+    expect(description.length, url).toBeGreaterThanOrEqual(100);
+    expect(description.length, url).toBeLessThanOrEqual(160);
+    expect(titles.has(title) || descriptions.has(description), url + ' repeats another page').toBe(false);
+    titles.add(title); descriptions.add(description);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonical);
+    await expect(page.locator('html')).toHaveAttribute('lang', url === '/students-ar.html' ? 'ar' : 'en-GB');
+    await expect(page.locator('h1')).toHaveCount(1);
+    // The home page is linked by its canonical address, never as index.html.
+    expect(await page.locator('a[href="index.html"]').count(), url).toBe(0);
+    // Every service, and the Arabic page, is one step away from every page.
+    for (const href of ['services.html', 'buy.html', 'sell.html', 'rent.html', 'invest.html', 'advisory.html', 'students-ar.html']) {
+      await expect(page.locator('.ft-nav a[href="' + href + '"]'), url + ' footer ' + href).toHaveCount(1);
+    }
+    // One connected description: the page belongs to the website, which belongs to the business.
+    const ld = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+    const ids = new Set(ld.map(x => x['@id']).filter(Boolean));
+    const webpage = ld.find(x => x['@id'] === canonical + '#webpage');
+    expect(webpage, url).toBeTruthy();
+    expect(webpage.isPartOf['@id']).toBe('https://crownsmere.com/#website');
+    expect(ids.has('https://crownsmere.com/#website') && ids.has('https://crownsmere.com/#business'), url).toBe(true);
+    if (webpage.breadcrumb) expect(ids.has(webpage.breadcrumb['@id']), url).toBe(true);
+  }
+  await page.goto('/');
+  const site = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent()).find(x => x['@type'] === 'WebSite');
+  expect(site.name).toBe('Crownsmere Estate');
+  expect(site.alternateName).toContain('Crownsmere');
+  await expect(page.locator('link[rel="icon"][sizes="96x96"]')).toHaveAttribute('href', 'assets/img/favicon-96.png');
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  for (const [url] of pages) expect(sitemap).toContain('<loc>https://crownsmere.com' + url + '</loc>');
+  expect(sitemap).not.toContain('<priority>');
+  expect(await (await request.get('/robots.txt')).text()).toContain('Sitemap: https://crownsmere.com/sitemap.xml');
+  expect((await request.get('/favicon.ico')).status()).toBe(200);
+  // The IndexNow key file holds the key it is named after.
+  expect(await (await request.get('/b75e961dc2682efd3fe5ff7efb9468f3.txt')).text()).toBe('b75e961dc2682efd3fe5ff7efb9468f3');
 });
 
 test('wording stays accurate: drafts are not called sent, consent and privacy text intact', async ({page}) => {

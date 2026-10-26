@@ -69,7 +69,7 @@ jobs:
           if grep -q 'http-equiv="Content-Security-Policy"' <<<"$home"; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
 
           echo "== Pages"
-          for p in / /services.html /buy.html /sell.html /rent.html /invest.html /advisory.html /about.html /students.html /students-ar.html /contact.html /privacy.html /assets/style.css /assets/student.css /assets/main.js /assets/student.js /assets/fonts/inter-latin.woff2 /assets/img/townhouse.avif /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg; do
+          for p in / /services.html /buy.html /sell.html /rent.html /invest.html /advisory.html /about.html /students.html /students-ar.html /contact.html /privacy.html /assets/style.css /assets/student.css /assets/main.js /assets/student.js /assets/fonts/inter-latin.woff2 /assets/img/townhouse.avif /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /favicon.ico /assets/img/favicon-96.png /assets/img/favicon-192.png; do
             code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 200 ]; then ok "$p ($code)"; else bad "$p returned $code"; fi
           done
@@ -84,3 +84,24 @@ jobs:
           if grep -Eo '(src|href)="http://[^"]+' <<<"$home"; then bad "page references insecure http:// resources"; else ok "no insecure http:// resources"; fi
 
           exit $fail
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push'
+
+      - name: Tell Bing and other IndexNow search engines about the pages
+        # After each deploy to main, and only once the live check above has passed. Best effort: a
+        # failed submission never fails this workflow. Google does not use IndexNow; it reads the sitemap.
+        if: github.event_name == 'push'
+        continue-on-error: true
+        shell: bash
+        run: |
+          KEY=$(python3 -c "import re; print(re.search(r'INDEXNOW_KEY = \"([0-9a-f]+)\"', open('tools/build.py').read()).group(1))")
+          if [ "$(curl -s --max-time 20 "https://crownsmere.com/$KEY.txt")" != "$KEY" ]; then
+            echo "The key file is not live yet, so nothing was submitted"; exit 0
+          fi
+          URLS=$(curl -s --max-time 20 https://crownsmere.com/sitemap.xml | grep -o '<loc>[^<]*</loc>' | sed -e 's/<loc>//' -e 's/<\/loc>//')
+          BODY=$(python3 -c 'import json, sys; key = sys.argv[1]; print(json.dumps({"host": "crownsmere.com", "key": key, "keyLocation": f"https://crownsmere.com/{key}.txt", "urlList": sys.argv[2].split()}))' "$KEY" "$URLS")
+          code=$(curl -s -o indexnow.txt -w '%{http_code}' --max-time 30 -X POST https://api.indexnow.org/indexnow \
+                 -H 'Content-Type: application/json; charset=utf-8' --data "$BODY")
+          echo "Submitted $(echo "$URLS" | wc -w) pages; IndexNow answered $code (200 or 202 means accepted)"
+          cat indexnow.txt 2>/dev/null || true
