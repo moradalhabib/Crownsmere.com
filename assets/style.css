@@ -201,6 +201,10 @@ h2 { font-size: clamp(32px, 2.6vw + 20px, 52px); }
   .hero-sub { font-size: 19px; }
 }
 
+/* ---------- Home: the neighbourhoods, under the tiles ---------- */
+.home-areas { max-width: 46em; margin: 22px 0 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.home-areas a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+
 /* ---------- Tiles: the way into each part of the site (home and services) ---------- */
 .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 /* An odd last tile (the fifth service) spans the row rather than sitting alone. */
@@ -545,13 +549,19 @@ h2 { font-size: clamp(32px, 2.6vw + 20px, 52px); }
 .ft-mark img { width: auto; height: 40px; }
 .ft-brand p { max-width: 30em; margin: 12px 0 6px; font-size: 15px; color: var(--ink-2); }
 .ft-mail { font-weight: 600; text-underline-offset: 4px; }
-.ft-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 22px; }
+/* Two columns of links: the services, and the rest of the site. */
+.ft-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.ft-nav ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.ft-h { display: flex; align-items: center; min-height: 32px; margin: 0 0 2px; font: 600 12px/1.4 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
 .ft-nav a { display: inline-flex; align-items: center; min-height: 40px; font-size: 15px; color: var(--ink-2); text-decoration: none; }
+.ft-nav .ft-h a { min-height: 32px; font: inherit; color: inherit; }
+.ft-nav a[lang="ar"] { font-family: var(--arabic); }
 .ft-nav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
 .ft-legal { margin: 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
 .ft-reg { grid-column: 1 / -1; margin: -8px 0 0; font-size: 12px; line-height: 1.6; color: var(--ink-3); }
 @media (min-width: 900px) {
   .ft-in { grid-template-columns: 1fr auto; align-items: end; gap: 28px 64px; }
+  .ft-nav { gap: 0 64px; }
   .ft-legal { grid-column: 1 / -1; }
 }
 

@@ -46,6 +46,21 @@ Sources: [ABA GPSolo, 2026](https://www.americanbar.org/groups/gpsolo/resources/
 - **Structured data:** FAQ rich results no longer appear in Google (fully withdrawn in 2026), but the markup is harmless and still helps machines read the page, so it stays. The business markup now lists English and Arabic as enquiry languages. Sources: [Search Engine Journal](https://www.searchenginejournal.com/google-drops-faq-rich-results/574429/), [Techwyse](https://www.techwyse.com/news/ai-search/google-faq-rich-results-deprecated-2026).
 - **Not done, on evidence:** `llms.txt`. Studies across 300,000 domains found no effect on AI citations and AI crawlers rarely fetch it. Sources: [Search Engine Journal](https://www.searchenginejournal.com/llms-txt-shows-no-clear-effect-on-ai-citations-based-on-300k-domains/), [PPC Land](https://ppc.land/llms-txt-adoption-rises-8-8x-but-97-of-files-get-zero-ai-requests/).
 
+## 4b. Search engines (SEO audit, 26 October 2026)
+- **Audit:** Lighthouse (mobile) scored every page 100 for SEO, accessibility and best practices and 92 to 98 for performance. Its SEO score only covers basics, so each page was also checked by hand. Problems found and fixed:
+  - the Arabic page declared itself English;
+  - one title and five descriptions were long enough to be cut off in results;
+  - Sell, Invest and Advisory had under 100 words each;
+  - each service page had only 2 to 5 links from the rest of the site (the Arabic page had 1);
+  - home links pointed at `/index.html`, a duplicate of the canonical `/`;
+  - the favicon was 64px (Google asks for a multiple of 48px);
+  - `/favicon.ico` was missing;
+  - `main.js` held up the first paint.
+- **Structured data:** one connected description per page (business, website, page, breadcrumb trail, service, questions). FAQ rich results no longer show in Google, but the markup still tells machines, including AI search, what each page answers. Google uses `WebSite` markup on the home page, including `alternateName`, to choose the site name it shows. Sources: [Google: site names](https://developers.google.com/search/docs/appearance/site-names), [Google: favicons](https://goo.gle/3VIh2V3).
+- **IndexNow:** Bing's recommended way to hear about new and changed pages; the key is published as a file at the site root. Google does not use it. Sources: [IndexNow guide (third-party)](https://geo.tenten.co/en/blog/indexnow-implementation), [Bing Webmaster Tools and IndexNow (third-party)](https://geotoolbox.ai/blog/bing-webmaster-tools).
+- **Local and AI search:** studies by vendors (directional, not independent) find that a Google Business Profile and consistent directory listings are the most-cited sources for local businesses in AI answers, ahead of the business's own website. A service-area business must hide its address but still needs a real one for verification (not a PO box or virtual office). Sources: [Google Business Profile help](https://support.google.com/business/answer/10514137?hl=en-GB), [Beancount: AI Overviews and small businesses](https://beancount.io/blog/2026/08/16/google-ai-overviews-chatgpt-perplexity-small-business-visibility-guide).
+- **Not done:** neighbourhood landing pages (ten near-identical area pages risk being treated as doorway pages unless each has genuinely local content written by someone who knows the area), Arabic versions of the main pages (need a native writer), and `llms.txt` (no measurable effect, see section 4).
+
 ## 5. What only the business can supply (in priority order)
 1. **Regulatory and company details** in `BUSINESS`: legal name, company number and registered office (if a company), redress scheme and membership number, AML supervisor, VAT number. Client money protection is not needed while Crownsmere holds no client money.
 2. **Commission rates** in `FEES` for any commission paid by a landlord or tenant (amount with VAT, or how it is worked out). A legal requirement for letting agents in England.
