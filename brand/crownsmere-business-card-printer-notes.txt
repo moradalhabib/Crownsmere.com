@@ -1,0 +1,21 @@
+Crownsmere Estate: business card for Alaa Qadir
+Print instructions
+
+FILE TO PRINT: crownsmere-business-card-print.pdf
+  - Finished size: 85 x 55 mm (UK standard), landscape, printed both sides.
+  - Page 1 is the front, page 2 the back, both the same way up.
+  - 3 mm bleed on every side (each page is 91 x 61 mm); the trim box is set in the PDF.
+  - CMYK, ISO Coated v2 300% (FOGRA39). Text is outlined; images are 300 ppi or more.
+
+SAME ARTWORK, IF YOU NEED IT ANOTHER WAY
+  - crownsmere-business-card-front.pdf and crownsmere-business-card-back.pdf: one side each.
+  - crownsmere-business-card-print-crop-marks.pdf: with crop marks, on a 105 x 75 mm page.
+
+GOLD FOIL (OPTIONAL)
+  - crownsmere-business-card-foil-base.pdf: print this in CMYK.
+  - crownsmere-business-card-foil-layer.pdf: the foil areas in solid black (gold foil on the monogram,
+    CROWNSMERE and ESTATE with its rules on the front; the monogram and the rule on the back).
+
+PLEASE
+  - Use board of 400 gsm or more, with a matt or soft-touch finish.
+  - Send a printed proof before the full run: the navy is close to the darkest colour the paper can hold.

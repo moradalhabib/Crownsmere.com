@@ -37,6 +37,13 @@ QR code (opens https://crownsmere.com/)
 PASS  reads from the print file at 300 dpi (two different readers)
 PASS  reads from a small, low-resolution photo of the card (about 6 pixels per mm)
 
+Other versions of the print file (same artwork)
+PASS  crownsmere-business-card-front.pdf: 1 page(s), 91 x 61 mm, trim 85 x 55 mm, CMYK, outlines, artwork identical to the print file (difference 0.00 of 255)
+PASS  crownsmere-business-card-back.pdf: 1 page(s), 91 x 61 mm, trim 85 x 55 mm, CMYK, outlines, artwork identical to the print file (difference 0.00 of 255)
+PASS  crownsmere-business-card-print-crop-marks.pdf: 2 page(s), 105 x 75 mm with crop marks, trim 85 x 55 mm, CMYK, outlines, artwork identical to the print file (difference 0.00 of 255)
+PASS  crop marks, page 1: 8 of 8 on the trim lines, 4 mm clear of the trim, nothing else outside the bleed
+PASS  crop marks, page 2: 8 of 8 on the trim lines, 4 mm clear of the trim, nothing else outside the bleed
+
 Gold foil pair
 PASS  crownsmere-business-card-foil-base.pdf: same page and trim as the print file
 PASS  crownsmere-business-card-foil-layer.pdf: same page and trim as the print file
