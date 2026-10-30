@@ -2,6 +2,7 @@ include:
   - .well-known
 exclude:
   - mail-filter
+  - brand
   - tools
   - README.md
   - docs

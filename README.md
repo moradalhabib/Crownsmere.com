@@ -19,6 +19,18 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 - `assets/img/`: monogram, photography and the skyline drawing (AVIF and WebP, with JPEG fallbacks). After replacing a photograph, regenerate its AVIF: `python3 -c "from PIL import Image; Image.open('assets/img/NAME.jpg').convert('RGB').save('assets/img/NAME.avif', 'AVIF', quality=60, speed=4)"`
 - `docs/research-2026-10.md`: research notes (law, market, accessibility, speed) behind the October 2026 improvements, with sources; not published
 - `mail-filter/`: AI filter for the hello@ inbox, run on cPanel (see `mail-filter/README.md`; excluded from the website by `_config.yml`)
+- `brand/`: business card, digital card, contact file and email signature (see below; excluded from the website by `_config.yml`)
+
+## Business card, digital card and email signature
+Made by `tools/brand.py` from the site's own logo, fonts and colours, with only facts the site already states. All in `brand/`:
+- `crownsmere-business-card-print.pdf`: the file for the printer. Two pages (front, back), UK size 85 × 55 mm with 3 mm bleed (91 × 61 mm), nothing important within 4 mm of the edge, fonts embedded, logo at over 600 dpi, QR code as vector. It is RGB: online printers convert it themselves.
+- `crownsmere-card-front.png`, `crownsmere-card-back.png`: each side, trimmed, at about 380 dpi.
+- `crownsmere-digital-card.png`: both sides together, to send by email, WhatsApp or LinkedIn.
+- `alaa-qadir.vcf`: contact file (vCard 3.0) that phones and email programs save in one tap, with the monogram as the contact photo.
+- `email-signature.html`: open it in a browser, press **Copy signature** and paste into Gmail, Outlook or Apple Mail (instructions on the page). Also `email-signature-snippet.html` (the signature alone) and `email-signature.txt` (plain text, for the iPhone). The signature's logo loads from `https://crownsmere.com/assets/img/monogram-sm.png`, so that file must stay on the site; the live site check fails if it goes missing.
+
+The QR code opens https://crownsmere.com/. To change a detail (for example to add a phone or WhatsApp number, in `PERSON`), edit `tools/brand.py`, then:
+`pip install segno fonttools brotli`, `python3 tools/brand.py`, and `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node tools/brand-render.cjs` (any Playwright Chromium works).
 
 ## Design (October 2026 redesign)
 Visitors found the old site far too long on phones: the home page was 16 screens on an iPhone. The redesign keeps the brand (warm cream, navy ink, gold accents, the monogram and serif headings) and makes every page short, calm and easy to act on:
