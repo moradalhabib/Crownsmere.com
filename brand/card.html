@@ -27,6 +27,7 @@ body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .role { margin: 1.7mm 0 0; font: 500 5.4pt/1 "Inter", sans-serif; letter-spacing: 0.16em; color: #80612f; }
 .rule { width: 9mm; height: 0.25mm; margin: 3.4mm 0 3mm; background: #b08d57; }
 .lines { margin: 0; font: 400 7pt/1.6 "Inter", sans-serif; color: #0e1b2e; }
+.lines b { display: inline-block; width: 3.4mm; font: 500 5.2pt/1 "Inter", sans-serif; color: #80612f; }
 .tag { margin: 0; font: 400 9.5pt/1.15 "Cormorant Garamond", serif; color: #4a5263; }
 .tag em { color: #80612f; }
 .side { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }
@@ -35,7 +36,8 @@ body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .brand small { display: block; margin: 1.1mm -0.92pt 0 0; font: 500 4.4pt/1 "Inter", sans-serif; letter-spacing: 0.42em; color: #80612f; }
 .qr { display: flex; flex-direction: column; align-items: center; }
 .qr svg { display: block; width: 17mm; height: 17mm; }
-.qr p { margin: 1.6mm 0 0; font: 500 4.8pt/1 "Inter", sans-serif; letter-spacing: 0.14em; color: #5c6270; }
+/* 17 mm across 25 modules: the 2.8 mm gap keeps the four-module quiet zone the QR standard asks for. */
+.qr p { margin: 2.8mm 0 0; font: 500 4.8pt/1 "Inter", sans-serif; letter-spacing: 0.14em; color: #5c6270; }
 
 @page { size: 91mm 61mm; margin: 0; }
 .card { break-after: page; }
@@ -54,7 +56,7 @@ body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       <p class="name">Alaa Qadir</p>
       <p class="role">SENIOR PROPERTY CONSULTANT</p>
       <div class="rule"></div>
-      <p class="lines">hello@crownsmere.com<br>crownsmere.com</p>
+      <p class="lines"><b>M</b>+44 7384 190760<br><b>E</b>alaa.qadir@crownsmere.com<br><b>W</b>crownsmere.com</p>
     </div>
     <p class="tag">London property, <em>personally handled.</em></p>
   </div>

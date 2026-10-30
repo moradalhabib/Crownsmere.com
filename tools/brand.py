@@ -9,8 +9,8 @@ PNG images.
     python3 tools/brand.py
     PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node tools/brand-render.cjs   # any Playwright Chromium
 
-Only facts the website already states go on the cards. Add a phone or WhatsApp number to PERSON
-when there is one; the cards, signature and contact file pick it up.
+Alaa's own email and mobile number (PERSON) go on the card, the signature and the contact file; the
+rest is only what the website already states. Change a detail in PERSON and run both steps again.
 """
 import base64, html, io, os
 
@@ -23,8 +23,9 @@ OUT = os.path.join(ROOT, "brand")
 SITE = "https://crownsmere.com/"
 SITE_SHORT = "crownsmere.com"
 BRAND = "Crownsmere Estate"
-EMAIL = "hello@crownsmere.com"
-PERSON = {"first": "Alaa", "last": "Qadir", "title": "Senior Property Consultant", "phone": None}
+# Alaa's direct details, from the owner (October 2026). The website itself keeps hello@crownsmere.com.
+PERSON = {"first": "Alaa", "last": "Qadir", "title": "Senior Property Consultant",
+          "email": "alaa.qadir@crownsmere.com", "phone": "+44 7384 190760"}
 TAGLINE = ("London property,", "personally handled.")      # the home page's heading
 LINE = "Private property search · Prime London"            # the sharing image's strap line
 # The signature's logo is fetched from the live site when an email is opened, so this file must stay online.
@@ -94,6 +95,7 @@ body {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
 .role {{ margin: 1.7mm 0 0; font: 500 5.4pt/1 "Inter", sans-serif; letter-spacing: 0.16em; color: {GOLD_INK}; }}
 .rule {{ width: 9mm; height: 0.25mm; margin: 3.4mm 0 3mm; background: {GOLD}; }}
 .lines {{ margin: 0; font: 400 7pt/1.6 "Inter", sans-serif; color: {NAVY}; }}
+.lines b {{ display: inline-block; width: 3.4mm; font: 500 5.2pt/1 "Inter", sans-serif; color: {GOLD_INK}; }}
 .tag {{ margin: 0; font: 400 9.5pt/1.15 "Cormorant Garamond", serif; color: {INK2}; }}
 .tag em {{ color: {GOLD_INK}; }}
 .side {{ display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }}
@@ -102,7 +104,8 @@ body {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
 .brand small {{ display: block; margin: 1.1mm -0.92pt 0 0; font: 500 4.4pt/1 "Inter", sans-serif; letter-spacing: 0.42em; color: {GOLD_INK}; }}
 .qr {{ display: flex; flex-direction: column; align-items: center; }}
 .qr svg {{ display: block; width: 17mm; height: 17mm; }}
-.qr p {{ margin: 1.6mm 0 0; font: 500 4.8pt/1 "Inter", sans-serif; letter-spacing: 0.14em; color: {INK3}; }}
+/* 17 mm across 25 modules: the 2.8 mm gap keeps the four-module quiet zone the QR standard asks for. */
+.qr p {{ margin: 2.8mm 0 0; font: 500 4.8pt/1 "Inter", sans-serif; letter-spacing: 0.14em; color: {INK3}; }}
 """
 
 
@@ -115,7 +118,9 @@ def front():
 
 
 def back():
-    lines = [e(EMAIL), SITE_SHORT] + ([e(PERSON["phone"])] if PERSON["phone"] else [])
+    # M(obile), E(mail), W(ebsite): the usual small labels on a UK card.
+    rows = ([("M", PERSON["phone"])] if PERSON["phone"] else []) + [("E", PERSON["email"]), ("W", SITE_SHORT)]
+    lines = [f"<b>{k}</b>{e(v)}" for k, v in rows]
     return f'''<div class="card back"><div class="safe">
   <div class="who">
     <div>
@@ -177,7 +182,8 @@ def signature_html():
     serif = "Georgia, 'Times New Roman', serif"
     p = f"margin: 0; font-family: {sans}; font-size: 13px; line-height: 19px; color: {NAVY};"
     a = f"color: {NAVY}; text-decoration: none;"
-    phone = (f'<br><a href="tel:{e(PERSON["phone"].replace(" ", ""))}" style="{a}">{e(PERSON["phone"])}</a>'
+    bar = f'&nbsp;&nbsp;<span style="color: {GOLD};">|</span>&nbsp;&nbsp;'
+    phone = (f'{bar}<a href="tel:{e(PERSON["phone"].replace(" ", ""))}" style="{a}">{e(PERSON["phone"])}</a>'
              if PERSON["phone"] else "")
     return f'''<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
 <tr>
@@ -186,7 +192,8 @@ def signature_html():
 <p style="margin: 0; font-family: {serif}; font-size: 19px; line-height: 24px; color: {NAVY};">{e(name)}</p>
 <p style="margin: 2px 0 0; font-family: {sans}; font-size: 10px; line-height: 14px; letter-spacing: 1.5px; color: {GOLD_INK};">{e(PERSON["title"]).upper()}</p>
 <p style="margin: 9px 0 0; font-family: {serif}; font-size: 13px; line-height: 19px; letter-spacing: 1.5px; color: {NAVY};">CROWNSMERE <span style="font-family: {sans}; font-size: 9px; letter-spacing: 2.5px; color: {GOLD_INK};">ESTATE</span></p>
-<p style="{p}"><a href="mailto:{EMAIL}" style="{a}">{EMAIL}</a>&nbsp;&nbsp;<span style="color: {GOLD};">|</span>&nbsp;&nbsp;<a href="{SITE}" style="{a}">{SITE_SHORT}</a>{phone}</p>
+<p style="{p}"><a href="mailto:{PERSON["email"]}" style="{a}">{PERSON["email"]}</a>{phone}</p>
+<p style="{p}"><a href="{SITE}" style="{a}">{SITE_SHORT}</a></p>
 <p style="margin: 3px 0 0; font-family: {serif}; font-size: 14px; line-height: 19px; font-style: italic; color: {GOLD_INK};">{e(" ".join(TAGLINE))}</p>
 </td>
 </tr>
@@ -194,10 +201,10 @@ def signature_html():
 
 
 def signature_text():
-    rows = [name, PERSON["title"], BRAND, f"{EMAIL} | {SITE_SHORT}"]
+    rows = [name, PERSON["title"], BRAND, PERSON["email"]]
     if PERSON["phone"]:
         rows.append(PERSON["phone"])
-    rows.append(" ".join(TAGLINE))
+    rows += [SITE_SHORT, " ".join(TAGLINE)]
     return "\n".join(rows) + "\n"
 
 
@@ -300,9 +307,9 @@ def vcard():
     rows = ["BEGIN:VCARD", "VERSION:3.0",
             f'N:{esc(PERSON["last"])};{esc(PERSON["first"])};;;', f"FN:{esc(name)}",
             f"ORG:{esc(BRAND)}", f'TITLE:{esc(PERSON["title"])}',
-            f"EMAIL;TYPE=INTERNET,WORK:{EMAIL}", f"URL:{SITE}"]
+            f'EMAIL;TYPE=INTERNET,WORK:{PERSON["email"]}', f"URL:{SITE}"]
     if PERSON["phone"]:
-        rows.append(f'TEL;TYPE=WORK,VOICE:{PERSON["phone"].replace(" ", "")}')
+        rows.append(f'TEL;TYPE=CELL,VOICE:{PERSON["phone"].replace(" ", "")}')
     rows += [f"NOTE:{esc(LINE)}", f"PHOTO;ENCODING=b;TYPE=JPEG:{b64}", "END:VCARD"]
 
     def fold(line):

@@ -22,14 +22,14 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 - `brand/`: business card, digital card, contact file and email signature (see below; excluded from the website by `_config.yml`)
 
 ## Business card, digital card and email signature
-Made by `tools/brand.py` from the site's own logo, fonts and colours, with only facts the site already states. All in `brand/`:
+Made by `tools/brand.py` from the site's own logo, fonts and colours. They carry Alaa's direct email and mobile number (`PERSON` in that file) and otherwise only facts the site already states. All in `brand/`:
 - `crownsmere-business-card-print.pdf`: the file for the printer. Two pages (front, back), UK size 85 × 55 mm with 3 mm bleed (91 × 61 mm), nothing important within 4 mm of the edge, fonts embedded, logo at over 600 dpi, QR code as vector. It is RGB: online printers convert it themselves.
 - `crownsmere-card-front.png`, `crownsmere-card-back.png`: each side, trimmed, at about 380 dpi.
 - `crownsmere-digital-card.png`: both sides together, to send by email, WhatsApp or LinkedIn.
 - `alaa-qadir.vcf`: contact file (vCard 3.0) that phones and email programs save in one tap, with the monogram as the contact photo.
 - `email-signature.html`: open it in a browser, press **Copy signature** and paste into Gmail, Outlook or Apple Mail (instructions on the page). Also `email-signature-snippet.html` (the signature alone) and `email-signature.txt` (plain text, for the iPhone). The signature's logo loads from `https://crownsmere.com/assets/img/monogram-sm.png`, so that file must stay on the site; the live site check fails if it goes missing.
 
-The QR code opens https://crownsmere.com/. To change a detail (for example to add a phone or WhatsApp number, in `PERSON`), edit `tools/brand.py`, then:
+The QR code opens https://crownsmere.com/ (25 × 25 modules at 17 mm, with its full quiet zone; tested with two QR readers on the print file and on simulated phone photos). To change a detail, edit `PERSON` in `tools/brand.py`, then:
 `pip install segno fonttools brotli`, `python3 tools/brand.py`, and `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node tools/brand-render.cjs` (any Playwright Chromium works).
 
 ## Design (October 2026 redesign)
