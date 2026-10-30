@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 """Business card, digital card, contact file and email signature for Crownsmere Estate.
 
-Writes everything into brand/ (kept out of the website by _config.yml). The pages use the site's own
-logo, fonts and colours. Then tools/brand-render.cjs turns the card pages into the print PDF and the
-PNG images.
+One command makes everything in brand/ (kept out of the website by _config.yml), from the site's own
+logo, fonts and colours:
 
-    pip install segno fonttools brotli    # once: QR codes, and fixed-weight fonts for the print file
-    python3 tools/brand.py
-    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node tools/brand-render.cjs   # any Playwright Chromium
+    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers python3 tools/brand.py    # any Playwright Chromium
+
+It writes the pages into brand/.build/, tools/brand-render.cjs draws them, and tools/brand_print.py makes
+the CMYK print files, checks them (brand/crownsmere-business-card-preflight.txt) and draws the proof.
+Tools it needs are listed in README.md.
 
 Alaa's own email and mobile number (PERSON) go on the card, the signature and the contact file; the
-rest is only what the website already states. Change a detail in PERSON and run both steps again.
+rest is only what the website already states. Change a detail in PERSON and run it again.
 """
-import base64, html, io, os
+import base64, html, io, math, os, subprocess, sys
 
+import numpy as np
 import segno
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "brand")
+BUILD = os.path.join(OUT, ".build")    # pages, fonts and drafts the files are made from; not committed
 
 SITE = "https://crownsmere.com/"
 SITE_SHORT = "crownsmere.com"
@@ -45,13 +48,14 @@ def write(fname, text):
 
 
 def qr_svg():
-    # Medium error correction keeps the code to 25 x 25 modules, which scans easily at 17 mm.
+    # Medium error correction keeps the code to 25 x 25 modules: 0.68 mm each at 17 mm, which phones
+    # read easily. The card keeps at least four modules of plain background around it (the standard's quiet zone).
     return segno.make(SITE, error="m").svg_inline(dark=NAVY, light=None, border=0, omitsize=True)
 
 
 # The site's fonts are variable (any weight). Printed from those, Chromium embeds them in the PDF as
 # Type 3 fonts, which some printers' file checks reject. So the card pages use fixed-weight copies,
-# made here into brand/.fonts/ (not committed, and not published).
+# made into brand/.build/ (not committed, and not published).
 STATIC = [("Inter", "normal", 400, "inter-latin"), ("Inter", "normal", 500, "inter-latin"),
           ("Cormorant Garamond", "normal", 400, "cormorant-garamond"),
           ("Cormorant Garamond", "normal", 500, "cormorant-garamond"),
@@ -62,96 +66,173 @@ STATIC = [("Inter", "normal", 400, "inter-latin"), ("Inter", "normal", 500, "int
 def static_fonts():
     from fontTools.ttLib import TTFont
     from fontTools.varLib import instancer
-    os.makedirs(os.path.join(OUT, ".fonts"), exist_ok=True)
+    os.makedirs(os.path.join(BUILD, "fonts"), exist_ok=True)
     for _, _, weight, src in STATIC:
         font = instancer.instantiateVariableFont(TTFont(os.path.join(ROOT, "assets/fonts", src + ".woff2")), {"wght": weight})
         font.flavor = None
-        font.save(os.path.join(OUT, ".fonts", f"{src}-{weight}.ttf"))
+        font.save(os.path.join(BUILD, "fonts", f"{src}-{weight}.ttf"))
 
+
+def front_gradient():
+    """The front's soft light, drawn here as a 300 dpi image (91 x 61 mm) rather than a CSS gradient:
+    converting a vector gradient to CMYK, Ghostscript turns it into a coarse 90 ppi image, which can band
+    on press. A light dither (under one level of 256) keeps the steps from showing."""
+    w, h = math.ceil(91 / 25.4 * 300), math.ceil(61 / 25.4 * 300)   # rounded up, so never under 300 dpi
+    yy, xx = np.mgrid[0:h, 0:w].astype(float)
+    # An ellipse 125% x 95% of the card, centred halfway across and 40% down (as CSS radial-gradient sizes it)
+    t = np.clip(np.hypot((xx + 0.5 - w * 0.5) / (w * 1.25), (yy + 0.5 - h * 0.4) / (h * 0.95)), 0, 1)
+    stops = [(0.0, "#172b46"), (0.58, NAVY), (1.0, "#0b1727")]
+    rgb = np.zeros((h, w, 3))
+    for (t0, c0), (t1, c1) in zip(stops, stops[1:]):
+        a = np.array([int(c0[i:i + 2], 16) for i in (1, 3, 5)], float)
+        b = np.array([int(c1[i:i + 2], 16) for i in (1, 3, 5)], float)
+        k = ((t - t0) / (t1 - t0))[..., None]
+        rgb = np.where(((t >= t0) & (t <= t1))[..., None], a + (b - a) * np.clip(k, 0, 1), rgb)
+    rng = np.random.default_rng(39)
+    rgb += rng.random(rgb.shape) + rng.random(rgb.shape) - 1   # triangular dither
+    Image.fromarray(np.clip(np.round(rgb), 0, 255).astype(np.uint8)).save(os.path.join(BUILD, "front-gradient.png"))
+
+
+def monogram_assets():
+    """The logo, cropped tight to its edges so it lines up exactly with the type (the site's file has a
+    transparent margin on the right and at the top), and its outline as vector shapes for the gold-foil
+    layer, traced with potrace from the logo's transparency at 8 times its size. The trace matches the
+    original outline to 99.3 per cent; brand/monogram-vector.svg keeps it for other print work."""
+    src = Image.open(os.path.join(ROOT, "assets/img/monogram.png")).convert("RGBA")
+    tight = src.crop(src.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox())
+    tight.save(os.path.join(BUILD, "monogram-tight.png"))
+    scale, pad = 8, 4
+    alpha = Image.new("L", (tight.width + 2 * pad, tight.height + 2 * pad), 0)
+    alpha.paste(tight.getchannel("A"), (pad, pad))
+    big = alpha.resize((alpha.width * scale, alpha.height * scale), Image.LANCZOS)
+    big = big.filter(ImageFilter.GaussianBlur(scale * 0.7))
+    big.point(lambda v: 0 if v >= 128 else 255, "1").save(os.path.join(BUILD, "monogram.pbm"))
+    subprocess.run(["potrace", os.path.join(BUILD, "monogram.pbm"), "-s", "--flat", "-t", "40", "-a", "1.2",
+                    "-O", "1.0", "-o", os.path.join(BUILD, "monogram-trace.svg")], check=True)
+    svg = open(os.path.join(BUILD, "monogram-trace.svg")).read()
+    body = svg[svg.index("<g"):svg.rindex("</svg>")]
+    w, h = tight.width * scale, tight.height * scale
+    view = f"{pad * scale} {pad * scale} {w} {h}"   # the padding stays outside the drawing
+    with open(os.path.join(OUT, "monogram-vector.svg"), "w") as f:
+        f.write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view}" width="{w / 100:.2f}mm" height="{h / 100:.2f}mm">\n'
+                f"<title>{BRAND} monogram (outline traced from the website logo)</title>\n{body}</svg>\n")
+    return view, body
+
+
+_logo = Image.open(os.path.join(ROOT, "assets/img/monogram.png")).convert("RGBA")
+_box = _logo.getchannel("A").point(lambda v: 255 if v > 8 else 0).getbbox()
+MONO_RATIO = (_box[2] - _box[0]) / (_box[3] - _box[1])   # width over height of the logo itself
+MONO_VIEW, MONO_BODY = "", ""   # the traced outline, set by main() before any card is written
+
+# Measured from the monogram's opaque middle tones, so the lettering is the logo's own gold.
+GOLD_ON_NAVY = "#dfb86e"
+PRINT_ZOOM = 8
 
 FONTS = "".join(f'@font-face {{ font-family: "{family}"; font-style: {style}; font-weight: {weight}; '
-                f'src: url(".fonts/{src}-{weight}.ttf") format("truetype"); }}\n'
+                f'src: url("fonts/{src}-{weight}.ttf") format("truetype"); }}\n'
                 for family, style, weight, src in STATIC)
 
-# UK business card: 85 x 55 mm trimmed, with 3 mm bleed on every side (91 x 61 mm), and nothing that
-# matters closer than 4 mm to the trim (the .safe box starts 7 mm from the bleed edge).
+# UK business card: 85 x 55 mm trimmed, with 3 mm bleed on every side (91 x 61 mm). Nothing that matters
+# comes closer than 4 mm to the trim: .safe starts 7 mm from the edge of the bleed. No text is smaller than
+# 6 pt. Lengths in the back's layout come from measuring the rendered type, so the lines meet exactly:
+# the top of the name's tallest letter and the top of the monogram on the safe line, and the tagline's
+# baseline level with the foot of the QR code, 1.2 mm above the safe line so its descenders stay inside it.
 CARD_CSS = FONTS + f"""
 * {{ box-sizing: border-box; }}
 html, body {{ margin: 0; padding: 0; }}
-body {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
+body {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; font-kerning: normal; text-rendering: geometricPrecision; }}
+p {{ margin: 0; }}
 .card {{ position: relative; width: 91mm; height: 61mm; overflow: hidden; }}
 .safe {{ position: absolute; top: 7mm; right: 7mm; bottom: 7mm; left: 7mm; }}
 
-.front {{ background: radial-gradient(120% 95% at 50% 36%, #182c47 0%, {NAVY} 64%); }}
-.front .safe {{ display: flex; flex-direction: column; align-items: center; justify-content: center; }}
-.front img {{ display: block; height: 21mm; width: auto; }}
-.wm {{ margin: 3.4mm 0 0; padding-left: 0.16em; font: 500 12.5pt/1 "Cinzel", serif; letter-spacing: 0.16em; color: #ecd6aa; }}
-.wm-sub {{ margin: 1.8mm 0 0; padding-left: 0.52em; font: 500 5.2pt/1 "Inter", sans-serif; letter-spacing: 0.52em; color: #c4a46e; }}
+/* Front: the monogram and wordmark, raised 1.2 mm above the true centre, where the eye reads the middle. */
+.front {{ background: {NAVY} url("front-gradient.png") 0 0 / 100% 100% no-repeat; }}
+.front .safe {{ display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 2.4mm; }}
+.front .mono {{ display: block; height: 22mm; width: {22 * MONO_RATIO:.3f}mm; }}
+.wm {{ margin-top: 3.9mm; padding-left: 0.2em; font: 500 13.5pt/1 "Cinzel", serif; letter-spacing: 0.2em; color: {GOLD_ON_NAVY}; }}
+.est {{ display: flex; align-items: center; gap: 2.4mm; margin-top: 2.5mm; }}
+/* Centred on the line, which is the middle of Inter's capitals (its cap middle sits within 0.001 em of the
+   line's centre); the preflight measures it in the print file. */
+.est i {{ display: block; width: 7mm; height: 0.2mm; background: {GOLD_ON_NAVY}; }}
+.est span {{ padding-left: 0.55em; font: 500 6.5pt/1 "Inter", sans-serif; letter-spacing: 0.55em; color: {GOLD_ON_NAVY}; }}
 
+/* Back */
 .back {{ background: {CREAM}; color: {NAVY}; }}
-.back .safe {{ display: flex; justify-content: space-between; }}
-.who {{ display: flex; flex-direction: column; justify-content: space-between; }}
-.name {{ margin: 0; font: 500 17pt/1 "Cormorant Garamond", serif; }}
-.role {{ margin: 1.7mm 0 0; font: 500 5.4pt/1 "Inter", sans-serif; letter-spacing: 0.16em; color: {GOLD_INK}; }}
-.rule {{ width: 9mm; height: 0.25mm; margin: 3.4mm 0 3mm; background: {GOLD}; }}
-.lines {{ margin: 0; font: 400 7pt/1.6 "Inter", sans-serif; color: {NAVY}; }}
-.lines b {{ display: inline-block; width: 3.4mm; font: 500 5.2pt/1 "Inter", sans-serif; color: {GOLD_INK}; }}
-.tag {{ margin: 0; font: 400 9.5pt/1.15 "Cormorant Garamond", serif; color: {INK2}; }}
+.back .safe > * {{ position: absolute; }}
+.name {{ left: var(--name-left, 0mm); top: var(--name-top, 0mm); font: 500 17.5pt/1 "Cormorant Garamond", serif; }}
+.role {{ left: 0; top: var(--role-top, 8mm); font: 500 6pt/1 "Inter", sans-serif; letter-spacing: 0.18em; color: {GOLD_INK}; }}
+.back .rule {{ left: 0; top: var(--rule-top, 13mm); display: block; width: 10mm; height: 0.25mm; background: {GOLD}; }}
+.lines {{ left: 0; top: var(--lines-top, 17mm); font: 400 7.5pt/1.62 "Inter", sans-serif; color: {NAVY}; }}
+.lines b {{ display: inline-block; width: 3.8mm; font: 500 6pt/1 "Inter", sans-serif; color: {GOLD_INK}; }}
+.tag {{ left: 0; bottom: var(--tag-bottom, 0mm); font: 400 10pt/1 "Cormorant Garamond", serif; color: {INK2}; }}
 .tag em {{ color: {GOLD_INK}; }}
-.side {{ display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; }}
-/* Negative right margins cancel the letter spacing after the last letter, so both lines end flush with the QR code. */
-.brand {{ margin: 0 -0.92pt 0 0; text-align: right; font: 500 6.6pt/1 "Cinzel", serif; letter-spacing: 0.14em; color: {NAVY}; }}
-.brand small {{ display: block; margin: 1.1mm -0.92pt 0 0; font: 500 4.4pt/1 "Inter", sans-serif; letter-spacing: 0.42em; color: {GOLD_INK}; }}
-.qr {{ display: flex; flex-direction: column; align-items: center; }}
-.qr svg {{ display: block; width: 17mm; height: 17mm; }}
-/* 17 mm across 25 modules: the 2.8 mm gap keeps the four-module quiet zone the QR standard asks for. */
-.qr p {{ margin: 2.8mm 0 0; font: 500 4.8pt/1 "Inter", sans-serif; letter-spacing: 0.14em; color: {INK3}; }}
+.back .mono {{ right: 0; top: var(--mono-top, 0mm); display: block; height: 10.5mm; width: {10.5 * MONO_RATIO:.3f}mm; }}
+.qr {{ right: 0; bottom: 1.2mm; display: block; width: 17mm; height: 17mm; }}
+
+/* The gold-foil pair: "base" is the colour print with the foil areas left empty, "layer" the foil areas
+   alone in solid black, for printers that foil. */
+.layer .card {{ background: none; }}
+.layer .card * {{ visibility: hidden; }}
+.layer .foil, .layer .foil * {{ visibility: visible; color: #000; }}
+.layer i.foil {{ background: #000; }}
+.base .foil {{ visibility: hidden; }}
 """
 
+# Positions on the back, in mm from the edges of the safe area, set from the ink measured in the print file
+# (the preflight report shows it). The name moves 0.06 mm right because the serif foot of its A reaches past
+# the type's left edge.
+BACK_LAYOUT = {"--name-left": "0.06mm", "--name-top": "-0.49mm", "--role-top": "6.85mm", "--rule-top": "11.95mm",
+               "--lines-top": "15.35mm", "--tag-bottom": "0.595mm", "--mono-top": "0mm"}
 
-def front():
+
+def monogram(mode):
+    if mode == "layer":
+        return (f'<svg class="mono foil" viewBox="{MONO_VIEW}" preserveAspectRatio="none" aria-hidden="true">'
+                f'{MONO_BODY.replace("#000000", "#000")}</svg>')
+    return '<img class="mono foil" src="monogram-tight.png" alt="">'
+
+
+def front(mode="print"):
     return f'''<div class="card front"><div class="safe">
-  <img src="../assets/img/monogram.png" alt="">
-  <p class="wm">CROWNSMERE</p>
-  <p class="wm-sub">ESTATE</p>
+  {monogram(mode)}
+  <p class="wm foil">CROWNSMERE</p>
+  <p class="est"><i class="foil"></i><span class="foil">ESTATE</span><i class="foil"></i></p>
 </div></div>'''
 
 
-def back():
+def back(mode="print"):
     # M(obile), E(mail), W(ebsite): the usual small labels on a UK card.
     rows = ([("M", PERSON["phone"])] if PERSON["phone"] else []) + [("E", PERSON["email"]), ("W", SITE_SHORT)]
-    lines = [f"<b>{k}</b>{e(v)}" for k, v in rows]
-    return f'''<div class="card back"><div class="safe">
-  <div class="who">
-    <div>
-      <p class="name">{e(name)}</p>
-      <p class="role">{e(PERSON["title"]).upper()}</p>
-      <div class="rule"></div>
-      <p class="lines">{"<br>".join(lines)}</p>
-    </div>
-    <p class="tag">{e(TAGLINE[0])} <em>{e(TAGLINE[1])}</em></p>
-  </div>
-  <div class="side">
-    <p class="brand">CROWNSMERE<small>ESTATE</small></p>
-    <div class="qr">{qr_svg()}<p>SCAN TO VISIT</p></div>
-  </div>
+    lines = "<br>".join(f"<b>{k}</b>{e(v)}" for k, v in rows)
+    style = "; ".join(f"{k}: {v}" for k, v in BACK_LAYOUT.items())
+    return f'''<div class="card back"><div class="safe" style="{style}">
+  <p class="name">{e(name)}</p>
+  <p class="role">{e(PERSON["title"]).upper()}</p>
+  <i class="rule foil"></i>
+  <p class="lines">{lines}</p>
+  <p class="tag">{e(TAGLINE[0])} <em>{e(TAGLINE[1])}</em></p>
+  {monogram(mode)}
+  <div class="qr">{qr_svg()}</div>
 </div></div>'''
 
 
-def card_page():
+def card_page(mode="print"):
     # Two pages, front then back, each 91 x 61 mm: the file a printer asks for.
     return f'''<!doctype html>
 <html lang="en-GB"><head><meta charset="utf-8">
-<title>{BRAND} business card (print, 85 x 55 mm with 3 mm bleed)</title>
+<title>{BRAND} business card ({mode}; 85 x 55 mm with 3 mm bleed)</title>
 <style>{CARD_CSS}
-@page {{ size: 91mm 61mm; margin: 0; }}
+/* Drawn 8 times larger for the PDF: Chromium snaps boxes (rules, images) to whole CSS pixels, 0.26 mm at
+   full size but 0.03 mm at 8 times. tools/brand_print.py scales the pages back to 91 x 61 mm exactly. */
+@page {{ size: {91 * PRINT_ZOOM}mm {61 * PRINT_ZOOM}mm; margin: 0; }}
+@media print {{ html {{ zoom: {PRINT_ZOOM}; }} }}
 .card {{ break-after: page; }}
 .card:last-child {{ break-after: auto; }}
 @media screen {{ body {{ background: #888; padding: 10mm; }} .card {{ margin-bottom: 8mm; }} }}
 </style></head>
-<body>
-{front()}
-{back()}
+<body class="{mode}">
+{front(mode)}
+{back(mode)}
 </body></html>
 '''
 
@@ -324,18 +405,30 @@ def vcard():
     return "\r\n".join(fold(r) for r in rows) + "\r\n"
 
 
+def write_build(fname, text):
+    with open(os.path.join(BUILD, fname), "w", encoding="utf-8") as f:
+        f.write(text)
+
+
 def main():
-    os.makedirs(OUT, exist_ok=True)
+    global MONO_VIEW, MONO_BODY
+    os.makedirs(BUILD, exist_ok=True)
     static_fonts()
-    write("card.html", card_page())
-    write("share-card.html", share_page())
+    front_gradient()
+    MONO_VIEW, MONO_BODY = monogram_assets()
+    for mode in ("print", "base", "layer"):
+        write_build(f"card-{mode}.html", card_page(mode))
+    write_build("share-card.html", share_page())
     sig, text = signature_html(), signature_text()
     write("email-signature.html", signature_page(sig, text))
     write("email-signature-snippet.html", sig + "\n")
     write("email-signature.txt", text)
     write(f'{PERSON["first"].lower()}-{PERSON["last"].lower()}.vcf', vcard())
-    print("Wrote brand/: card.html, share-card.html, email-signature.html, email-signature-snippet.html, "
-          "email-signature.txt, and the contact file")
+    # Draw the pages in Chromium, then make the print files from them and check them.
+    subprocess.run(["node", os.path.join(ROOT, "tools/brand-render.cjs")], check=True)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import brand_print
+    brand_print.finish()
 
 
 if __name__ == "__main__":

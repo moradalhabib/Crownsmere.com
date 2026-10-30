@@ -1,0 +1,50 @@
+Crownsmere Estate business card: preflight report
+Made by tools/brand.py. Card 85 x 55 mm, 3 mm bleed, 4 mm safe area, ISO Coated v2 300% (FOGRA39).
+
+Print file: crownsmere-business-card-print.pdf
+PASS  2 pages, front then back (2)
+PASS  page 1: 91.00 x 61.00 mm, card plus bleed
+PASS  page 1: TrimBox 85.00 x 55.00 mm
+PASS  page 1: bleed 3.00 to 3.00 mm on every side
+PASS  page 1: BleedBox matches the page
+PASS  page 2: 91.00 x 61.00 mm, card plus bleed
+PASS  page 2: TrimBox 85.00 x 55.00 mm
+PASS  page 2: bleed 3.00 to 3.00 mm on every side
+PASS  page 2: BleedBox matches the page
+PASS  no screen (RGB) colour anywhere (0 colour spaces, 0 colour settings)
+PASS  process colour only: 16 CMYK colour settings, no spot colours
+PASS  output intent: ISO Coated v2 300% (FOGRA39) embedded
+PASS  all text converted to outlines (0 fonts left)
+PASS  images in CMYK (cmyk, cmyk, cmyk)
+PASS  image resolution at least 300 ppi (lowest 300 ppi)
+PASS  page 1: total ink at most 300% (highest 290%)
+      navy at the corner of the front: C90 M80 Y52 K64
+PASS  page 2: total ink at most 300% (highest 287%)
+
+Layout, measured in the print files at 1200 dpi (mm from the trim)
+PASS  smallest text 6.0 pt (role "SENIOR PROPERTY CONSULTA"); printers ask for 6 pt or more
+PASS  front: all ink at least 4 mm inside the trim (closest 8.61 mm)
+PASS  back: all ink at least 4 mm inside the trim (closest 4.00 mm)
+PASS  front: logo group 1.33 mm above the true centre (the optical centre)
+PASS  front: centred across (+0.032 mm)
+PASS  back: tops of the name and the monogram level (4.043, 4.021)
+PASS  back: tagline baseline level with the foot of the QR code (49.760, 49.781)
+PASS  back: monogram and QR code share a right edge (80.979, 81.000)
+PASS  back: left column on one edge (name 4.02, role 4.08, rule 4.00, lines 4.02, tag 4.08)
+PASS  QR code: 0.681 mm modules, clear space of at least 4 modules (5.9)
+
+QR code (opens https://crownsmere.com/)
+PASS  reads from the print file at 300 dpi (two different readers)
+PASS  reads from a small, low-resolution photo of the card (about 6 pixels per mm)
+
+Gold foil pair
+PASS  crownsmere-business-card-foil-base.pdf: same page and trim as the print file
+PASS  crownsmere-business-card-foil-layer.pdf: same page and trim as the print file
+PASS  foil layer: one ink, solid black only (4 fills, all 100%)
+PASS  foil layer: text as outlines
+PASS  front: ESTATE rules level with the middle of the capitals (-0.002 mm)
+PASS  foil layer: foil on both sides (2.4% of the front, 0.4% of the back)
+      foil: the monogram, CROWNSMERE, ESTATE and its rules on the front; the monogram and the rule on the back
+      finest foil detail: 0.2 mm rules and 6.5 pt ESTATE; check the printer's foil minimums (usually 0.1 to 0.2 mm lines, 6 to 8 pt text)
+
+All checks passed.

@@ -19,18 +19,25 @@ Website of **Crownsmere Estate**, a private, by-request property service in prim
 - `assets/img/`: monogram, photography and the skyline drawing (AVIF and WebP, with JPEG fallbacks). After replacing a photograph, regenerate its AVIF: `python3 -c "from PIL import Image; Image.open('assets/img/NAME.jpg').convert('RGB').save('assets/img/NAME.avif', 'AVIF', quality=60, speed=4)"`
 - `docs/research-2026-10.md`: research notes (law, market, accessibility, speed) behind the October 2026 improvements, with sources; not published
 - `mail-filter/`: AI filter for the hello@ inbox, run on cPanel (see `mail-filter/README.md`; excluded from the website by `_config.yml`)
-- `brand/`: business card, digital card, contact file and email signature (see below; excluded from the website by `_config.yml`)
+- `brand/`: business card (print, gold foil, proof and preflight), digital card, vector monogram, contact file and email signature (see below; excluded from the website by `_config.yml`)
 
 ## Business card, digital card and email signature
 Made by `tools/brand.py` from the site's own logo, fonts and colours. They carry Alaa's direct email and mobile number (`PERSON` in that file) and otherwise only facts the site already states. All in `brand/`:
-- `crownsmere-business-card-print.pdf`: the file for the printer. Two pages (front, back), UK size 85 × 55 mm with 3 mm bleed (91 × 61 mm), nothing important within 4 mm of the edge, fonts embedded, logo at over 600 dpi, QR code as vector. It is RGB: online printers convert it themselves.
-- `crownsmere-card-front.png`, `crownsmere-card-back.png`: each side, trimmed, at about 380 dpi.
-- `crownsmere-digital-card.png`: both sides together, to send by email, WhatsApp or LinkedIn.
+- `crownsmere-business-card-print.pdf`: **the file for the printer.** Two pages (front, back), UK size 85 × 55 mm with 3 mm bleed (91 × 61 mm exactly), TrimBox and BleedBox set, everything at least 4 mm inside the trim, no text under 6 pt. Print colour (CMYK) converted with ISO Coated v2 300% (FOGRA39), which caps the ink at 300%, with the profile embedded as the output intent. Text as outlines; images at 300 ppi or more; QR code as vector.
+- `crownsmere-business-card-foil-base.pdf` and `crownsmere-business-card-foil-layer.pdf`: the same card for gold foil. The base is the colour print with the foil areas left empty; the layer is the foil areas alone in solid black (one ink): the monogram, CROWNSMERE and ESTATE with its rules on the front, the monogram and the rule on the back.
+- `crownsmere-business-card-preflight.txt`: every check above, measured in the finished files (alignments are measured in the print file at 1200 dpi). `tools/brand.py` stops with an error if any check fails.
+- `crownsmere-business-card-proof.png`: both sides as the press will print them on coated paper, with the trim, bleed and safe lines, and the gold-foil version beside them.
+- `crownsmere-card-front.png`, `crownsmere-card-back.png`: each side, trimmed, at about 380 dpi. `crownsmere-digital-card.png`: both sides together, to send by email, WhatsApp or LinkedIn.
+- `monogram-vector.svg`: the monogram's outline as vector shapes, traced from the website logo (99.3% match), for foil, embossing and other print work.
 - `alaa-qadir.vcf`: contact file (vCard 3.0) that phones and email programs save in one tap, with the monogram as the contact photo.
 - `email-signature.html`: open it in a browser, press **Copy signature** and paste into Gmail, Outlook or Apple Mail (instructions on the page). Also `email-signature-snippet.html` (the signature alone) and `email-signature.txt` (plain text, for the iPhone). The signature's logo loads from `https://crownsmere.com/assets/img/monogram-sm.png`, so that file must stay on the site; the live site check fails if it goes missing.
 
-The QR code opens https://crownsmere.com/ (25 × 25 modules at 17 mm, with its full quiet zone; tested with two QR readers on the print file and on simulated phone photos). To change a detail, edit `PERSON` in `tools/brand.py`, then:
-`pip install segno fonttools brotli`, `python3 tools/brand.py`, and `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node tools/brand-render.cjs` (any Playwright Chromium works).
+**The design.** Front: the gold monogram, CROWNSMERE in the monogram's own gold (Cinzel) and ESTATE between two fine rules on rich navy with a soft light, raised 1.2 mm above the true centre (the optical centre). Back: on cream, a strict grid: the name and the small monogram start on the same line, the tagline's baseline is level with the foot of the QR code, and the monogram and QR code share a right edge. The QR code (25 × 25 modules at 17 mm, 0.68 mm each, with its full quiet zone) opens https://crownsmere.com/; it read in 60 out of 60 simulated phone photos (zxing).
+
+**How it is made.** `tools/brand.py` writes the pages into `brand/.build/` (not committed), `tools/brand-render.cjs` draws them in Chromium (8 times larger for the PDF, because Chromium snaps rules and images to whole pixels), and `tools/brand_print.py` scales them to size, converts them to CMYK with Ghostscript, sets the PDF boxes, runs the preflight and draws the proof. To change a detail, edit `PERSON` in `tools/brand.py` and run:
+`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers python3 tools/brand.py` (any Playwright Chromium works). It needs Ghostscript, potrace, qpdf, poppler-utils and the ISO Coated v2 profile (Debian and Ubuntu: `apt install ghostscript potrace qpdf poppler-utils icc-profiles`), and `pip install segno fonttools brotli numpy pypdf zxing-cpp opencv-python-headless`.
+
+**Ordering.** Upload `crownsmere-business-card-print.pdf` as a double-sided 85 × 55 mm card (page 1 front, page 2 back). For the most luxurious result: heavy board (600 gsm or more, or a duplexed card), soft-touch laminate on the navy side, and gold foil using the two foil files, if the printer offers foil. Ask the printer for a printed proof before a large run: the navy is near the darkest colour coated paper can print.
 
 ## Design (October 2026 redesign)
 Visitors found the old site far too long on phones: the home page was 16 screens on an iPhone. The redesign keeps the brand (warm cream, navy ink, gold accents, the monogram and serif headings) and makes every page short, calm and easy to act on:

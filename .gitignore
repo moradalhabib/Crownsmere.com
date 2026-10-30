@@ -6,5 +6,5 @@ test-screenshots/
 test-results/
 playwright-report/
 
-# Fixed-weight fonts made by tools/brand.py for the business card PDF
-brand/.fonts/
+# Pages, fonts and drafts tools/brand.py makes the business card files from
+brand/.build/
