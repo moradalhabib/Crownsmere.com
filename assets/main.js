@@ -80,6 +80,28 @@
   var counter = form.querySelector(".step-count");
   var current = 0;
 
+  /* Opened from a property page (contact.html?property=<slug>): the form names the property, and so does
+     the email. Only properties the page itself lists (data-listings) are accepted. */
+  var listingRef = "";
+  try {
+    var refs = JSON.parse(form.getAttribute("data-listings") || "{}");
+    var wanted = new URLSearchParams(window.location.search).get("property") || "";
+    if (/^[a-z0-9-]{1,80}$/.test(wanted) && Object.prototype.hasOwnProperty.call(refs, wanted)) {
+      listingRef = refs[wanted] + " (ref. " + wanted + ")";
+    }
+  } catch (err) { listingRef = ""; }
+  if (listingRef) {
+    var refNote = form.querySelector("[data-form-ref]");
+    if (refNote) {
+      var refName = document.createElement("b");
+      refName.textContent = listingRef;
+      refNote.append("Enquiring about: ", refName);
+      refNote.hidden = false;
+    }
+    var buy = form.querySelector('input[name="request"][value="Buy a home"]');
+    if (buy) buy.checked = true;
+  }
+
   var say = function (msg, isError) {
     status.textContent = msg;
     status.classList.toggle("error", !!isError);
@@ -186,6 +208,7 @@
       if (WHEN[when]) line += ", " + WHEN[when];
       paras.push(line + ".");
     }
+    if (listingRef) paras.push("I would like details of, or a private viewing at, " + listingRef + ".");
     if (brief) paras.push(brief);
     if (name || how) {
       var c = how && how !== "Either" ? "Please contact me by " + how.toLowerCase() : "Please contact me by telephone or email";
@@ -234,7 +257,7 @@
     if (data._honey) return; // A bot filled the hidden field.
 
     var fullName = String(data.name || "").replace(/[\r\n<>]/g, " ").trim().slice(0, 80);
-    var subject = "Crownsmere Estate | Private Property Brief | " + fullName;
+    var subject = "Crownsmere Estate | " + (listingRef ? "Property Enquiry | " + listingRef.replace(/ \(ref\. .*\)$/, "") : "Private Property Brief") + " | " + fullName;
     var body = compose() + "\n\n" +
       "CONTACT DETAILS\n" +
       "Email: " + String(data.email || "") + "\n" +

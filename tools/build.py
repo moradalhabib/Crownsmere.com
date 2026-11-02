@@ -6,11 +6,18 @@ Edit it, then run:  python3 tools/build.py
 """
 import base64
 import hashlib
+import html as htmllib
 import json
 import os
 import re
+import sys
 
-OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import listings as listings_data  # noqa: E402  (tools/listings.py: the properties for sale)
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Pages are written to the site's root. A preview build (see tools/listings.py) goes to a separate folder.
+OUT = os.environ.get("CROWNSMERE_OUT") or ROOT
 SITE = "https://crownsmere.com"
 BRAND = "Crownsmere Estate"
 # No telephone number is published: Alaa shares it personally once a brief is received.
@@ -60,6 +67,21 @@ PORTRAIT = None
 # Verified figures only, e.g. ("12 years", "in prime London property"). Shown as a track record when filled in.
 TRACK_RECORD = []
 
+# ---------------------------------------------------------------- the Private Collection (properties for sale)
+# The properties themselves are in tools/listings.py. Marketing a property for its owner is estate agency
+# work, which needs redress scheme membership and HMRC anti-money-laundering registration first, so the
+# Collection stays off the site until BUSINESS names both.
+PREVIEW = os.environ.get("CROWNSMERE_PREVIEW") == "1"
+if PREVIEW and OUT == ROOT:
+    raise SystemExit("A preview build uses fictional sample listings: set CROWNSMERE_OUT to a separate folder.")
+LISTINGS = listings_data.SAMPLE if PREVIEW else listings_data.LISTINGS
+REGISTERED = bool(BUSINESS["redress_scheme"] and BUSINESS["aml_supervisor"])
+if LISTINGS and not REGISTERED and not PREVIEW:
+    print("NOTE: the Private Collection is not published. Fill in BUSINESS['redress_scheme'] and "
+          "BUSINESS['aml_supervisor'] in tools/build.py once Crownsmere is registered.")
+    LISTINGS = []
+COLLECTION = bool(LISTINGS)
+
 # ---------------------------------------------------------------- icons (24px line icons)
 P = {
     "house": '<path d="M3 11 12 3l9 8M5.5 9.5V21h13V9.5M10 21v-6h4v6"/>',
@@ -83,6 +105,7 @@ P = {
     "cap": '<path d="M2 9.5 12 5l10 4.5-10 4.5z"/><path d="M6 11.3V16c0 1.4 2.7 3 6 3s6-1.6 6-3v-4.7M22 9.5V15"/>',
     "tag": '<path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
     "trend": '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
+    "frame": '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="8.5" r="1.5"/>',
 }
 
 def ic(name, cls="ic"):
@@ -115,6 +138,8 @@ def link(page):
     return "./" if page == "index.html" else page
 
 NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
+if COLLECTION:
+    NAV.insert(2, ("collection.html", "Collection"))
 # The tab bar along the bottom of phones and tablets: (page, icon, label, Arabic label).
 TABS = [("index.html", "house", "Home", "الرئيسية"), ("services.html", "grid", "Services", "الخدمات"),
         ("about.html", "person", "About", "عن علا"), ("students.html", "cap", "Students", "الطلاب"),
@@ -158,7 +183,11 @@ SPECULATION = '{"prefetch":[{"where":{"href_matches":"/*"},"eagerness":"moderate
 SPECULATION_HASH = "sha256-" + base64.b64encode(hashlib.sha256(SPECULATION.encode()).digest()).decode()
 
 def lastmod(path):
-    """When a page last changed, for the sitemap and the page's structured data."""
+    """When a page last changed, for the sitemap and the page's structured data. A property page
+    carries the date its particulars were last checked."""
+    for x in LISTINGS:
+        if path == f"property-{x['slug']}.html":
+            return max(x["updated"], SITE_UPDATED_ISO)
     return UPDATED_ISO if path == "privacy.html" else SITE_UPDATED_ISO
 
 def structured_data(title, desc, path, canonical, lang, page_type, page_extra, extra_ld):
@@ -186,7 +215,8 @@ def structured_data(title, desc, path, canonical, lang, page_type, page_extra, e
     ld.insert(2, dict(webpage, **(page_extra or {})))
     return ld + (extra_ld or [])
 
-def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang="en", page_type="WebPage", page_extra=None):
+def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang="en", page_type="WebPage", page_extra=None,
+         og_image=None):
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = structured_data(title, desc, path, canonical, lang, page_type, page_extra, extra_ld)
     og_desc = og_desc or desc
@@ -200,6 +230,8 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
     other_locale = "".join(f'<meta property="og:locale:alternate" content="{"ar_AR" if l == "ar" else "en_GB"}">\n'
                            for l, u in ALTERNATES.get(path, []) if u != path and l != "x-default")
     verify = "".join(f'<meta name="{name}" content="{value}">\n' for name, value in VERIFY.items() if value)
+    # The picture shown when a page is shared: the brand image, or a property's own photograph.
+    og_url, og_w, og_h, og_alt = og_image or (f"{SITE}/assets/img/og-image.jpg", 1200, 630, "Crownsmere Estate: private property search in prime London")
     return f'''<!DOCTYPE html>
 <html lang="{"ar" if lang == "ar" else "en-GB"}" class="no-js">
 <head>
@@ -221,13 +253,13 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
 {other_locale}<meta property="og:url" content="{canonical}">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{og_desc}">
-<meta property="og:image" content="{SITE}/assets/img/og-image.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Crownsmere Estate: private property search in prime London">
+<meta property="og:image" content="{og_url}">
+<meta property="og:image:width" content="{og_w}">
+<meta property="og:image:height" content="{og_h}">
+<meta property="og:image:alt" content="{og_alt}">
 <meta name="twitter:title" content="{title}">
 <meta name="twitter:description" content="{og_desc}">
-<meta name="twitter:image" content="{SITE}/assets/img/og-image.jpg">
+<meta name="twitter:image" content="{og_url}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/favicon-96.png" sizes="96x96" type="image/png">
 <link rel="icon" href="assets/img/favicon-192.png" sizes="192x192" type="image/png">
@@ -310,7 +342,8 @@ def footer(current, lang="en"):
     """Every page links to every other from here: the five services, the rest of the site and the
     Arabic student page, so each page is one step from anywhere (for visitors and search engines)."""
     services = "".join(f'<li><a href="{sv["page"]}">{sv["name"]}</a></li>' for sv in SERVICES)
-    more = ('<li><a href="about.html">About Alaa</a></li><li><a href="students.html">Students</a></li>'
+    more = (('<li><a href="collection.html">Private Collection</a></li>' if COLLECTION else "")
+            + '<li><a href="about.html">About Alaa</a></li><li><a href="students.html">Students</a></li>'
             '<li><a href="students-ar.html" lang="ar" dir="rtl" hreflang="ar">مساعدة الطلاب بالعربية</a></li>'
             '<li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy</a></li>')
     en = ' lang="en-GB"' if lang == "ar" else ""
@@ -334,8 +367,8 @@ def footer(current, lang="en"):
 <script src="assets/main.js" defer></script>'''
 
 def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", lang="en", og_locale="en_GB",
-         page_type="WebPage", page_extra=None):
-    html = (head(title, desc, fname, extra_ld, og_desc, og_locale, lang, page_type, page_extra) + header(fname, lang)
+         page_type="WebPage", page_extra=None, og_image=None):
+    html = (head(title, desc, fname, extra_ld, og_desc, og_locale, lang, page_type, page_extra, og_image) + header(fname, lang)
             + '\n<main id="main">\n' + body + '\n</main>' + footer(fname, lang) + scripts + '\n</body>\n</html>\n')
     open(os.path.join(OUT, fname), "w").write(html)
     return html
@@ -408,6 +441,77 @@ SERVICES = [
 SECTION_OF = {s["page"]: "services.html" for s in SERVICES}
 CRUMBS.update({s["page"]: s["name"] for s in SERVICES})
 
+# ---------------------------------------------------------------- listings: checked before anything is built
+LISTING_REQUIRED = ["slug", "title", "area", "status", "listed", "updated", "price", "price_qualifier", "tenure",
+                    "council_tax_band", "council_tax_authority", "property_type", "construction", "bedrooms",
+                    "bathrooms", "receptions", "electricity", "water", "sewerage", "heating", "broadband",
+                    "mobile_signal", "parking", "occupancy", "building_safety", "restrictions", "rights_easements",
+                    "flood_risk", "planning", "accessibility", "description", "photos"]
+STATUSES = {"Available": "InStock", "Under offer": "LimitedAvailability", "Sold subject to contract": "SoldOut"}
+QUALIFIERS = ["Guide price", "Asking price", "Offers in excess of", "Offers in the region of"]
+TENURES = ["Freehold", "Leasehold", "Share of freehold"]
+EPC_BANDS = [("A", 92, 100), ("B", 81, 91), ("C", 69, 80), ("D", 55, 68), ("E", 39, 54), ("F", 21, 38), ("G", 1, 20)]
+
+def check_listings(items):
+    """Stop the build if a listing leaves out anything a buyer must be told."""
+    problems, seen = [], set()
+    vague = re.compile(r"^\s*(ask (the )?agent|tbc|tba|to be confirmed|unknown|\?+)\s*\.?$", re.I)
+    for n, x in enumerate(items, 1):
+        name = x.get("slug") or f"listing {n}"
+        for key in LISTING_REQUIRED:
+            v = x.get(key)
+            if v is None or v == "" or v == []:
+                problems.append(f"{name}: '{key}' is missing")
+            elif isinstance(v, str) and vague.match(v):
+                problems.append(f"{name}: '{key}' says \"{v}\"; give the actual answer")
+        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", str(x.get("slug", ""))):
+            problems.append(f"{name}: slug must use only a-z, 0-9 and hyphens")
+        if x.get("slug") in seen:
+            problems.append(f"{name}: slug is used twice")
+        seen.add(x.get("slug"))
+        if x.get("status") not in STATUSES:
+            problems.append(f"{name}: status must be one of {', '.join(STATUSES)}")
+        if x.get("price_qualifier") not in QUALIFIERS:
+            problems.append(f"{name}: price_qualifier must be one of {', '.join(QUALIFIERS)}")
+        if not isinstance(x.get("price"), int) or x.get("price", 0) <= 0:
+            problems.append(f"{name}: price must be a whole number of pounds")
+        if x.get("tenure") not in TENURES:
+            problems.append(f"{name}: tenure must be one of {', '.join(TENURES)}")
+        if x.get("tenure") in ("Leasehold", "Share of freehold"):
+            lease = x.get("lease") or {}
+            for key in ("years_remaining", "ground_rent", "service_charge"):
+                if lease.get(key) in (None, ""):
+                    problems.append(f"{name}: a {x['tenure'].lower()} needs lease['{key}']")
+        if str(x.get("council_tax_band", "")) not in list("ABCDEFGH"):
+            problems.append(f"{name}: council_tax_band must be a letter from A to H")
+        epc = x.get("epc") or {}
+        if not x.get("epc_exempt"):
+            for key in ("current", "current_score", "potential", "potential_score"):
+                if epc.get(key) in (None, ""):
+                    problems.append(f"{name}: epc['{key}'] is missing (every advert must show the EPC rating)")
+            for which in ("current", "potential"):
+                band = [b for b, lo, hi in EPC_BANDS if lo <= int(epc.get(which + "_score") or 0) <= hi]
+                if epc.get(which) and band and band[0] != epc.get(which):
+                    problems.append(f"{name}: an EPC score of {epc.get(which + '_score')} is band {band[0]}, not {epc.get(which)}")
+        for i, ph in enumerate(x.get("photos") or []):
+            if not (isinstance(ph, (tuple, list)) and len(ph) == 2 and ph[1]):
+                problems.append(f"{name}: photo {i + 1} needs a file name and a description")
+            elif not os.path.exists(os.path.join(ROOT, "assets", "img", ph[0] + ".jpg")):
+                problems.append(f"{name}: assets/img/{ph[0]}.jpg not found")
+        if x.get("floorplan") and not os.path.exists(os.path.join(ROOT, "assets", "img", x["floorplan"] + ".jpg")):
+            problems.append(f"{name}: assets/img/{x['floorplan']}.jpg not found")
+    if problems:
+        raise SystemExit("Listings need attention before the site can be built:\n  " + "\n  ".join(problems))
+
+# Checked even while unpublished, so a missing detail shows up as soon as a property is added.
+check_listings(listings_data.SAMPLE if PREVIEW else listings_data.LISTINGS)
+LISTING_PAGE = lambda x: f"property-{x['slug']}.html"
+if COLLECTION:
+    CRUMBS["collection.html"] = "Private Collection"
+    for _x in LISTINGS:
+        CRUMBS[LISTING_PAGE(_x)] = _x["title"]
+        SECTION_OF[LISTING_PAGE(_x)] = "collection.html"
+
 STEPS = [
     ("Share your brief", "A private conversation about what you are looking for, why, and when. No detail is too small."),
     ("See a curated shortlist", "I search personally, on and off the market, and check every property before you see it."),
@@ -446,6 +550,9 @@ FAQ = {
 }
 if FEES:
     FAQ["fees"] = (FAQ["fees"][0], FAQ["fees"][1] + ' Our <a href="services.html#fees">published fees</a> are on the services page.')
+if COLLECTION:
+    FAQ["listings"] = ("Do you list properties for sale?",
+                       "A small number, in the <a href=\"collection.html\">Private Collection</a>, offered with each owner&rsquo;s agreement and shown by appointment. Most of the homes I find for clients are never publicly advertised, so the best place to start is still your brief.")
 CONTACT_FAQ = ["how", "listings", "agent", "areas", "overseas", "private", "fees"]
 
 def strip_tags(s):
@@ -564,7 +671,8 @@ def cta(heading="Tell me what <em>you are looking for.</em>"):
 </section>'''
 
 # ---------------------------------------------------------------- home: a short front door to the rest of the site
-HOME_TILES = ([(sv["page"], sv["icon"], sv["name"], sv["tile"], "") for sv in SERVICES[:4]]
+HOME_TILES = ([("collection.html", "frame", "Private Collection", "Homes offered in confidence.", "")] if COLLECTION else []) + (
+              [(sv["page"], sv["icon"], sv["name"], sv["tile"], "") for sv in SERVICES[:4]]
               + [("students.html", "cap", "Students", "Rental help, even without a UK guarantor.", ""),
                  ("about.html", "person", "Meet Alaa", "Your consultant, one to one.", "")])
 
@@ -787,6 +895,11 @@ def step_actions(n, last=False):
            else f'<button type="button" class="btn btn-primary" data-next>Continue{ARROW}</button>')
     return f'<div class="step-actions">{back}{nxt}</div>'
 
+# A property page links here with ?property=<slug>; the form then names the property in the email.
+LISTING_REFS = (' data-listings="' + htmllib.escape(json.dumps({x["slug"]: f'{x["title"]}, {x["area"]}' for x in LISTINGS}, ensure_ascii=False)) + '"'
+                if COLLECTION else "")
+FORM_REF = '\n        <p class="form-ref" data-form-ref hidden></p>' if COLLECTION else ""
+
 NEXT = [
     ("Answer three short steps", "What you need, a few details about your brief, and how to reach you."),
     ("Review and send the email", "Your email app opens with your brief written out for Alaa. Nothing is sent until you press Send."),
@@ -804,7 +917,7 @@ contact_body = f'''
     </div>
 
     <div class="form-card" id="brief">
-      <form class="letter-form" action="mailto:{ALAA}" method="POST" enctype="text/plain" novalidate>
+      <form class="letter-form" action="mailto:{ALAA}" method="POST" enctype="text/plain" novalidate{LISTING_REFS}>{FORM_REF}
         <input type="hidden" name="source" value="crownsmere.com/contact">
         <div class="hp" aria-hidden="true"><label for="f-hp">Leave this empty</label><input id="f-hp" type="text" name="_honey" tabindex="-1" autocomplete="off"></div>
 
@@ -1148,6 +1261,250 @@ page("privacy.html", f"Privacy Notice | {BRAND}",
      "How Crownsmere Estate collects, uses and protects the personal information you share with us, and the rights you have over it.",
      privacy_body)
 
+# ---------------------------------------------------------------- the Private Collection
+def jpeg_size(path):
+    """Width and height of a JPEG, read from its header (no image library needed)."""
+    data = open(path, "rb").read()
+    i = 2
+    while i < len(data) - 9:
+        if data[i] != 0xFF:
+            i += 1
+            continue
+        m = data[i + 1]
+        if m in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+            return int.from_bytes(data[i + 7:i + 9], "big"), int.from_bytes(data[i + 5:i + 7], "big")
+        if m in (0xD8, 0x01, 0xFF) or 0xD0 <= m <= 0xD7:
+            i += 2 if m != 0xFF else 1
+            continue
+        i += 2 + int.from_bytes(data[i + 2:i + 4], "big")
+    raise SystemExit(f"Could not read the size of {path}")
+
+def photo(name, alt, cls="", lazy=True, sizes=""):
+    """A listing photograph with AVIF and WebP versions, made from the JPEG when missing (needs Pillow)."""
+    base = os.path.join(ROOT, "assets", "img", name)
+    for ext, opts in (("webp", dict(quality=82)), ("avif", dict(quality=60, speed=4))):
+        if not os.path.exists(f"{base}.{ext}"):
+            try:
+                from PIL import Image
+                Image.open(f"{base}.jpg").convert("RGB").save(f"{base}.{ext}", ext.upper(), **opts)
+            except Exception:  # without Pillow, or a format it cannot write, the JPEG alone is served
+                pass
+    w, h = jpeg_size(f"{base}.jpg")
+    srcs = "".join(f'<source type="image/{ext}" srcset="assets/img/{name}.{ext}">' for ext in ("avif", "webp")
+                   if os.path.exists(f"{base}.{ext}"))
+    attrs = (f' class="{cls}"' if cls else "") + (' loading="lazy" decoding="async"' if lazy else ' fetchpriority="high"')
+    return f'<picture>{srcs}<img src="assets/img/{name}.jpg" alt="{alt}" width="{w}" height="{h}"{attrs}></picture>'
+
+def price_text(x):
+    return f'{x["price_qualifier"]} &pound;{x["price"]:,}'
+
+def status_tag(x):
+    cls = {"Available": "avail", "Under offer": "offer", "Sold subject to contract": "sold"}[x["status"]]
+    return f'<span class="lst-status lst-{cls}">{x["status"]}</span>'
+
+def summary(x):
+    """The headline facts, as a short line: 5 bedrooms · 4 bathrooms · 4,210 sq ft."""
+    parts = [f'{x["bedrooms"]} bedroom{"s" if x["bedrooms"] != 1 else ""}',
+             f'{x["bathrooms"]} bathroom{"s" if x["bathrooms"] != 1 else ""}']
+    if x.get("size_sqft"):
+        parts.append(f'{x["size_sqft"]:,} sq ft')
+    return " &middot; ".join(parts)
+
+def epc_text(x):
+    if x.get("epc_exempt"):
+        return x["epc_exempt"]
+    e = x["epc"]
+    return f'{e["current"]} ({e["current_score"]}), with potential {e["potential"]} ({e["potential_score"]})'
+
+def epc_chart(x):
+    """The familiar A to G energy rating graph, current and potential marked. The text beside it gives the
+    same information, so the graph itself is hidden from screen readers."""
+    if x.get("epc_exempt"):
+        return ""
+    e = x["epc"]
+    rows = ""
+    for band, lo, hi in EPC_BANDS:
+        cur = f'<span class="epc-mark">{e["current_score"]} {band}</span>' if e["current"] == band else ""
+        pot = f'<span class="epc-mark">{e["potential_score"]} {band}</span>' if e["potential"] == band else ""
+        rows += (f'<div class="epc-row"><span class="epc-bar epc-{band.lower()}"><span>{lo}&ndash;{hi}</span><b>{band}</b></span>'
+                 f'<span class="epc-cell">{cur}</span><span class="epc-cell">{pot}</span></div>')
+    return (f'<div class="epc" aria-hidden="true"><div class="epc-row epc-headrow"><span>Energy rating</span>'
+            f'<span class="epc-cell">Current</span><span class="epc-cell">Potential</span></div>{rows}</div>')
+
+def mi_rows(rows):
+    return "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in rows if v not in (None, ""))
+
+def material_information(x):
+    """Everything a buyer must be told before deciding to view: Trading Standards' Parts A, B and C."""
+    lease = x.get("lease") or {}
+    tenure_rows = [("Tenure", x["tenure"])]
+    if x["tenure"] != "Freehold":
+        tenure_rows += [("Lease remaining", f'{lease["years_remaining"]} years'), ("Ground rent", lease["ground_rent"]),
+                        ("Service charge", lease["service_charge"]), ("Lease notes", lease.get("notes"))]
+    part_a = ([("Price", price_text(x))] + tenure_rows
+              + [("Council tax", f'Band {x["council_tax_band"]} ({x["council_tax_authority"]})'),
+                 ("Energy performance (EPC)", epc_text(x))])
+    rooms = f'{x["bedrooms"]} bedrooms, {x["bathrooms"]} bathrooms, {x["receptions"]} reception room{"s" if x["receptions"] != 1 else ""}'
+    part_b = [("Property type", x["property_type"]), ("Floor", x.get("floor")), ("Construction", x["construction"]),
+              ("Accommodation", rooms), ("Internal area", f'{x["size_sqft"]:,} sq ft ({round(x["size_sqft"] * 0.092903):,} sq m), approximate' if x.get("size_sqft") else ""),
+              ("Electricity", x["electricity"]), ("Water", x["water"]), ("Sewerage", x["sewerage"]), ("Heating", x["heating"]),
+              ("Broadband", x["broadband"]), ("Mobile signal", x["mobile_signal"]), ("Parking", x["parking"])]
+    part_c = [("Occupancy", x["occupancy"]), ("Building safety", x["building_safety"]), ("Restrictions", x["restrictions"]),
+              ("Rights and easements", x["rights_easements"]), ("Flood risk", x["flood_risk"]), ("Planning", x["planning"]),
+              ("Accessibility", x["accessibility"])]
+    interest = x.get("personal_interest") or "None"
+    return f"""
+<section class="sec sec-alt" id="material-information" aria-labelledby="mi-title">
+  <div class="wrap">
+    {sec_head("Before you view", "Material <em>information.</em>", "Everything you need to know before deciding to view, as confirmed by the owner. Please verify each point with your own solicitor and surveyor.", "mi-title")}
+    <div class="mi" data-reveal>
+      <div class="mi-group"><h3>Price, tenure and council tax</h3><dl class="mi-list">{mi_rows(part_a)}</dl>{epc_chart(x)}</div>
+      <div class="mi-group"><h3>The property</h3><dl class="mi-list">{mi_rows(part_b)}</dl></div>
+      <div class="mi-group"><h3>Things to know</h3><dl class="mi-list">{mi_rows(part_c)}</dl></div>
+    </div>
+    <p class="fine mi-note">Particulars last checked with the owner on {date_text(x["updated"])}. They are given in good faith, do not form part of any offer or contract, and measurements are approximate. Personal interest (Estate Agents Act 1979): {interest}.</p>
+  </div>
+</section>"""
+
+def date_text(iso):
+    y, m, d = (int(v) for v in iso.split("-"))
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    return f"{d} {months[m - 1]} {y}"
+
+def listing_card(x):
+    lead = x["photos"][0]
+    return (f'<a class="lst-card" href="{LISTING_PAGE(x)}"><div class="lst-card-media">{photo(lead[0], lead[1])}{status_tag(x)}</div>'
+            f'<div class="lst-card-body"><p class="lst-card-area">{x["area"]}</p><h2>{x["title"]}</h2>'
+            f'<p class="lst-card-facts">{summary(x)}</p><p class="lst-card-price">{price_text(x)}</p>'
+            f'<p class="lst-card-epc">{x["tenure"]} &middot; EPC {x["epc"]["current"] if not x.get("epc_exempt") else "exempt"} &middot; Council tax band {x["council_tax_band"]}</p></div></a>')
+
+def listing_ld(x, url):
+    """A RealEstateListing for search engines: the home, its price and whether it is still available.
+    Only the area is given, never the full address."""
+    kind = "Apartment" if re.search(r"apartment|flat|penthouse|maisonette", x["property_type"], re.I) else "House"
+    home = {"@type": kind, "name": x["title"], "numberOfBedrooms": x["bedrooms"], "numberOfBathroomsTotal": x["bathrooms"],
+            "numberOfRooms": x["bedrooms"] + x["receptions"],
+            "address": {"@type": "PostalAddress", "addressLocality": x["area"], "addressRegion": "London", "addressCountry": "GB"}}
+    if x.get("size_sqft"):
+        home["floorSize"] = {"@type": "QuantitativeValue", "value": x["size_sqft"], "unitCode": "FTK"}
+    return {"@context": "https://schema.org", "@type": "RealEstateListing", "@id": f"{url}#listing", "url": url,
+            "name": f'{x["title"]}, {x["area"]}', "description": strip_tags(x["description"][0]),
+            "datePosted": x["listed"], "image": [f"{SITE}/assets/img/{n}.jpg" for n, _ in x["photos"]],
+            "about": home,
+            "offers": {"@type": "Offer", "price": x["price"], "priceCurrency": "GBP",
+                       "availability": f'https://schema.org/{STATUSES[x["status"]]}', "seller": {"@id": f"{SITE}/#business"}}}
+
+PREVIEW_NOTE = ('<p class="preview-note wrap">Design preview with a fictional sample property. Not published.</p>' if PREVIEW else "")
+
+def listing_page(x):
+    fname = LISTING_PAGE(x)
+    url = f"{SITE}/{fname}"
+    lead, rest = x["photos"][0], x["photos"][1:]
+    thumbs = "".join(f"<figure>{photo(n, a)}</figure>" for n, a in rest)
+    plan = (f'<figure class="lst-plan">{photo(x["floorplan"], "Floor plan of " + x["title"].lower())}<figcaption>Floor plan, not to scale</figcaption></figure>'
+            if x.get("floorplan") else "")
+    paras = "".join(f"<p>{t}</p>" for t in x["description"])
+    feats = "".join(f"<li>{ic('check')}<span>{t}</span></li>" for t in x.get("features") or [])
+    feats = f'<ul class="checks checks-lg lst-features">{feats}</ul>' if feats else ""
+    facts = [("Bedrooms", x["bedrooms"]), ("Bathrooms", x["bathrooms"]), ("Receptions", x["receptions"])]
+    if x.get("size_sqft"):
+        facts.append(("Internal area", f'{x["size_sqft"]:,} sq ft'))
+    facts += [("Tenure", x["tenure"]), ("EPC", x["epc"]["current"] if not x.get("epc_exempt") else "Exempt"),
+              ("Council tax", f'Band {x["council_tax_band"]}')]
+    facts = "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
+    ask = f'contact.html?property={x["slug"]}#brief'
+    subject = f'Crownsmere Estate | {x["title"]}, {x["area"]}'.replace(" ", "%20").replace("|", "%7C").replace(",", "%2C")
+    body = f"""{PREVIEW_NOTE}
+<section class="lst-hero">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="collection.html">Private Collection</a></li><li aria-current="page">{x["area"]}</li></ol></nav>
+    <div class="lst-head">
+      <div>
+        <h1>{x["title"]}</h1>
+        <p class="lst-area">{ic("pin")}<span>{x["area"]}</span></p>
+      </div>
+      <div class="lst-pricebox"><p class="lst-price">{price_text(x)}</p>{status_tag(x)}</div>
+    </div>
+    <div class="lst-gallery{" lst-gallery-solo" if not rest else ""}">
+      <figure class="lst-lead">{photo(lead[0], lead[1], lazy=False)}</figure>
+      {f'<div class="lst-thumbs" role="group" aria-label="More photographs" tabindex="0">{thumbs}</div>' if rest else ""}
+    </div>
+    <dl class="lst-facts">{facts}</dl>
+  </div>
+</section>
+
+<section class="sec sec-tight">
+  <div class="wrap lst-body">
+    <div class="lst-copy" data-reveal>
+      <h2>About the <em>home.</em></h2>
+      {paras}
+      {feats}
+      {plan}
+    </div>
+    <aside class="lst-ask" aria-label="Arrange a viewing">
+      <p class="lst-ask-price">{price_text(x)}</p>
+      <p>{summary(x)}</p>
+      <div class="btn-row">
+        {btn(ask, "Request details or a viewing")}
+        {btn(f"mailto:{EMAIL}?subject={subject}", "Email", "ghost", arrow=False)}
+      </div>
+      <ul class="lst-ask-notes"><li>{ic("lock")}<span>Viewings strictly by appointment</span></li><li>{ic("pin")}<span>The exact address is shared on request</span></li></ul>
+    </aside>
+  </div>
+</section>
+{material_information(x)}
+<nav class="wrap pager" aria-label="More properties">
+  {btn("collection.html", "All properties", "ghost", arrow=False)}
+  <a class="more" href="contact.html">Not quite right? Share your brief{ARROW}</a>
+</nav>"""
+    ph = x["photos"][0][0]
+    w, h = jpeg_size(os.path.join(ROOT, "assets", "img", ph + ".jpg"))
+    desc = strip_tags(f'{x["title"]} in {x["area"]}: {summary(x).replace("&middot;", ",")}. {price_text(x).replace("&pound;", "£")}. Viewings by appointment with Crownsmere Estate.')
+    desc = re.sub(r"\s+,", ",", desc)
+    page(fname, f'{x["title"]}, {x["area"]} | {BRAND}', desc[:160], body, extra_ld=[listing_ld(x, url)],
+         og_image=(f"{SITE}/assets/img/{ph}.jpg", w, h, x["photos"][0][1]))
+
+def collection_page():
+    cards = "".join(listing_card(x) for x in LISTINGS)
+    body = f"""{PREVIEW_NOTE}
+{page_hero("Private Collection", "Homes offered <em>in confidence.</em>", "A small number of homes, offered with their owners&rsquo; agreement. Every viewing is by appointment, and the exact address is shared on request.")}
+
+<section class="sec sec-tight">
+  <div class="wrap">
+    <div class="lst-grid" data-reveal>{cards}</div>
+    <p class="fine">Each property page sets out the material information confirmed by its owner, including tenure, council tax and the energy rating.</p>
+  </div>
+</section>
+
+<section class="sec sec-tight">
+  <div class="wrap">
+    <div class="callout" data-reveal>
+      <div>
+        <p class="eyebrow">By request</p>
+        <h2>Not here? <em>It may never be advertised.</em></h2>
+        <p>Most of the homes Alaa finds for clients never appear online. Share your brief and the search begins.</p>
+      </div>
+      {btn("contact.html", "Share your brief")}
+    </div>
+  </div>
+</section>"""
+    items = {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": n, "url": f"{SITE}/{LISTING_PAGE(x)}"}
+                                                      for n, x in enumerate(LISTINGS, 1)]}
+    page("collection.html", f"Private Collection: Homes for Sale | {BRAND}",
+         "Homes for sale in prime London, offered in confidence by Crownsmere Estate. Viewings by appointment; full material information on every property.",
+         body, page_type="CollectionPage", page_extra={"mainEntity": items})
+
+# Pages for properties no longer listed are removed, so they do not linger on the site.
+for _old in [f for f in os.listdir(OUT) if re.fullmatch(r"property-[a-z0-9-]+\.html", f)]:
+    if _old not in [LISTING_PAGE(x) for x in LISTINGS]:
+        os.remove(os.path.join(OUT, _old))
+if COLLECTION:
+    collection_page()
+    for _x in LISTINGS:
+        listing_page(_x)
+elif os.path.exists(os.path.join(OUT, "collection.html")):
+    os.remove(os.path.join(OUT, "collection.html"))
+
 # ---------------------------------------------------------------- 404
 notfound_body = f'''
 <section class="page-hero notfound">
@@ -1172,7 +1529,9 @@ open(os.path.join(OUT, "404.html"), "w").write(html)
 # ---------------------------------------------------------------- SEO files
 # Search engines ignore <priority>, and trust <lastmod> only while it is accurate: the privacy notice
 # keeps its own date, every other page the date the pages last changed.
-pages = ["", "services.html"] + [sv["page"] for sv in SERVICES] + ["about.html", "students.html", "students-ar.html", "contact.html", "privacy.html"]
+pages = (["", "services.html"] + [sv["page"] for sv in SERVICES]
+         + (["collection.html"] + [LISTING_PAGE(x) for x in LISTINGS] if COLLECTION else [])
+         + ["about.html", "students.html", "students-ar.html", "contact.html", "privacy.html"])
 def sitemap_alternates(p):
     return "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{SITE}/{u}"/>' for l, u in ALTERNATES.get(p, []))
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
