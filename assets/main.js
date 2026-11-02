@@ -27,12 +27,13 @@
      leave a focused control under a bar. Only for keyboard (Tab) navigation, and checked once
      scrolling has stopped, so it never moves the page under a tap or fights a smooth scroll. */
   var tabBar = document.querySelector(".tabbar");
+  var lstBar = document.querySelector("[data-lst-bar]");   // a property page's viewing bar (phones and tablets)
   var focusTimer = 0, tabbing = false;
   document.addEventListener("keydown", function (e) { if (e.key === "Tab") tabbing = true; });
   document.addEventListener("pointerdown", function () { tabbing = false; });
   document.addEventListener("focusin", function (e) {
     var el = e.target;
-    if (!tabbing || [hd, tabBar].some(function (x) { return x && x.contains(el); })) return;
+    if (!tabbing || [hd, tabBar, lstBar].some(function (x) { return x && x.contains(el); })) return;
     clearTimeout(focusTimer);
     var seenY = -1, still = 0, waited = 0;
     var check = function () {
@@ -44,6 +45,7 @@
       var top = hd ? hd.offsetHeight : 0;
       var bottom = tabBar && tabBar.getClientRects().length
         ? Math.min(window.innerHeight, tabBar.getBoundingClientRect().top) : window.innerHeight;
+      if (lstBar && lstBar.getClientRects().length && !lstBar.classList.contains("is-away")) bottom = Math.min(bottom, lstBar.getBoundingClientRect().top);
       if (r.top < top) window.scrollBy(0, r.top - top - 12);
       else if (r.bottom > bottom) window.scrollBy(0, Math.min(r.bottom - bottom + 12, r.top - top - 12));
     };
@@ -63,6 +65,36 @@
       });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
     revealEls.forEach(function (el) { if (!el.classList.contains("in")) io.observe(el); });
+  }
+
+  /* ---------- Property pages: share, and the viewing bar on phones ---------- */
+  var share = document.querySelector("[data-share]");
+  if (share && (navigator.share || (navigator.clipboard && navigator.clipboard.writeText))) {
+    var shareLabel = share.querySelector("span");
+    share.hidden = false;
+    share.addEventListener("click", function () {
+      var data = { title: document.title, url: window.location.href.split("#")[0].split("?")[0] };
+      if (navigator.share) { navigator.share(data).catch(function () {}); return; }
+      navigator.clipboard.writeText(data.url).then(function () {
+        shareLabel.textContent = "Link copied";
+        setTimeout(function () { shareLabel.textContent = "Share"; }, 2500);
+      }, function () {});
+    });
+  }
+  if (lstBar && "IntersectionObserver" in window) {
+    // Out of the way while the price at the top or the enquiry card is already on screen.
+    var onScreen = [];
+    var watch = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var i = onScreen.indexOf(en.target);
+        if (en.isIntersecting && i < 0) onScreen.push(en.target);
+        if (!en.isIntersecting && i >= 0) onScreen.splice(i, 1);
+      });
+      var away = onScreen.length > 0;
+      lstBar.classList.toggle("is-away", away);
+      lstBar.inert = away;
+    });
+    document.querySelectorAll("[data-lst-price], [data-lst-ask]").forEach(function (el) { watch.observe(el); });
   }
 
   /* ---------- Brief form: three short steps, then a prepared email ----------

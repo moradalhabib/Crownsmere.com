@@ -106,6 +106,7 @@ P = {
     "tag": '<path d="M3 12.5V4h8.5L21 13.5 13.5 21z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
     "trend": '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
     "frame": '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="8.5" r="1.5"/>',
+    "share": '<path d="M12 15V3M7.5 7.5 12 3l4.5 4.5M5 12v8h14v-8"/>',
 }
 
 def ic(name, cls="ic"):
@@ -1413,6 +1414,16 @@ def listing_page(x):
               ("Council tax", f'Band {x["council_tax_band"]}')]
     facts = "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
     ask = f'contact.html?property={x["slug"]}#brief'
+    n = len(x["photos"])
+    all_photos = (f'<a class="lst-allphotos" href="#photos">{ic("frame")}<span>All {n} photos</span></a>' if n > 1 else "")
+    every = "".join(f"<figure>{photo(nm, alt)}</figure>" for nm, alt in x["photos"])
+    photo_section = (f"""
+<section class="sec sec-tight" id="photos" aria-labelledby="photos-title">
+  <div class="wrap">
+    <h2 id="photos-title" class="lst-photos-title">Photographs</h2>
+    <div class="lst-photos">{every}</div>
+  </div>
+</section>""" if n > 1 else "")
     subject = f'Crownsmere Estate | {x["title"]}, {x["area"]}'.replace(" ", "%20").replace("|", "%7C").replace(",", "%2C")
     body = f"""{PREVIEW_NOTE}
 <section class="lst-hero">
@@ -1423,10 +1434,10 @@ def listing_page(x):
         <h1>{x["title"]}</h1>
         <p class="lst-area">{ic("pin")}<span>{x["area"]}</span></p>
       </div>
-      <div class="lst-pricebox"><p class="lst-price">{price_text(x)}</p>{status_tag(x)}</div>
+      <div class="lst-pricebox" data-lst-price><p class="lst-price">{price_text(x)}</p><div class="lst-tags">{status_tag(x)}<button class="lst-share" type="button" data-share hidden>{ic("share")}<span>Share</span></button></div></div>
     </div>
     <div class="lst-gallery{" lst-gallery-solo" if not rest else ""}">
-      <figure class="lst-lead">{photo(lead[0], lead[1], lazy=False)}</figure>
+      <figure class="lst-lead">{photo(lead[0], lead[1], lazy=False)}{all_photos}</figure>
       {f'<div class="lst-thumbs" role="group" aria-label="More photographs" tabindex="0">{thumbs}</div>' if rest else ""}
     </div>
     <dl class="lst-facts">{facts}</dl>
@@ -1441,7 +1452,7 @@ def listing_page(x):
       {feats}
       {plan}
     </div>
-    <aside class="lst-ask" aria-label="Arrange a viewing">
+    <aside class="lst-ask" aria-label="Arrange a viewing" data-lst-ask>
       <p class="lst-ask-price">{price_text(x)}</p>
       <p>{summary(x)}</p>
       <div class="btn-row">
@@ -1452,11 +1463,13 @@ def listing_page(x):
     </aside>
   </div>
 </section>
+{photo_section}
 {material_information(x)}
 <nav class="wrap pager" aria-label="More properties">
   {btn("collection.html", "All properties", "ghost", arrow=False)}
   <a class="more" href="contact.html">Not quite right? Share your brief{ARROW}</a>
-</nav>"""
+</nav>
+<div class="lst-bar" data-lst-bar><p><b>&pound;{x["price"]:,}</b><span>{x["price_qualifier"]} &middot; {x["status"]}</span></p>{btn(ask, "Request a viewing", arrow=False)}</div>"""
     ph = x["photos"][0][0]
     w, h = jpeg_size(os.path.join(ROOT, "assets", "img", ph + ".jpg"))
     desc = strip_tags(f'{x["title"]} in {x["area"]}: {summary(x).replace("&middot;", ",")}. {price_text(x).replace("&pound;", "£")}. Viewings by appointment with Crownsmere Estate.')

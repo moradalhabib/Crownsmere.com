@@ -626,6 +626,14 @@ body:has(:is(input, select, textarea):focus) .tabbar { transform: translateY(110
 .lst-area { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; font-weight: 500; color: var(--ink-2); }
 .lst-area .ic { width: 20px; height: 20px; color: var(--gold-ink); }
 .lst-pricebox { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.lst-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lst-share {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px;
+  background: transparent; border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer;
+  font: 600 13px/1 var(--sans); color: var(--ink);
+}
+.lst-share .ic { width: 16px; height: 16px; }
+.lst-share:hover { border-color: var(--ink); }
 .lst-price { margin: 0; font: 500 30px/1.1 var(--serif); }
 .lst-status {
   display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: 999px;
@@ -647,6 +655,19 @@ body:has(:is(input, select, textarea):focus) .tabbar { transform: translateY(110
 .lst-gallery picture, .lst-gallery img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .lst-gallery img { object-fit: cover; }
 .lst-lead { aspect-ratio: 3 / 2; }
+/* "All 6 photos" on the lead photograph, down to every photograph further down the page */
+.lst-allphotos {
+  position: absolute; z-index: 1; right: 12px; bottom: 12px;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px;
+  background: rgba(250, 247, 241, 0.94); border-radius: var(--r); box-shadow: var(--shadow);
+  font: 600 13px/1 var(--sans); color: var(--ink); text-decoration: none;
+}
+.lst-allphotos .ic { width: 18px; height: 18px; }
+.lst-photos-title { margin-bottom: 20px; }
+.lst-photos { display: grid; gap: 10px; }
+.lst-photos figure { margin: 0; overflow: hidden; border-radius: var(--r-lg); }
+.lst-photos img { width: 100%; }
+@media (min-width: 800px) { .lst-photos { grid-template-columns: 1fr 1fr; gap: 16px; } .lst-photos figure:first-child { grid-column: 1 / -1; } }
 .lst-thumbs { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .lst-thumbs::-webkit-scrollbar { display: none; }
 .lst-thumbs figure { flex: 0 0 62%; aspect-ratio: 3 / 2; scroll-snap-align: start; }
@@ -729,8 +750,42 @@ body:has(:is(input, select, textarea):focus) .tabbar { transform: translateY(110
 .lst-card-facts { margin: 0; font-size: 15px; color: var(--ink-2); }
 .lst-card-price { margin: 6px 0 0; font: 500 24px/1.2 var(--serif); }
 .lst-card-epc { margin: 0; font-size: 13px; color: var(--ink-3); }
-@media (min-width: 700px) { .lst-grid { grid-template-columns: 1fr 1fr; gap: 20px; } }
-@media (min-width: 1000px) { .lst-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+/* Image-led, two to a row: a few homes, each given room. A single home is shown wide. */
+@media (min-width: 700px) {
+  .lst-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .lst-card:only-child { grid-column: 1 / -1; }
+}
+@media (min-width: 1000px) {
+  .lst-grid { gap: 40px 32px; }
+  .lst-card-media { aspect-ratio: 4 / 3; }
+  .lst-card-body { padding: 24px 28px 28px; }
+  .lst-card h2 { font-size: 32px; }
+  .lst-card:only-child { flex-direction: row; }
+  .lst-card:only-child .lst-card-media { flex: 1.4; }
+  .lst-card:only-child .lst-card-body { flex: 1; align-content: center; padding: 40px; }
+}
+
+/* Phones and tablets: the price and "Request a viewing" stay to hand, just above the tab bar,
+   except while the price at the top or the enquiry card is already on screen. */
+.lst-bar { display: none; }
+@media (max-width: 999px) {
+  .lst-bar {
+    position: fixed; left: 0; right: 0; z-index: 39;
+    bottom: calc(var(--tab-h) + 4px + env(safe-area-inset-bottom));
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px var(--gutter);
+    background: rgba(255, 253, 249, 0.97); border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px -16px rgba(14, 27, 46, 0.3);
+    transition: transform 0.3s var(--ease), opacity 0.3s;
+  }
+  .lst-bar p { display: grid; margin: 0; line-height: 1.25; }
+  .lst-bar b { font: 500 21px/1.15 var(--serif); }
+  .lst-bar span { font-size: 12px; color: var(--ink-3); }
+  .lst-bar .btn { min-height: 44px; padding: 0 16px; font-size: 14px; flex: none; }
+  .lst-bar.is-away, body:has(:is(input, select, textarea):focus) .lst-bar { transform: translateY(calc(100% + var(--tab-h) + 8px)); opacity: 0; pointer-events: none; }
+  body:has(.lst-bar) .ft { padding-bottom: calc(var(--tab-h) + 104px + env(safe-area-inset-bottom)); }
+  html:has(.lst-bar) { scroll-padding-bottom: calc(var(--tab-h) + 96px + env(safe-area-inset-bottom)); }
+}
 
 /* The contact form, when opened from a property page */
 .form-ref { margin: 0 0 18px; padding: 12px 14px; background: var(--bg-alt); border-left: 3px solid var(--gold); border-radius: var(--r); font-size: 14px; color: var(--ink-2); }
