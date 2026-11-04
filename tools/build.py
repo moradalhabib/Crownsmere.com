@@ -189,6 +189,8 @@ def structured_data(title, desc, path, canonical, lang, page_type, page_extra, e
 def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang="en", page_type="WebPage", page_extra=None):
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = structured_data(title, desc, path, canonical, lang, page_type, page_extra, extra_ld)
+    # Escape HTML-delimiters so property text cannot terminate the JSON-LD script.
+    json_ld = json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     og_desc = og_desc or desc
     amp = lambda t: re.sub(r"&(?![a-zA-Z]+;|#[0-9]+;)", "&amp;", t)  # a bare "&" in text must be "&amp;"
     title, desc, og_desc = amp(title), amp(desc), amp(og_desc)
@@ -239,7 +241,7 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
 <link rel="preload" href="assets/fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="assets/style.css">
 {extra_css}<script type="speculationrules">{SPECULATION}</script>
-<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")}</script>
+<script type="application/ld+json">{json_ld}</script>
 </head>
 <body class="page-{slug}">
 <a class="skip" href="#main">Skip to content</a>'''
