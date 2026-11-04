@@ -132,7 +132,7 @@ def build_properties(ctx):
     <div class="property-toolbar">
       <div><p class="eyebrow">Discover</p><h2 id="properties-title">The <em>collection.</em></h2>
         <p class="property-count" aria-live="polite" data-property-count>{len(active)} {'property' if len(active) == 1 else 'properties'} available</p></div>
-      <form class="property-filters" aria-label="Filter properties" onsubmit="return false">
+      <form class="property-filters" aria-label="Filter properties">
         <label>Looking to<select data-filter="type"><option value="all">All properties</option><option value="sale">To buy</option><option value="rent">To rent</option></select></label>
         <label>Location<select data-filter="area"><option value="all">All areas</option>{areas_html}</select></label>
         <label>Bedrooms<select data-filter="beds"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5+</option></select></label>
@@ -158,7 +158,7 @@ def build_properties(ctx):
 </div></section>'''
     page("properties.html", "London Properties for Sale & Rent | " + brand,
          "Explore Crownsmere's curated London property collection. Enquire with Alaa Qadir about homes for sale, to rent and private opportunities.",
-         list_body, page_type="CollectionPage")
+         list_body, page_type="CollectionPage", scripts='\n<script src="assets/property.js" defer></script>')
 
     details = []
     for row in active:
@@ -242,6 +242,6 @@ def build_properties(ctx):
                                 "url":site+"/"+path}}
         page(path, row["title"] + " | " + brand,
              (row["title"] + " in " + row["area"] + ". Enquire through Alaa Qadir at Crownsmere Estate.")[:160],
-             detail_body, extra_ld=[structured])
+             detail_body, extra_ld=[structured], scripts='\n<script src="assets/property.js" defer></script>')
         details.append(path)
     return details
