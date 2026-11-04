@@ -19,7 +19,7 @@ EMAIL = "hello@crownsmere.com"
 ALAA = "alaa.qadir@crownsmere.com"
 UPDATED = "23 October 2026"          # the privacy notice's "Last updated" date
 UPDATED_ISO = "2026-10-23"
-SITE_UPDATED_ISO = "2026-10-26"     # when the pages last changed: the sitemap and the pages' structured data
+SITE_UPDATED_ISO = "2026-11-04"     # when the pages last changed: the sitemap and the pages' structured data
 
 # ---------------------------------------------------------------- search engines
 # Ownership checks for Google Search Console and Bing Webmaster Tools: paste the content value of the
@@ -114,10 +114,10 @@ def link(page):
     never as index.html."""
     return "./" if page == "index.html" else page
 
-NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
+NAV = [("index.html", "Home"), ("properties.html", "Properties"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
 # The tab bar along the bottom of phones and tablets: (page, icon, label, Arabic label).
-TABS = [("index.html", "house", "Home", "الرئيسية"), ("services.html", "grid", "Services", "الخدمات"),
-        ("about.html", "person", "About", "عن علا"), ("students.html", "cap", "Students", "الطلاب"),
+TABS = [("index.html", "house", "Home", "الرئيسية"), ("properties.html", "key", "Properties", "العقارات"),
+        ("services.html", "grid", "Services", "الخدمات"), ("students.html", "cap", "Students", "الطلاب"),
         ("contact.html", "mail", "Contact", "تواصل")]
 
 ORG = {
@@ -195,7 +195,8 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
     slug = "home" if path == "index.html" else path.replace(".html", "")
     preload = ('<link rel="preload" href="assets/img/townhouse.avif" as="image" type="image/avif" fetchpriority="high">\n'
                if path == "index.html" else "")
-    extra_css = '<link rel="stylesheet" href="assets/student.css">\n' if path.startswith("students") else ""
+    extra_css = ('<link rel="stylesheet" href="assets/student.css">\n' if path.startswith("students") else
+                 '<link rel="stylesheet" href="assets/property.css">\n' if path == "properties.html" or path.startswith("property-") else "")
     alternates = "".join(f'<link rel="alternate" hreflang="{l}" href="{SITE}/{u}">\n' for l, u in ALTERNATES.get(path, []))
     other_locale = "".join(f'<meta property="og:locale:alternate" content="{"ar_AR" if l == "ar" else "en_GB"}">\n'
                            for l, u in ALTERNATES.get(path, []) if u != path and l != "x-default")
@@ -310,7 +311,7 @@ def footer(current, lang="en"):
     """Every page links to every other from here: the five services, the rest of the site and the
     Arabic student page, so each page is one step from anywhere (for visitors and search engines)."""
     services = "".join(f'<li><a href="{sv["page"]}">{sv["name"]}</a></li>' for sv in SERVICES)
-    more = ('<li><a href="about.html">About Alaa</a></li><li><a href="students.html">Students</a></li>'
+    more = ('<li><a href="properties.html">Properties</a></li><li><a href="about.html">About Alaa</a></li><li><a href="students.html">Students</a></li>'
             '<li><a href="students-ar.html" lang="ar" dir="rtl" hreflang="ar">مساعدة الطلاب بالعربية</a></li>'
             '<li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy</a></li>')
     en = ' lang="en-GB"' if lang == "ar" else ""
@@ -420,8 +421,8 @@ AREAS = ["Mayfair", "Belgravia", "Knightsbridge", "Chelsea", "Kensington", "Holl
 FAQ = {
     "how": ("How does it work?",
             "You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."),
-    "listings": ("Why are there no properties listed on this website?",
-                 "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."),
+    "listings": ("Can I browse properties on the website?",
+                 "Yes. Visit our <a href=\"properties.html\">Properties collection</a> for homes currently available to view. Other opportunities are offered privately, so please share your brief with Alaa."),
     "agent": ("Are you a buying agent?",
               "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give you a second opinion."),
     "areas": ("Which areas do you cover?",
@@ -564,9 +565,12 @@ def cta(heading="Tell me what <em>you are looking for.</em>"):
 </section>'''
 
 # ---------------------------------------------------------------- home: a short front door to the rest of the site
-HOME_TILES = ([(sv["page"], sv["icon"], sv["name"], sv["tile"], "") for sv in SERVICES[:4]]
-              + [("students.html", "cap", "Students", "Rental help, even without a UK guarantor.", ""),
-                 ("about.html", "person", "Meet Alaa", "Your consultant, one to one.", "")])
+HOME_TILES = [("properties.html", "key", "Properties", "Explore our homes for sale and rent.", ""),
+              ("buy.html", "house", "Buy", "Discover your next London home.", ""),
+              ("rent.html", "key", "Rent", "Find a place that feels like home.", ""),
+              ("sell.html", "tag", "Sell", "Discreet private sales.", ""),
+              ("students.html", "cap", "Students", "Rental help, even without a UK guarantor.", ""),
+              ("about.html", "person", "Meet Alaa", "Your consultant, one to one.", "")]
 
 index_body = f'''
 <section class="hero" aria-labelledby="hero-title">
@@ -576,7 +580,8 @@ index_body = f'''
     <h1 id="hero-title">London property, <em>personally handled.</em></h1>
     <p class="hero-sub">Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a discreet, personal search, on and off the market.</p>
     <div class="hero-actions">
-      {btn("contact.html", "Share your brief", "light")}
+      {btn("properties.html", "Explore properties", "light")}
+      {btn("contact.html", "Share your brief", "ghost")}
     </div>
   </div>
 </section>
@@ -586,7 +591,7 @@ index_body = f'''
     {sec_head("How can we help?", "Find your way <em>forward.</em>", hid="help-title")}
     {tiles(HOME_TILES, label="Explore")}
     <p class="home-areas" data-reveal>Searching across prime London: {", ".join(AREAS[:-1])} and {AREAS[-1]}. <a href="services.html#areas">Where I search</a></p>
-    <p class="fine">Photographs illustrate London homes and neighbourhoods, not available listings.</p>
+    <p class="fine">Home-page photography is illustrative and does not depict property availability. Visit Properties to view authorised listings.</p>
   </div>
 </section>
 {testimonials()}
@@ -1148,6 +1153,10 @@ page("privacy.html", f"Privacy Notice | {BRAND}",
      "How Crownsmere Estate collects, uses and protects the personal information you share with us, and the rights you have over it.",
      privacy_body)
 
+# ---------------------------------------------------------------- curated property collection (private-by-default)
+from property_pages import build_properties
+PROPERTY_DETAIL_PAGES = build_properties(globals())
+
 # ---------------------------------------------------------------- 404
 notfound_body = f'''
 <section class="page-hero notfound">
@@ -1172,7 +1181,7 @@ open(os.path.join(OUT, "404.html"), "w").write(html)
 # ---------------------------------------------------------------- SEO files
 # Search engines ignore <priority>, and trust <lastmod> only while it is accurate: the privacy notice
 # keeps its own date, every other page the date the pages last changed.
-pages = ["", "services.html"] + [sv["page"] for sv in SERVICES] + ["about.html", "students.html", "students-ar.html", "contact.html", "privacy.html"]
+pages = ["", "properties.html", "services.html"] + [sv["page"] for sv in SERVICES] + PROPERTY_DETAIL_PAGES + ["about.html", "students.html", "students-ar.html", "contact.html", "privacy.html"]
 def sitemap_alternates(p):
     return "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{SITE}/{u}"/>' for l, u in ALTERNATES.get(p, []))
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
