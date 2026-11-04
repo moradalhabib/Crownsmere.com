@@ -344,11 +344,11 @@ def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", lang
 # ---------------------------------------------------------------- shared content
 TENANT_HELP = [
     "A search to your brief, on and off the market, including homes not yet advertised to rent",
-    "Accompanied viewings, with an honest view on every property",
-    "Direct negotiation of the rent, tenancy length, move-in date, furnishings and other terms",
+    "Viewings coordinated with the appointed letting agent",
+    "Discussion of rental terms and a personal introduction to the relevant agent",
     "Clear guidance on deposits, rent in advance and what to expect before you commit",
 ]
-TENANT_INTRO = "When you ask Alaa to find you a home to rent, she represents you: searching, viewing and negotiating directly with landlords and their agents on your behalf, so you secure the right home on the right terms."
+TENANT_INTRO = "When you ask Alaa to find you a home to rent, she listens to your brief, sources suitable opportunities and coordinates an introduction to the appropriate owner or letting agent. The appointed professional handles the tenancy process."
 
 # One page per service. "anchor" is the service's old section on services.html (services.html#let still
 # lands on Rent). "tile" is the short line on the home and services tiles; "groups" are the page's lists.
@@ -358,17 +358,17 @@ SERVICES = [
          lede="Tell me what you are looking for, and I will find it: on the market, off the market, or not yet on anyone&rsquo;s radar.",
          groups=[("What I do for you", "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf.",
                   ["A private briefing on your requirements", "A personal search, on and off the market",
-                   "A curated shortlist, checked before you see it", "Accompanied viewings, negotiation and support to completion"])],
+                   "A curated shortlist, checked before you see it", "Introductions to appointed agents for viewings and sale progression"])],
          steps=True, cta="Tell me what <em>you are looking for.</em>",
          faq=["offmarket", "areas", "overseas", "fees"],
          kind="Property search for buyers", title="Buy a Home in Prime London",
-         desc="A personal search for homes in prime London, on and off the market, with accompanied viewings and negotiation through to completion."),
+         desc="A personal search for London homes, on and off the market, with introductions to the agents responsible for viewing and the sale process."),
     dict(page="sell.html", anchor="sell", name="Sell", icon="tag",
          h1="Sell, <em>quietly and privately.</em>", tile="A quiet, private sale.",
          lede="A quiet, private sale. Your property is introduced only to qualified buyers, without the noise of a public listing.",
          groups=[("What I do for you", "",
-                  ["A confidential conversation about your plans", "Valuation advice and pricing strategy",
-                   "Discreet introductions to qualified buyers, viewings by appointment", "No public listing unless you wish it"])],
+                  ["A confidential conversation about your plans", "Introductions to specialist valuation and pricing support",
+                   "Discreet buyer introductions to the appointed selling agent, with viewings by appointment", "No public listing unless you wish it"])],
          steps=False, cta="Thinking of <em>a private sale?</em>",
          faq=["public", "private", "fees"],
          kind="Private property sales", title="Sell Your London Property Privately",
@@ -383,7 +383,7 @@ SERVICES = [
          steps=True, cta="Tell me what <em>you need.</em>",
          faq=["landlords", "areas", "fees"],
          kind="Lettings", title="Rent or Let in Prime London",
-         desc="Find a London home to rent, with Alaa Qadir negotiating directly with landlords for you, or the right tenant for your property, found discreetly."),
+         desc="Find a London rental or suitable tenant with a personal search by Alaa Qadir, who introduces qualified clients to the appointed letting agent."),
     dict(page="invest.html", anchor="invest", name="Invest", icon="trend",
          h1="Invest, <em>to your brief.</em>", tile="Opportunities sourced to your brief.",
          lede="Investment opportunities sourced to your criteria, including those that never reach the open market.",
@@ -412,7 +412,7 @@ CRUMBS.update({s["page"]: s["name"] for s in SERVICES})
 STEPS = [
     ("Share your brief", "A private conversation about what you are looking for, why, and when. No detail is too small."),
     ("See a curated shortlist", "I search personally, on and off the market, and check every property before you see it."),
-    ("View, negotiate, complete", "Accompanied viewings, calm negotiation and support through to completion, and long after."),
+    ("Meet your appointed agent", "With your agreement, Alaa coordinates an introduction; the appointed agent manages viewings, offers and transaction progression."),
 ]
 
 AREAS = ["Mayfair", "Belgravia", "Knightsbridge", "Chelsea", "Kensington", "Holland Park",
@@ -424,13 +424,13 @@ FAQ = {
     "listings": ("Can I browse properties on the website?",
                  "Yes. Visit our <a href=\"properties.html\">Properties collection</a> for homes currently available to view. Other opportunities are offered privately, so please share your brief with Alaa."),
     "agent": ("Are you a buying agent?",
-              "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give you a second opinion."),
+              "Crownsmere sources property opportunities and arranges introductions. For partner listings, the appointed estate agent handles viewings, negotiation and completion. Crownsmere may receive a disclosed commission for an introduction."),
     "areas": ("Which areas do you cover?",
               "Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask."),
     "overseas": ("I live overseas. Can you still help?",
                  "Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person."),
     "private": ("Is my enquiry confidential?",
-                "Completely. Your brief and your details are used only to help you, and are shared with relevant partners only with your further agreement. See the <a href=\"privacy.html\">privacy notice</a> for details."),
+                "Your enquiry is treated confidentially. We explain any proposed agent introduction and ask for your agreement before sharing your details. See the <a href=\"privacy.html\">privacy notice</a> for details."),
     "fees": ("How are fees agreed?",
              "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."),
     # Asked on the service pages; each answer restates what the service pages already say.
@@ -439,7 +439,7 @@ FAQ = {
     "public": ("Will my property be advertised publicly?",
                "Not unless you wish it. Your property is introduced only to qualified buyers, with viewings by appointment, so the sale stays quiet and private."),
     "landlords": ("Do you help landlords as well as tenants?",
-                  "Yes. For landlords, the right tenant for your property is found discreetly, with private, by-appointment viewings, negotiation of terms and clear communication throughout."),
+                  "Yes. Alaa can introduce suitable tenants to the appointed letting agent, who handles viewings, negotiations and tenancy progression."),
     "invest_offmarket": ("Can you find off-market investments?",
                          "Yes. Opportunities are sourced to your brief, including those that never reach the open market, with neighbourhood-level analysis of yield and growth."),
     "second_opinion": ("Can I ask for a second opinion only?",
@@ -668,14 +668,14 @@ for i, sv in enumerate(SERVICES):
 QUALITIES = [
     ("person", "A full one-to-one service", "You deal with Alaa directly, from the first conversation to the keys. No call centre, no hand-offs."),
     ("people", "Well connected", "A discreet network of owners, agents and advisers opens doors to homes that never appear online."),
-    ("scales", "Direct negotiation, on your side", "Alaa negotiates with sellers, landlords and their agents for you: price or rent, terms and timing."),
-    ("heart", "Client care", "Honest updates at every stage, viewings arranged around you, and support after you move in."),
+    ("scales", "Personal introductions, clearly handled", "Alaa qualifies every enquiry and arranges the introduction to the appointed property professional, with your agreement."),
+    ("heart", "Client care", "Clear communication from the first enquiry through to an agreed agent introduction."),
     ("pin", "Prime London insight", "Street-by-street knowledge of Prime and Super Prime London, built over long-standing relationships."),
     ("shield", "Complete discretion", "Your plans and your details stay private, shared only with your agreement."),
 ]
 AUDIENCES = [
     ("buy.html", "Buyers", "A home or a pied-&agrave;-terre"),
-    ("rent.html", "Tenants", "The right rental, negotiated for you"),
+    ("rent.html", "Tenants", "Your rental search, personally guided"),
     ("sell.html", "Owners selling", "A quiet, private sale"),
     ("rent.html", "Landlords", "The right tenant, found discreetly"),
     ("invest.html", "Investors", "Opportunities sourced to your brief"),
@@ -707,7 +707,7 @@ about_body = f'''
     <div class="profile-copy">
       <p class="eyebrow">Senior Property Consultant &middot; {BRAND}</p>
       <h1>Alaa <em>Qadir.</em></h1>
-      <p class="lede">A one-to-one property consultant in prime London. Alaa finds, negotiates and secures homes for buyers and tenants, and represents owners who want a quiet, well-handled sale or let.</p>
+      <p class="lede">A one-to-one property consultant in prime London. Alaa sources properties, speaks personally with prospective buyers and tenants, and coordinates introductions to appointed sales and letting agents.</p>
       <ul class="tags tags-sm"><li>One-to-one service</li><li>Prime London</li><li>Buyers, tenants and owners</li><li>Enquiries in English and Arabic</li></ul>
       <div class="btn-row">
         {btn("contact.html", "Share your brief")}
@@ -764,11 +764,11 @@ about_body = f'''
 PERSON = {"@type": "Person", "@id": f"{SITE}/about.html#alaa", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant",
                              "worksFor": {"@id": f"{SITE}/#business"}, "workLocation": {"@type": "City", "name": "London"},
                              "knowsAbout": ["Prime London property", "Property search", "Off-market property",
-                                            "Negotiation for buyers and tenants", "Private sales", "Lettings"],
+                                            "Buyer and tenant introductions", "Private sales", "Lettings"],
                              **({"image": f"{SITE}/assets/img/{PORTRAIT}.jpg"} if PORTRAIT else {})}
 
 page("about.html", f"Alaa Qadir, Senior Property Consultant | {BRAND}",
-     "Alaa Qadir is a one-to-one property consultant in prime London, negotiating directly for buyers and tenants and handling discreet sales and lettings.",
+     "Alaa Qadir is a one-to-one property consultant in prime London, sourcing opportunities and coordinating introductions to sales and letting agents.",
      about_body, page_type="ProfilePage", page_extra={"mainEntity": PERSON})
 
 # ---------------------------------------------------------------- contact
