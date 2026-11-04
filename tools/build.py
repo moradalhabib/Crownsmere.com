@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+from html import escape as html_escape
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://crownsmere.com"
@@ -192,8 +193,8 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
     # Escape HTML-delimiters so property text cannot terminate the JSON-LD script.
     json_ld = json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     og_desc = og_desc or desc
-    amp = lambda t: re.sub(r"&(?![a-zA-Z]+;|#[0-9]+;)", "&amp;", t)  # a bare "&" in text must be "&amp;"
-    title, desc, og_desc = amp(title), amp(desc), amp(og_desc)
+    # Property titles/descriptions are untrusted: escape both elements and meta attributes.
+    title, desc, og_desc = (html_escape(str(value), quote=True) for value in (title, desc, og_desc))
     slug = "home" if path == "index.html" else path.replace(".html", "")
     preload = ('<link rel="preload" href="assets/img/townhouse.avif" as="image" type="image/avif" fetchpriority="high">\n'
                if path == "index.html" else "")
