@@ -223,10 +223,10 @@ test('about: Alaa Qadir profile covers how she works, with nothing invented', as
   await expect(page).toHaveTitle(/Alaa Qadir/);
   await expect(page.locator('h1')).toContainText('Alaa');
   await expect(page.locator('#story-title')).toHaveText('Not a typical estate agency.');
-  for (const quality of ['one-to-one service', 'Well connected', 'Direct negotiation', 'Client care', 'Complete discretion']) {
+  for (const quality of ['one-to-one service', 'Well connected', 'Personal introductions', 'Client care', 'Complete discretion']) {
     await expect(page.locator('.card h3', {hasText: new RegExp(quality, 'i')})).toHaveCount(1);
   }
-  await expect(page.locator('#tenants')).toContainText('negotiating directly with landlords');
+  await expect(page.locator('#tenants')).toContainText('coordinates an introduction');
   expect(await page.locator('.whos .who').evaluateAll(els => els.map(el => el.getAttribute('href'))))
     .toEqual(['buy.html', 'rent.html', 'sell.html', 'rent.html', 'invest.html', 'students.html']);
   // Figures and client comments appear only once real ones are supplied.
