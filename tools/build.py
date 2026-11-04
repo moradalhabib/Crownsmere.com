@@ -239,7 +239,7 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
 <link rel="preload" href="assets/fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="assets/style.css">
 {extra_css}<script type="speculationrules">{SPECULATION}</script>
-<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
+<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")}</script>
 </head>
 <body class="page-{slug}">
 <a class="skip" href="#main">Skip to content</a>'''
