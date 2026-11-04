@@ -44,7 +44,7 @@ jobs:
         run: |
           python3 tools/create_property_qa_fixture.py --output-dir "${RUNNER_TEMP}/crownsmere-property-fixture"
           npx html-validate "${RUNNER_TEMP}/crownsmere-property-fixture/property-qa-fictional-apartment.html"
-          python3 -m http.server 8766 --bind 127.0.0.1 --directory "${RUNNER_TEMP}/crownsmere-property-fixture" >"${RUNNER_TEMP}/property-fixture-server.log" 2>&1 &
+          python3 tests/e2e/serve.py --port 8766 --root "${RUNNER_TEMP}/crownsmere-property-fixture" >"${RUNNER_TEMP}/property-fixture-server.log" 2>&1 &
           qa_server_pid=$!
           trap 'kill "$qa_server_pid" || true' EXIT
           CROWNSMERE_PROPERTY_FIXTURE=1 npx playwright test tests/e2e/property-fixture.spec.cjs --config=playwright.config.cjs --browser chromium
