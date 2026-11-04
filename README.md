@@ -64,7 +64,9 @@ What only the owner can do, in order of impact:
 
 
 ## Property catalogue and Mobbin-led design
-The November 2026 development branch introduces a property catalogue and sitewide UI refinements.nUse the source-grounded Mobbin reference matrix in [docs/property-platform.md](docs/property-platform.md) for **all future Crownsmere screens and pages**: homepage, services, Alaa profile, student lettings, contact, property listings and property details. Preserve the original Crownsmere brand. Never copy Mobbin assets or an entire source design.
+The November 2026 development branch introduces a property catalogue and sitewide UI refinements.
+
+Use the source-grounded Mobbin reference matrix in [docs/property-platform.md](docs/property-platform.md) for **all future Crownsmere screens and pages**: homepage, services, Alaa profile, student lettings, contact, property listings and property details. Preserve the original Crownsmere brand. Never copy Mobbin assets or an entire source design.
 
 Only listings marked `published` with both `owner_authority` and `compliance_cleared` set to `true`, and with verified real property particulars and images, are generated. The catalogue begins empty. It is not yet authorised for production release.
 
