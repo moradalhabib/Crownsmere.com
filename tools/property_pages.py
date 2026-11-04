@@ -208,7 +208,7 @@ def build_properties(ctx):
       <h2>A closer <em>look.</em></h2>
       <p class="property-description">{txt(row["description"])}</p>
       <dl class="property-facts">{facts_html}</dl>
-      {feature_block}
+{feature_block}
 {floorplan_block}
       <p class="fine">All particulars are subject to confirmation with the appointed agent. Images and descriptions relate to this property and are published with authority.</p>
     </div>
