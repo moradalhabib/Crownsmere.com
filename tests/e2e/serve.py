@@ -15,6 +15,11 @@ ROOT = Path.cwd().resolve()
 
 
 class Handler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        # Both HTML and static assets must come from the selected QA root.
+        # SimpleHTTPRequestHandler otherwise defaults to the process cwd.
+        super().__init__(*args, directory=str(ROOT), **kwargs)
+
     def do_GET(self):
         path = unquote(urlsplit(self.path).path)
         if path == "/" or path.endswith("/"):
