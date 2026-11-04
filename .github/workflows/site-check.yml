@@ -69,10 +69,21 @@ jobs:
           if grep -q 'http-equiv="Content-Security-Policy"' <<<"$home"; then ok "Content Security Policy present in the page"; else bad "Content Security Policy missing"; fi
 
           echo "== Pages"
-          for p in / /services.html /buy.html /sell.html /rent.html /invest.html /advisory.html /about.html /students.html /students-ar.html /contact.html /privacy.html /assets/style.css /assets/student.css /assets/main.js /assets/student.js /assets/fonts/inter-latin.woff2 /assets/img/townhouse.avif /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /favicon.ico /assets/img/favicon-96.png /assets/img/favicon-192.png; do
+          for p in / /properties.html /services.html /buy.html /sell.html /rent.html /invest.html /advisory.html /about.html /students.html /students-ar.html /contact.html /privacy.html /assets/style.css /assets/student.css /assets/property.css /assets/main.js /assets/student.js /assets/property.js /assets/fonts/inter-latin.woff2 /assets/img/townhouse.avif /sitemap.xml /robots.txt /site.webmanifest /.well-known/security.txt /assets/img/og-image.jpg /favicon.ico /assets/img/favicon-96.png /assets/img/favicon-192.png; do
             code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE$p")
             if [ "$code" = 200 ]; then ok "$p ($code)"; else bad "$p returned $code"; fi
           done
+          echo "== Property collection publication safeguards"
+          public_properties=$(curl -skS --max-time 20 "https://$SITE/properties.html")
+          if grep -q 'data-property-grid' <<<"$public_properties"; then ok "property collection loads"; else bad "property collection missing"; fi
+          if grep -q 'QA Fictional Apartment\|CME-QA-ONLY\|Example listing' <<<"$public_properties"; then
+            bad "test or example property leaked to production"
+          else
+            ok "no QA fixture properties exposed"
+          fi
+          code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE/data/properties.json")
+          if [ "$code" = 404 ]; then ok "property source records excluded from published website"; else bad "property source records publicly reachable ($code)"; fi
+
           code=$(curl -sk -o /dev/null --max-time 20 -w '%{http_code}' "https://$SITE/no-such-page")
           if [ "$code" = 404 ]; then ok "missing pages return 404"; else bad "missing page returned $code"; fi
           for p in /mail-filter/filter.php /mail-filter/config.php /tools/build.py /tests/e2e/ux.spec.cjs /docs/research-2026-10.md /README.md; do
