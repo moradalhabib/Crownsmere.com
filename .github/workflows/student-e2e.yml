@@ -69,7 +69,7 @@ jobs:
         run: |
           python3 tools/create_property_qa_fixture.py --output-dir "${RUNNER_TEMP}/crownsmere-property-e2e"
           npx html-validate "${RUNNER_TEMP}/crownsmere-property-e2e/property-qa-fictional-apartment.html"
-          python3 -m http.server 8766 --bind 127.0.0.1 --directory "${RUNNER_TEMP}/crownsmere-property-e2e" > "${RUNNER_TEMP}/crownsmere-fixture-http.log" 2>&1 &
+          python3 tests/e2e/serve.py --port 8766 --root "${RUNNER_TEMP}/crownsmere-property-e2e" > "${RUNNER_TEMP}/crownsmere-fixture-http.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           for engine in chromium webkit firefox; do
