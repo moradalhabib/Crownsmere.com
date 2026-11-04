@@ -241,7 +241,8 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
 <link rel="preload" href="assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="assets/style.css">
-{extra_css}<script type="speculationrules">{SPECULATION}</script>
+{extra_css}<link rel="stylesheet" href="assets/editorial.css">
+<script type="speculationrules">{SPECULATION}</script>
 <script type="application/ld+json">{json_ld}</script>
 </head>
 <body class="page-{slug}">
@@ -267,7 +268,7 @@ def header(current, lang="en"):
       <span class="wm"><b>CROWNSMERE</b><small>Estate</small></span>
     </a>
     <nav class="hd-nav" aria-label="Main">{links}</nav>
-    {btn("contact.html", "Start enquiry", "primary", arrow=False, extra=' data-cta')}
+    {btn("contact.html", "Speak to Alaa", "primary", arrow=False, extra=' data-cta')}
   </div>
 </header>'''
 
@@ -577,29 +578,66 @@ HOME_TILES = [("properties.html", "key", "Properties", "Explore our homes for sa
 
 index_body = f'''
 <section class="hero" aria-labelledby="hero-title">
-  <picture class="hero-media">{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="A white-stucco London townhouse with a black front door" width="1055" height="687" fetchpriority="high"></picture>
+  <picture class="hero-media">{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="An elegant London stucco townhouse-lined street" width="1055" height="687" fetchpriority="high"></picture>
   <div class="wrap hero-in">
-    <p class="eyebrow">Prime London property consultancy</p>
-    <h1 id="hero-title">London property, <em>personally handled.</em></h1>
-    <p class="hero-sub">Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a discreet, personal search, on and off the market.</p>
+    <p class="eyebrow">Crownsmere Estate · Prime London</p>
+    <h1 id="hero-title">London property, <em>beautifully personal.</em></h1>
+    <p class="hero-sub">For the home you imagine and the move you are planning. A more thoughtful way to discover London property, with Alaa Qadir as your first point of contact.</p>
     <div class="hero-actions">
       {btn("properties.html", "Explore properties", "light")}
-      {btn("contact.html", "Share your brief", "ghost")}
+      {btn("contact.html", "Speak to Alaa", "ghost")}
     </div>
   </div>
 </section>
 
-<section class="sec" aria-labelledby="help-title">
+<section class="home-discover" aria-labelledby="discover-title">
   <div class="wrap">
-    {sec_head("How can we help?", "Find your way <em>forward.</em>", hid="help-title")}
-    {tiles(HOME_TILES, label="Explore")}
-    <p class="home-areas" data-reveal>Searching across prime London: {", ".join(AREAS[:-1])} and {AREAS[-1]}. <a href="services.html#areas">Where I search</a></p>
-    <p class="fine">Home-page photography is illustrative and does not depict property availability. Visit Properties to view authorised listings.</p>
+    <div class="home-overline"><p class="eyebrow">A more personal London</p></div>
+    <div class="home-discover-intro" data-reveal>
+      <h2 id="discover-title">Every address has a story. <em>Find yours.</em></h2>
+      <p class="lede">Discover opportunities for sale or rent and tell Alaa what really matters. The right property journey begins with understanding you.</p>
+    </div>
+    <div class="home-paths" data-reveal>
+      <a class="home-path" href="properties.html" aria-label="Explore Crownsmere properties for sale">
+        <picture>{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="A London terrace of elegant white townhouses" width="1055" height="687" loading="lazy"></picture>
+        <div class="home-path-content"><div><p class="eyebrow">01 / Buying in London</p><h3>For sale</h3><p>Find a place to call your own</p></div><span class="home-path-arrow" aria-hidden="true">&rarr;</span></div>
+      </a>
+      <a class="home-path" href="rent.html" aria-label="Explore Crownsmere rental services">
+        <picture>{sources("interior")}<img src="assets/img/interior.jpg" alt="A light-filled London sitting room with neutral furnishings" width="826" height="463" loading="lazy"></picture>
+        <div class="home-path-content"><div><p class="eyebrow">02 / Renting in London</p><h3>To rent</h3><p>Let your next chapter begin</p></div><span class="home-path-arrow" aria-hidden="true">&rarr;</span></div>
+      </a>
+    </div>
+    <p class="home-disclaimer">Photography is illustrative and does not represent a currently available property. <a href="properties.html">View the current collection.</a></p>
+  </div>
+</section>
+
+<section class="home-editorial" aria-labelledby="home-personal-title">
+  <div class="home-editorial-grid">
+    <div class="home-editorial-picture">{pic("colonnade", "London's period townhouse architecture beside mature trees", 563, 398)}</div>
+    <div class="home-editorial-content">
+      <p class="eyebrow">Beyond the listing</p>
+      <h2 id="home-personal-title">It starts with <em>a conversation.</em></h2>
+      <p class="lede">No crowded shortlist. No impersonal hand-offs. Alaa takes the time to understand your plans, then introduces you to the right property professionals when you are ready.</p>
+      <a class="more" href="about.html">Meet Alaa Qadir {ARROW}</a>
+      <p class="home-editorial-mark">Alaa Qadir</p>
+      <p class="home-editorial-copy">Senior Property Consultant · Crownsmere Estate</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec home-ways" aria-labelledby="help-title">
+  <div class="wrap">
+    <div class="home-overline"><p class="eyebrow">Explore Crownsmere</p></div>
+    <div class="sec-head" data-reveal>
+      <h2 id="help-title">Your next move, <em>beautifully considered.</em></h2>
+      <p class="lede">From your first London rental to a private sale, discover how Crownsmere can make the process more personal.</p>
+    </div>
+    {tiles(HOME_TILES, label="Explore Crownsmere services")}
+    <p class="home-areas" data-reveal>Our London focus: {", ".join(AREAS[:-1])} and {AREAS[-1]}. <a href="services.html#areas">Discover where we search</a>.</p>
   </div>
 </section>
 {testimonials()}
-{cta()}'''
-
+{cta("The right move begins <em>with you.</em>")}'''
 page("index.html", f"{BRAND} | Buy, Sell & Rent London Property",
      "Personal property search, private sales, lettings and student rental help in prime London. Work directly with property consultant Alaa Qadir.",
      index_body)
@@ -725,9 +763,9 @@ about_body = f'''
   <div class="wrap story-text" data-reveal>
     <p class="eyebrow">Why Crownsmere</p>
     <h2 id="story-title">Not a typical <em>estate agency.</em></h2>
-    <p class="lead">As your dedicated consultant, I work for you and you alone. My clients come to me with a request, and my role is simple: to find what they are looking for, and to look after their interests at every step.</p>
+    <p class="lead">You start with me and I stay your point of contact. I listen carefully to your brief, source relevant opportunities and coordinate introductions to appointed estate and letting agents, with your agreement.</p>
     <p>Property is about people, not just buildings. I take on a small number of clients so that each one receives my full attention, honest advice and a search shaped entirely around them.</p>
-    <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to the final signature, you deal directly with me, in complete confidence.</p>
+    <p>You will never be passed between departments or shown a property simply because it needs selling. From the first conversation to an agreed introduction, I remain personally involved; the appointed agent manages the transaction.</p>
     {signature(f"Senior Property Consultant &middot; {BRAND}")}
   </div>
 </section>
