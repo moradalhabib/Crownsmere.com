@@ -38,6 +38,8 @@ test('detail page shows real fixture facts, has no injected script and routes en
   await expect(page.locator('h1')).toContainText('QA Fictional Apartment');
   await expect(page.locator('.property-detail-price')).toContainText('£4,321 pcm');
   await expect(page.locator('.property-gallery-photo')).toHaveCount(1);
+  await expect.poll(() => page.locator('.property-gallery-photo img').evaluate(img => img.complete && img.naturalWidth > 0))
+    .toBe(true);
   await expect(page.locator('.property-facts')).toContainText('Bedrooms');
   await expect(page.locator('form[data-property-enquiry]')).toHaveAttribute('action','mailto:alaa.qadir@crownsmere.com');
   expect(await page.locator('main').innerText()).toContain("<script>alert('xss')</script>");
