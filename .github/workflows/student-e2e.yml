@@ -7,16 +7,22 @@ on:
       - fix/crownsmere-visual-refinement-20261021
       - fix/student-language-header-overlap-20261021
       - improve/crownsmere-ux-mobile-20261021
+      - feature/mobbin-property-portfolio-20261104
   pull_request:
     paths:
       - '*.html'
       - 'assets/**'
-      - 'tools/build.py'
+      - 'tools/**'
+      - 'data/properties.json'
       - 'tests/e2e/**'
       - '.htmlvalidate.json'
       - 'playwright.config.cjs'
       - '.github/workflows/student-e2e.yml'
   workflow_dispatch:
+
+concurrency:
+  group: crownsmere-e2e-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -34,6 +40,12 @@ jobs:
           node-version: '22'
       - name: Install Playwright test runner and HTML validator
         run: npm install --no-save --no-audit --no-fund --legacy-peer-deps @playwright/test@1.56.1 html-validate@10.17.0
+      - name: Confirm property publishing safeguards and generated site
+        run: |
+          python3 -m py_compile tools/build.py tools/property_pages.py tools/create_property_qa_fixture.py
+          python3 tools/test_properties.py
+          python3 tools/build.py
+          git diff --check
       - name: Validate the HTML of every page
         run: npx html-validate *.html
       - name: Install Chromium dependencies
@@ -52,6 +64,18 @@ jobs:
       - name: Run every website test in Firefox
         if: ${{ !cancelled() }}
         run: npx playwright test --config=playwright.config.cjs --browser firefox
+      - name: Test published-property fixture across all three browser engines
+        if: ${{ !cancelled() }}
+        run: |
+          python3 tools/create_property_qa_fixture.py --output-dir "${RUNNER_TEMP}/crownsmere-property-e2e"
+          npx html-validate "${RUNNER_TEMP}/crownsmere-property-e2e/property-qa-fictional-apartment.html"
+          python3 -m http.server 8766 --bind 127.0.0.1 --directory "${RUNNER_TEMP}/crownsmere-property-e2e" > "${RUNNER_TEMP}/crownsmere-fixture-http.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for engine in chromium webkit firefox; do
+            echo "Testing property visitor flow in ${engine}"
+            CROWNSMERE_PROPERTY_FIXTURE=1 npx playwright test tests/e2e/property-fixture.spec.cjs --config=playwright.config.cjs --browser "${engine}"
+          done
       - name: Attach QA screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4
