@@ -209,7 +209,7 @@ def build_properties(ctx):
       <p class="property-description">{txt(row["description"])}</p>
       <dl class="property-facts">{facts_html}</dl>
       {feature_block}
-      {floorplan_block}
+{floorplan_block}
       <p class="fine">All particulars are subject to confirmation with the appointed agent. Images and descriptions relate to this property and are published with authority.</p>
     </div>
     <aside class="property-enquire" aria-labelledby="property-enquire-title">
@@ -234,7 +234,7 @@ def build_properties(ctx):
     </aside>
   </div>
 </section>
-<nav class="wrap property-detail-return"><a class="more" href="properties.html">← Back to properties</a></nav>'''
+<nav class="wrap property-detail-return" aria-label="Back to properties"><a class="more" href="properties.html">← Back to properties</a></nav>'''
         structured = {"@context":"https://schema.org","@type":"RealEstateListing",
                       "name":row["title"],"description":row["description"],
                       "url":site+"/"+path,
