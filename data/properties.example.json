@@ -1,0 +1,31 @@
+[
+  {
+    "slug": "example-property-not-for-publication",
+    "reference": "CME-EXAMPLE-001",
+    "status": "draft",
+    "owner_authority": false,
+    "compliance_cleared": false,
+    "listing_type": "sale",
+    "title": "Example listing — do not publish",
+    "area": "Example London area",
+    "address_public": "Area only",
+    "price": 1000000,
+    "property_type": "Apartment",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "floor_area_sqft": 980,
+    "description": "Illustrative example of the data format. Replace with verified facts and authorised photos.",
+    "features": [
+      "Example feature"
+    ],
+    "tenure": "Leasehold",
+    "council_tax_band": null,
+    "epc_rating": null,
+    "furnished": null,
+    "availability": null,
+    "photos": [
+      "front.jpg"
+    ],
+    "floorplan": null
+  }
+]
