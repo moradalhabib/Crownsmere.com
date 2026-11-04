@@ -617,3 +617,57 @@ body:has(:is(input, select, textarea):focus) .tabbar { transform: translateY(110
   .hero::after, .hero-media { display: none; }
   .hero h1, .hero-sub { color: var(--ink); }
 }
+
+
+/* ==========================================================================
+   November 2026: whole-site editorial refinement, informed by Mobbin's
+   property, consultancy, contact and navigation references.
+   Preserves Crownsmere's own typography, brand and reduced-motion preferences.
+   ========================================================================== */
+:root {
+  --r: 9px;
+  --r-lg: 18px;
+  --shadow: 0 1px 2px rgba(14, 27, 46, .035), 0 18px 42px -16px rgba(14, 27, 46, .14);
+}
+h1, h2, h3 { letter-spacing: -.025em; }
+.lede { text-wrap: pretty; }
+.btn { border-radius: 10px; }
+.btn-primary { box-shadow: 0 5px 16px rgba(14, 27, 46, .1); }
+.btn:active { transform: translateY(1px); }
+.hd { border-bottom-color: rgba(14,27,46,.045); }
+@media (min-width: 1000px) {
+  .hd-nav { gap: clamp(16px,2.1vw,26px); }
+  .hd-nav a { font-size: 14px; }
+}
+.hero .btn-ghost { color: #fff; border-color: rgba(255,255,255,.62); background: rgba(8,17,31,.22); }
+.hero .btn-ghost:hover { background: rgba(255,255,255,.14); border-color: #fff; }
+.tile, .card, .who, .quote { box-shadow: 0 6px 26px rgba(14,27,46,.025); }
+.tile, .who { transition: transform .25s var(--ease), border-color .25s, box-shadow .3s var(--ease); }
+.tile:hover, .who:hover { transform: translateY(-2px); }
+.tile-go { color: var(--gold-ink); }
+.page-hero { border-bottom: 1px solid rgba(14,27,46,.045); }
+.sec-head h2 { max-width: 18ch; }
+.sec-alt { background: #f5eee3; }
+.callout { border-radius: 22px; box-shadow: 0 10px 35px rgba(14,27,46,.045); }
+.form-card { border-radius: 22px; box-shadow: 0 16px 54px rgba(14,27,46,.075); }
+.form-card :is(input:not([type="radio"],[type="checkbox"],[type="hidden"]),select,textarea) { border-radius: 9px; }
+.faq-item summary { border-radius: 6px; }
+.profile-media,.story-media { border-radius: 22px; }
+.profile-media img,.story-media img { transition: transform .75s var(--ease); }
+@media (hover: hover) {
+  .profile-media:hover img,.story-media:hover img { transform: scale(1.018); }
+}
+.cta { background: radial-gradient(circle at 90% 15%, rgba(176,141,87,.11),transparent 31%), #f4eee3; }
+.cta .btn-row { gap: 12px; }
+.ft { border-top: 1px solid rgba(14,27,46,.09); }
+.ft-nav a { transition: color .2s; }
+.tabbar a { transition: color .2s; }
+@media (max-width: 599px) {
+  .tile { border-radius: 14px; }
+  .tile:hover,.who:hover { transform: none; }
+  .hero .btn-ghost { border-color: rgba(255,255,255,.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile,.who,.profile-media img,.story-media img,.btn { transition: none !important; }
+  .tile:hover,.who:hover,.profile-media:hover img,.story-media:hover img,.btn:active { transform: none; }
+}

@@ -5,3 +5,7 @@ node_modules/
 test-screenshots/
 test-results/
 playwright-report/
+
+# Confidential offline working copies must never enter this public repository.
+data/*.local.json
+data/*.draft.json

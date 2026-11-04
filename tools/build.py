@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+from html import escape as html_escape
 
 OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://crownsmere.com"
@@ -19,7 +20,7 @@ EMAIL = "hello@crownsmere.com"
 ALAA = "alaa.qadir@crownsmere.com"
 UPDATED = "23 October 2026"          # the privacy notice's "Last updated" date
 UPDATED_ISO = "2026-10-23"
-SITE_UPDATED_ISO = "2026-10-26"     # when the pages last changed: the sitemap and the pages' structured data
+SITE_UPDATED_ISO = "2026-11-04"     # when the pages last changed: the sitemap and the pages' structured data
 
 # ---------------------------------------------------------------- search engines
 # Ownership checks for Google Search Console and Bing Webmaster Tools: paste the content value of the
@@ -114,10 +115,10 @@ def link(page):
     never as index.html."""
     return "./" if page == "index.html" else page
 
-NAV = [("index.html", "Home"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
+NAV = [("index.html", "Home"), ("properties.html", "Properties"), ("services.html", "Services"), ("about.html", "About Alaa"), ("students.html", "Students"), ("contact.html", "Contact")]
 # The tab bar along the bottom of phones and tablets: (page, icon, label, Arabic label).
-TABS = [("index.html", "house", "Home", "الرئيسية"), ("services.html", "grid", "Services", "الخدمات"),
-        ("about.html", "person", "About", "عن علا"), ("students.html", "cap", "Students", "الطلاب"),
+TABS = [("index.html", "house", "Home", "الرئيسية"), ("properties.html", "key", "Properties", "العقارات"),
+        ("services.html", "grid", "Services", "الخدمات"), ("students.html", "cap", "Students", "الطلاب"),
         ("contact.html", "mail", "Contact", "تواصل")]
 
 ORG = {
@@ -189,13 +190,16 @@ def structured_data(title, desc, path, canonical, lang, page_type, page_extra, e
 def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang="en", page_type="WebPage", page_extra=None):
     canonical = f"{SITE}/{'' if path == 'index.html' else path}"
     ld = structured_data(title, desc, path, canonical, lang, page_type, page_extra, extra_ld)
+    # Escape HTML-delimiters so property text cannot terminate the JSON-LD script.
+    json_ld = json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     og_desc = og_desc or desc
-    amp = lambda t: re.sub(r"&(?![a-zA-Z]+;|#[0-9]+;)", "&amp;", t)  # a bare "&" in text must be "&amp;"
-    title, desc, og_desc = amp(title), amp(desc), amp(og_desc)
+    # Property titles/descriptions are untrusted: escape both elements and meta attributes.
+    title, desc, og_desc = (html_escape(str(value), quote=True) for value in (title, desc, og_desc))
     slug = "home" if path == "index.html" else path.replace(".html", "")
     preload = ('<link rel="preload" href="assets/img/townhouse.avif" as="image" type="image/avif" fetchpriority="high">\n'
                if path == "index.html" else "")
-    extra_css = '<link rel="stylesheet" href="assets/student.css">\n' if path.startswith("students") else ""
+    extra_css = ('<link rel="stylesheet" href="assets/student.css">\n' if path.startswith("students") else
+                 '<link rel="stylesheet" href="assets/property.css">\n' if path == "properties.html" or path.startswith("property-") else "")
     alternates = "".join(f'<link rel="alternate" hreflang="{l}" href="{SITE}/{u}">\n' for l, u in ALTERNATES.get(path, []))
     other_locale = "".join(f'<meta property="og:locale:alternate" content="{"ar_AR" if l == "ar" else "en_GB"}">\n'
                            for l, u in ALTERNATES.get(path, []) if u != path and l != "x-default")
@@ -238,7 +242,7 @@ def head(title, desc, path, extra_ld=None, og_desc=None, og_locale="en_GB", lang
 <link rel="preload" href="assets/fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
 {preload}<link rel="stylesheet" href="assets/style.css">
 {extra_css}<script type="speculationrules">{SPECULATION}</script>
-<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
+<script type="application/ld+json">{json_ld}</script>
 </head>
 <body class="page-{slug}">
 <a class="skip" href="#main">Skip to content</a>'''
@@ -310,7 +314,7 @@ def footer(current, lang="en"):
     """Every page links to every other from here: the five services, the rest of the site and the
     Arabic student page, so each page is one step from anywhere (for visitors and search engines)."""
     services = "".join(f'<li><a href="{sv["page"]}">{sv["name"]}</a></li>' for sv in SERVICES)
-    more = ('<li><a href="about.html">About Alaa</a></li><li><a href="students.html">Students</a></li>'
+    more = ('<li><a href="properties.html">Properties</a></li><li><a href="about.html">About Alaa</a></li><li><a href="students.html">Students</a></li>'
             '<li><a href="students-ar.html" lang="ar" dir="rtl" hreflang="ar">مساعدة الطلاب بالعربية</a></li>'
             '<li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy</a></li>')
     en = ' lang="en-GB"' if lang == "ar" else ""
@@ -343,11 +347,11 @@ def page(fname, title, desc, body, extra_ld=None, og_desc=None, scripts="", lang
 # ---------------------------------------------------------------- shared content
 TENANT_HELP = [
     "A search to your brief, on and off the market, including homes not yet advertised to rent",
-    "Accompanied viewings, with an honest view on every property",
-    "Direct negotiation of the rent, tenancy length, move-in date, furnishings and other terms",
+    "Viewings coordinated with the appointed letting agent",
+    "Discussion of rental terms and a personal introduction to the relevant agent",
     "Clear guidance on deposits, rent in advance and what to expect before you commit",
 ]
-TENANT_INTRO = "When you ask Alaa to find you a home to rent, she represents you: searching, viewing and negotiating directly with landlords and their agents on your behalf, so you secure the right home on the right terms."
+TENANT_INTRO = "When you ask Alaa to find you a home to rent, she listens to your brief, sources suitable opportunities and coordinates an introduction to the appropriate owner or letting agent. The appointed professional handles the tenancy process."
 
 # One page per service. "anchor" is the service's old section on services.html (services.html#let still
 # lands on Rent). "tile" is the short line on the home and services tiles; "groups" are the page's lists.
@@ -355,34 +359,34 @@ SERVICES = [
     dict(page="buy.html", anchor="buy", name="Buy", icon="house",
          h1="Buy a home, <em>personally found.</em>", tile="A personal search, on and off the market.",
          lede="Tell me what you are looking for, and I will find it: on the market, off the market, or not yet on anyone&rsquo;s radar.",
-         groups=[("What I do for you", "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf.",
+         groups=[("What I do for you", "When you are buying, I take time to understand your requirements, source relevant properties and introduce you to the appointed agent, who handles viewings, offers and sale progression.",
                   ["A private briefing on your requirements", "A personal search, on and off the market",
-                   "A curated shortlist, checked before you see it", "Accompanied viewings, negotiation and support to completion"])],
+                   "A curated shortlist, checked before you see it", "Introductions to appointed agents for viewings and sale progression"])],
          steps=True, cta="Tell me what <em>you are looking for.</em>",
          faq=["offmarket", "areas", "overseas", "fees"],
          kind="Property search for buyers", title="Buy a Home in Prime London",
-         desc="A personal search for homes in prime London, on and off the market, with accompanied viewings and negotiation through to completion."),
+         desc="A personal search for London homes, on and off the market, with introductions to the agents responsible for viewing and the sale process."),
     dict(page="sell.html", anchor="sell", name="Sell", icon="tag",
          h1="Sell, <em>quietly and privately.</em>", tile="A quiet, private sale.",
          lede="A quiet, private sale. Your property is introduced only to qualified buyers, without the noise of a public listing.",
          groups=[("What I do for you", "",
-                  ["A confidential conversation about your plans", "Valuation advice and pricing strategy",
-                   "Discreet introductions to qualified buyers, viewings by appointment", "No public listing unless you wish it"])],
+                  ["A confidential conversation about your plans", "Introductions to specialist valuation and pricing support",
+                   "Discreet buyer introductions to the appointed selling agent, with viewings by appointment", "No public listing unless you wish it"])],
          steps=False, cta="Thinking of <em>a private sale?</em>",
          faq=["public", "private", "fees"],
          kind="Private property sales", title="Sell Your London Property Privately",
-         desc="A quiet, private sale in prime London: valuation advice, pricing strategy and discreet introductions to qualified buyers, with no public listing."),
+         desc="Private sales in prime London: buyer introductions and introductions to the appointed selling agent, with public advertising only where authorised."),
     dict(page="rent.html", anchor="let", name="Rent", icon="key",
          h1="Rent or let, <em>discreetly.</em>", tile="The right rental, or the right tenant.",
          lede="Whether you are looking for a home to rent or the right tenant for your property, the search is personal and discreet.",
          groups=[("If you are renting", TENANT_INTRO, TENANT_HELP),
                  ("If you are letting your property", "",
-                  ["The right tenant for your property, found discreetly", "Private, by-appointment viewings",
-                   "Negotiation of terms and clear communication throughout"])],
+                  ["The right tenant for your property, found discreetly", "Viewings arranged through the appointed letting agent",
+                   "Clear communications and introductions throughout"])],
          steps=True, cta="Tell me what <em>you need.</em>",
          faq=["landlords", "areas", "fees"],
          kind="Lettings", title="Rent or Let in Prime London",
-         desc="Find a London home to rent, with Alaa Qadir negotiating directly with landlords for you, or the right tenant for your property, found discreetly."),
+         desc="Find a London rental or suitable tenant with a personal search by Alaa Qadir, who introduces qualified clients to the appointed letting agent."),
     dict(page="invest.html", anchor="invest", name="Invest", icon="trend",
          h1="Invest, <em>to your brief.</em>", tile="Opportunities sourced to your brief.",
          lede="Investment opportunities sourced to your criteria, including those that never reach the open market.",
@@ -411,7 +415,7 @@ CRUMBS.update({s["page"]: s["name"] for s in SERVICES})
 STEPS = [
     ("Share your brief", "A private conversation about what you are looking for, why, and when. No detail is too small."),
     ("See a curated shortlist", "I search personally, on and off the market, and check every property before you see it."),
-    ("View, negotiate, complete", "Accompanied viewings, calm negotiation and support through to completion, and long after."),
+    ("Meet your appointed agent", "With your agreement, Alaa coordinates an introduction; the appointed agent manages viewings, offers and transaction progression."),
 ]
 
 AREAS = ["Mayfair", "Belgravia", "Knightsbridge", "Chelsea", "Kensington", "Holland Park",
@@ -420,16 +424,16 @@ AREAS = ["Mayfair", "Belgravia", "Knightsbridge", "Chelsea", "Kensington", "Holl
 FAQ = {
     "how": ("How does it work?",
             "You share your brief, by email or through the form on this site. We then have a private conversation about what you are looking for and why. From there, I search personally and bring you a shortlist of properties that genuinely fit."),
-    "listings": ("Why are there no properties listed on this website?",
-                 "Deliberately. Crownsmere works from your brief rather than from a list of properties to sell. Many of the homes I find are never publicly advertised, and those that are deserve to be judged against your brief, not a shop window."),
+    "listings": ("Can I browse properties on the website?",
+                 "Yes. Visit our <a href=\"properties.html\">Properties collection</a> for homes currently available to view. Other opportunities are offered privately, so please share your brief with Alaa."),
     "agent": ("Are you a buying agent?",
-              "When you are buying, the service works in much the same way as a buying agent or property finder: I represent you, search on and off the market to your brief, and negotiate on your behalf. Crownsmere can also help you sell or let privately, invest, or simply give you a second opinion."),
+              "Crownsmere sources property opportunities and arranges introductions. For partner listings, the appointed estate agent handles viewings, negotiation and completion. Crownsmere may receive a disclosed commission for an introduction."),
     "areas": ("Which areas do you cover?",
               "Prime and Super Prime London, including Mayfair, Belgravia, Knightsbridge, Chelsea, Kensington and Notting Hill. If your brief takes us further afield, just ask."),
     "overseas": ("I live overseas. Can you still help?",
                  "Please get in touch. A search can begin by telephone or video call, with regular updates until you are able to visit in person."),
     "private": ("Is my enquiry confidential?",
-                "Completely. Your brief and your details are used only to help you, and are shared with relevant partners only with your further agreement. See the <a href=\"privacy.html\">privacy notice</a> for details."),
+                "Your enquiry is treated confidentially. We explain any proposed agent introduction and ask for your agreement before sharing your details. See the <a href=\"privacy.html\">privacy notice</a> for details."),
     "fees": ("How are fees agreed?",
              "Every brief is different, so terms are discussed openly at the outset and agreed in writing before any work begins."),
     # Asked on the service pages; each answer restates what the service pages already say.
@@ -438,7 +442,7 @@ FAQ = {
     "public": ("Will my property be advertised publicly?",
                "Not unless you wish it. Your property is introduced only to qualified buyers, with viewings by appointment, so the sale stays quiet and private."),
     "landlords": ("Do you help landlords as well as tenants?",
-                  "Yes. For landlords, the right tenant for your property is found discreetly, with private, by-appointment viewings, negotiation of terms and clear communication throughout."),
+                  "Yes. Alaa can introduce suitable tenants to the appointed letting agent, who handles viewings, negotiations and tenancy progression."),
     "invest_offmarket": ("Can you find off-market investments?",
                          "Yes. Opportunities are sourced to your brief, including those that never reach the open market, with neighbourhood-level analysis of yield and growth."),
     "second_opinion": ("Can I ask for a second opinion only?",
@@ -564,9 +568,12 @@ def cta(heading="Tell me what <em>you are looking for.</em>"):
 </section>'''
 
 # ---------------------------------------------------------------- home: a short front door to the rest of the site
-HOME_TILES = ([(sv["page"], sv["icon"], sv["name"], sv["tile"], "") for sv in SERVICES[:4]]
-              + [("students.html", "cap", "Students", "Rental help, even without a UK guarantor.", ""),
-                 ("about.html", "person", "Meet Alaa", "Your consultant, one to one.", "")])
+HOME_TILES = [("properties.html", "key", "Properties", "Explore our homes for sale and rent.", ""),
+              ("buy.html", "house", "Buy", "Discover your next London home.", ""),
+              ("rent.html", "key", "Rent", "Find a place that feels like home.", ""),
+              ("sell.html", "tag", "Sell", "Discreet private sales.", ""),
+              ("students.html", "cap", "Students", "Rental help, even without a UK guarantor.", ""),
+              ("about.html", "person", "Meet Alaa", "Your consultant, one to one.", "")]
 
 index_body = f'''
 <section class="hero" aria-labelledby="hero-title">
@@ -576,7 +583,8 @@ index_body = f'''
     <h1 id="hero-title">London property, <em>personally handled.</em></h1>
     <p class="hero-sub">Buying, selling, renting or moving to London? Work directly with Alaa Qadir for a discreet, personal search, on and off the market.</p>
     <div class="hero-actions">
-      {btn("contact.html", "Share your brief", "light")}
+      {btn("properties.html", "Explore properties", "light")}
+      {btn("contact.html", "Share your brief", "ghost")}
     </div>
   </div>
 </section>
@@ -586,7 +594,7 @@ index_body = f'''
     {sec_head("How can we help?", "Find your way <em>forward.</em>", hid="help-title")}
     {tiles(HOME_TILES, label="Explore")}
     <p class="home-areas" data-reveal>Searching across prime London: {", ".join(AREAS[:-1])} and {AREAS[-1]}. <a href="services.html#areas">Where I search</a></p>
-    <p class="fine">Photographs illustrate London homes and neighbourhoods, not available listings.</p>
+    <p class="fine">Home-page photography is illustrative and does not depict property availability. Visit Properties to view authorised listings.</p>
   </div>
 </section>
 {testimonials()}
@@ -663,14 +671,14 @@ for i, sv in enumerate(SERVICES):
 QUALITIES = [
     ("person", "A full one-to-one service", "You deal with Alaa directly, from the first conversation to the keys. No call centre, no hand-offs."),
     ("people", "Well connected", "A discreet network of owners, agents and advisers opens doors to homes that never appear online."),
-    ("scales", "Direct negotiation, on your side", "Alaa negotiates with sellers, landlords and their agents for you: price or rent, terms and timing."),
-    ("heart", "Client care", "Honest updates at every stage, viewings arranged around you, and support after you move in."),
+    ("scales", "Personal introductions, clearly handled", "Alaa qualifies every enquiry and arranges the introduction to the appointed property professional, with your agreement."),
+    ("heart", "Client care", "Clear communication from the first enquiry through to an agreed agent introduction."),
     ("pin", "Prime London insight", "Street-by-street knowledge of Prime and Super Prime London, built over long-standing relationships."),
     ("shield", "Complete discretion", "Your plans and your details stay private, shared only with your agreement."),
 ]
 AUDIENCES = [
     ("buy.html", "Buyers", "A home or a pied-&agrave;-terre"),
-    ("rent.html", "Tenants", "The right rental, negotiated for you"),
+    ("rent.html", "Tenants", "Your rental search, personally guided"),
     ("sell.html", "Owners selling", "A quiet, private sale"),
     ("rent.html", "Landlords", "The right tenant, found discreetly"),
     ("invest.html", "Investors", "Opportunities sourced to your brief"),
@@ -702,7 +710,7 @@ about_body = f'''
     <div class="profile-copy">
       <p class="eyebrow">Senior Property Consultant &middot; {BRAND}</p>
       <h1>Alaa <em>Qadir.</em></h1>
-      <p class="lede">A one-to-one property consultant in prime London. Alaa finds, negotiates and secures homes for buyers and tenants, and represents owners who want a quiet, well-handled sale or let.</p>
+      <p class="lede">A one-to-one property consultant in prime London. Alaa sources properties, speaks personally with prospective buyers and tenants, and coordinates introductions to appointed sales and letting agents.</p>
       <ul class="tags tags-sm"><li>One-to-one service</li><li>Prime London</li><li>Buyers, tenants and owners</li><li>Enquiries in English and Arabic</li></ul>
       <div class="btn-row">
         {btn("contact.html", "Share your brief")}
@@ -759,11 +767,11 @@ about_body = f'''
 PERSON = {"@type": "Person", "@id": f"{SITE}/about.html#alaa", "name": "Alaa Qadir", "jobTitle": "Senior Property Consultant",
                              "worksFor": {"@id": f"{SITE}/#business"}, "workLocation": {"@type": "City", "name": "London"},
                              "knowsAbout": ["Prime London property", "Property search", "Off-market property",
-                                            "Negotiation for buyers and tenants", "Private sales", "Lettings"],
+                                            "Buyer and tenant introductions", "Private sales", "Lettings"],
                              **({"image": f"{SITE}/assets/img/{PORTRAIT}.jpg"} if PORTRAIT else {})}
 
 page("about.html", f"Alaa Qadir, Senior Property Consultant | {BRAND}",
-     "Alaa Qadir is a one-to-one property consultant in prime London, negotiating directly for buyers and tenants and handling discreet sales and lettings.",
+     "Alaa Qadir is a one-to-one property consultant in prime London, sourcing opportunities and coordinating introductions to sales and letting agents.",
      about_body, page_type="ProfilePage", page_extra={"mainEntity": PERSON})
 
 # ---------------------------------------------------------------- contact
@@ -1148,6 +1156,10 @@ page("privacy.html", f"Privacy Notice | {BRAND}",
      "How Crownsmere Estate collects, uses and protects the personal information you share with us, and the rights you have over it.",
      privacy_body)
 
+# ---------------------------------------------------------------- curated property collection (private-by-default)
+from property_pages import build_properties
+PROPERTY_DETAIL_PAGES = build_properties(globals())
+
 # ---------------------------------------------------------------- 404
 notfound_body = f'''
 <section class="page-hero notfound">
@@ -1172,7 +1184,7 @@ open(os.path.join(OUT, "404.html"), "w").write(html)
 # ---------------------------------------------------------------- SEO files
 # Search engines ignore <priority>, and trust <lastmod> only while it is accurate: the privacy notice
 # keeps its own date, every other page the date the pages last changed.
-pages = ["", "services.html"] + [sv["page"] for sv in SERVICES] + ["about.html", "students.html", "students-ar.html", "contact.html", "privacy.html"]
+pages = ["", "properties.html", "services.html"] + [sv["page"] for sv in SERVICES] + PROPERTY_DETAIL_PAGES + ["about.html", "students.html", "students-ar.html", "contact.html", "privacy.html"]
 def sitemap_alternates(p):
     return "".join(f'<xhtml:link rel="alternate" hreflang="{l}" href="{SITE}/{u}"/>' for l, u in ALTERNATES.get(p, []))
 sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'

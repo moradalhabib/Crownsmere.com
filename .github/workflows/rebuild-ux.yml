@@ -5,7 +5,12 @@ on:
     branches:
       - main
       - fix/crownsmere-visual-refinement-20261021
+      - feature/mobbin-property-portfolio-20261104
   workflow_dispatch:
+
+concurrency:
+  group: crownsmere-rebuild-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -19,15 +24,63 @@ jobs:
           persist-credentials: true
       - name: Verify and regenerate website
         run: |
-          python3 -m py_compile tools/build.py
+          python3 -m py_compile tools/build.py tools/property_pages.py
+          python3 tools/test_properties.py
           python3 tools/build.py
           git diff --check
           git diff --stat
+      - uses: actions/setup-node@v4
+        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
+        with:
+          node-version: '20'
+      - name: Browser QA across the Crownsmere website
+        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
+        run: |
+          npm install --no-save --no-audit --no-fund @playwright/test@1.56.1 html-validate@10.17.0
+          npx playwright install --with-deps chromium
+          npx playwright test --config=playwright.config.cjs
+      - name: Verify synthetic property details in a temporary site
+        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
+        run: |
+          python3 tools/create_property_qa_fixture.py --output-dir "${RUNNER_TEMP}/crownsmere-property-fixture"
+          npx html-validate "${RUNNER_TEMP}/crownsmere-property-fixture/property-qa-fictional-apartment.html"
+          python3 tests/e2e/serve.py --port 8766 --root "${RUNNER_TEMP}/crownsmere-property-fixture" >"${RUNNER_TEMP}/property-fixture-server.log" 2>&1 &
+          qa_server_pid=$!
+          trap 'kill "$qa_server_pid" || true' EXIT
+          CROWNSMERE_PROPERTY_FIXTURE=1 npx playwright test tests/e2e/property-fixture.spec.cjs --config=playwright.config.cjs --browser chromium
+      - name: Upload browser QA evidence on failure
+        if: failure() && github.ref_name == 'feature/mobbin-property-portfolio-20261104'
+        uses: actions/upload-artifact@v4
+        with:
+          name: crownsmere-qa-failures
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+      - name: Submit QA-approved preview build artifact
+        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
+        uses: actions/upload-artifact@v4
+        with:
+          name: crownsmere-review-build
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            *.html
+            assets/
+            sitemap.xml
+            robots.txt
+            site.webmanifest
+            favicon.ico
+            .well-known/
+            !assets/img/properties/
       - name: Commit generated public pages
         run: |
           git config user.name "Crownsmere Site Build"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html services.html buy.html sell.html rent.html invest.html advisory.html about.html students.html students-ar.html contact.html privacy.html 404.html sitemap.xml robots.txt site.webmanifest *.txt
+          git add index.html properties.html services.html buy.html sell.html rent.html invest.html advisory.html about.html students.html students-ar.html contact.html privacy.html 404.html sitemap.xml robots.txt site.webmanifest *.txt
+          # Stage existing generated detail pages and additions; no-op when catalogue is empty.
+          git ls-files -z 'property-*.html' | xargs -0 -r git add -u --
+          find . -maxdepth 1 -name 'property-*.html' -print0 | xargs -0 -r git add --
           if git diff --cached --quiet; then
             echo "Generated pages are already current"
             exit 0

@@ -1,6 +1,7 @@
 include:
   - .well-known
 exclude:
+  - data
   - mail-filter
   - tools
   - README.md

@@ -1,11 +1,13 @@
 # Crownsmere.com
 
-Website of **Crownsmere Estate**, a private, by-request property service in prime London (Alaa Qadir, Senior Property Consultant): clients share a brief and Crownsmere finds the right property, on and off the market. There are deliberately no conventional property listings. Plain HTML, CSS and JavaScript, hosted on GitHub Pages at crownsmere.com.
+Website of **Crownsmere Estate**, a private, by-request property service in prime London (Alaa Qadir, Senior Property Consultant): clients share a brief and Crownsmere finds the right property, on and off the market. A curated public property collection is being added on a development branch; no listing appears publicly until publication and compliance approvals are both recorded. Plain HTML, CSS and JavaScript, hosted on GitHub Pages at crownsmere.com.
 
 ## Structure
 - `tools/build.py`: **the source of every page**, including both student pages. Edit the content there and run `python3 tools/build.py` (excluded from the website). The `rebuild-ux` workflow also regenerates the pages on every push to `main`.
 - **Business details to fill in** (top of `tools/build.py`): `BUSINESS` (company and regulatory details), `FEES` (published letting fees), `TESTIMONIALS` (real client comments), `PORTRAIT` (Alaa's photograph) and `TRACK_RECORD` (verified figures). Each shows on the site only once filled in. See `docs/research-2026-10.md` for why they matter.
-- `index.html`: a short front door: photo hero, six tiles (Buy, Sell, Rent, Invest, Students, Meet Alaa) and a closing call to action
+- `index.html`: a short front door: photo hero, six tiles (Properties, Buy, Rent, Sell, Students, Meet Alaa) and a closing call to action
+- `properties.html` and `property-<slug>.html`: curated catalogue and individual sale/rent details, with all enquiries first prepared for Alaa Qadir; see `docs/property-platform.md`
+- `data/properties.json`, `tools/property_pages.py`, `assets/property.css` and `assets/property.js`: private-by-default listing generator, styles and form behaviour. This public repository must NEVER contain private owner, lead or commission data.
 - `services.html`: a tile for each service, how it works, where Alaa searches and a student lettings callout. Old links to its sections (`services.html#let` and so on) land on the matching tile.
 - `buy.html`, `sell.html`, `rent.html`, `invest.html`, `advisory.html`: one short page per service (from `SERVICES` in `tools/build.py`), each with a breadcrumb back to Services and a link to the next service
 - `about.html`: Alaa Qadir's profile ("About Alaa"): why Crownsmere, her one-to-one service, network, direct negotiation for buyers and tenants, client care, who she works with, and her track record and client comments once supplied
@@ -31,7 +33,7 @@ Visitors found the old site far too long on phones: the home page was 16 screens
 | Students | 3,750px | 2,616px |
 | Contact | 3,190px | 2,316px |
 
-**Navigation update (October 2026).** A client asked for "a navigating site as opposed to a page". Phones and tablets now have a tab bar along the bottom (Home, Services, About, Students, Contact), always on screen, replacing the hidden menu and the quick-contact bar. The home page became a short front door (2,314px on the same phone) with a tile for each part of the site, and each service has its own page. How it works and the neighbourhoods moved to Services, Why Crownsmere to About, and the questions to Contact.
+**Navigation update (October 2026).** A client asked for "a navigating site as opposed to a page". Phones and tablets now have a tab bar along the bottom (Home, Properties, Services, Students, Contact), always on screen, replacing the hidden menu and the quick-contact bar. The home page became a short front door (2,314px on the same phone) with a tile for each main path, and each service has its own page. How it works and the neighbourhoods moved to Services, Why Crownsmere to About, and the questions to Contact.
 
 - **One clear action everywhere:** "Share your brief" in the hero, the header on computers, the closing section of every page, and the Contact tab on phones.
 - **Navigation you can see:** on phones and tablets a tab bar along the bottom, with the current page marked (Services stays marked on each service page); it steps aside while a form field is being filled in. Computers keep the navigation in the header.
@@ -59,6 +61,21 @@ What only the owner can do, in order of impact:
 3. The same consistent listing on **Bing Places** and **Apple Business Connect**, then in professional directories once memberships are confirmed (for example The Property Ombudsman's member search or Propertymark).
 4. **Real client reviews** on the Business Profile, and permitted quotes in `TESTIMONIALS`.
 5. **Alaa's photograph** (`PORTRAIT`) and verified figures (`TRACK_RECORD`) on her profile, which strengthen the experience and expertise search engines look for.
+
+
+## Property catalogue and Mobbin-led design
+The November 2026 development branch introduces a property catalogue and sitewide UI refinements.
+
+Use the source-grounded Mobbin reference matrix in [docs/property-platform.md](docs/property-platform.md) for **all future Crownsmere screens and pages**: homepage, services, Alaa profile, student lettings, contact, property listings and property details. Preserve the original Crownsmere brand. Never copy Mobbin assets or an entire source design.
+
+Only listings marked `published` with both `owner_authority` and `compliance_cleared` set to `true`, and with verified real property particulars and images, are generated. The catalogue begins empty. It is not yet authorised for production release.
+
+Build and verify:
+```bash
+python3 -m py_compile tools/build.py tools/property_pages.py
+python3 tools/test_properties.py
+python3 tools/build.py
+```
 
 ## Preview locally
 `python3 -m http.server 8000`, then open http://localhost:8000
