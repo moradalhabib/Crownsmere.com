@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 const pages = [
   ['/', 'home'],
+  ['/properties.html', 'properties'],
   ['/services.html', 'services'],
   ['/buy.html', 'buy'],
   ['/sell.html', 'sell'],
@@ -36,7 +37,7 @@ async function tapBelowTheFold(link) {
  * 16 screens). These are the most each page may measure on a 390 x 844 phone.
  * The home page is a short front door; each service has its own short page. The footer links to
  * every page and each service page answers a few questions, for search engines as well as visitors. */
-const phoneLength = {home:2800, services:3900, buy:3400, sell:2450, rent:3900, invest:2400, advisory:2400,
+const phoneLength = {home:2900, properties:3900, services:3900, buy:3400, sell:2450, rent:3900, invest:2400, advisory:2400,
                      about:5500, students:3100, 'students-ar':3200, contact:3100, privacy:4800};
 
 for (const [url,name] of pages) {
@@ -204,12 +205,12 @@ test('home: a short front door with a tile for each part of the site', async ({p
   await expect.poll(() => hero.locator('img').evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
   const tiles = page.locator('.tile');
   expect(await tiles.evaluateAll(els => els.map(el => el.getAttribute('href'))))
-    .toEqual(['buy.html', 'sell.html', 'rent.html', 'invest.html', 'students.html', 'about.html']);
+    .toEqual(['properties.html', 'buy.html', 'rent.html', 'sell.html', 'students.html', 'about.html']);
   // The first row of tiles starts on the opening screen, above the tab bar.
   const first = await tiles.first().boundingBox();
   const bar = await page.locator('.tabbar').boundingBox();
   expect(first.y).toBeLessThan(bar.y - 60);
-  await expect(page.locator('.fine')).toContainText('not available listings');
+  await expect(page.locator('.fine')).toContainText('illustrative');
   await tapBelowTheFold(page.locator('.tile[href="students.html"]'));
   await expect(page).toHaveURL(/students\.html/);
 });
@@ -282,7 +283,7 @@ test('phones and tablets: the header and the tab bar stay on screen while scroll
 
 test('tab bar: five tabs on every page, the current one marked, and each tab opens its page', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
-  const current = {'/': './', '/services.html': 'services.html', '/buy.html': 'services.html', '/about.html': 'about.html',
+  const current = {'/': './', '/properties.html': 'properties.html', '/services.html': 'services.html', '/buy.html': 'services.html', '/about.html': null,
                    '/students.html': 'students.html', '/contact.html': 'contact.html', '/privacy.html': null};
   for (const [url, tab] of Object.entries(current)) {
     await page.goto(url);
@@ -302,7 +303,7 @@ test('tab bar: five tabs on every page, the current one marked, and each tab ope
   await expect(ar.locator('a[aria-current="page"]')).toHaveAttribute('href', 'students-ar.html');
   // Each tab opens its page.
   await page.goto('/');
-  for (const href of ['services.html', 'about.html', 'students.html', 'contact.html', './']) {
+  for (const href of ['properties.html', 'services.html', 'students.html', 'contact.html', './']) {
     await page.locator('.tabbar a[href="' + href + '"]').click();
     await expect(page).toHaveURL(href === './' ? /:8765\/$/ : new RegExp(href.replace('.', '\\.') + '$'));
   }
@@ -375,7 +376,7 @@ test('search engines: titles, descriptions, canonical addresses, languages, stru
     // The home page is linked by its canonical address, never as index.html.
     expect(await page.locator('a[href="index.html"]').count(), url).toBe(0);
     // Every service, and the Arabic page, is one step away from every page.
-    for (const href of ['services.html', 'buy.html', 'sell.html', 'rent.html', 'invest.html', 'advisory.html', 'students-ar.html']) {
+    for (const href of ['properties.html', 'services.html', 'buy.html', 'sell.html', 'rent.html', 'invest.html', 'advisory.html', 'students-ar.html']) {
       await expect(page.locator('.ft-nav a[href="' + href + '"]'), url + ' footer ' + href).toHaveCount(1);
     }
     // One connected description: the page belongs to the website, which belongs to the business.
@@ -414,4 +415,19 @@ test('wording stays accurate: drafts are not called sent, consent and privacy te
   const privacy = await page.locator('main').innerText();
   expect(privacy).toContain('if enabled');
   expect(privacy).not.toContain('OpenStreetMap');
+});
+
+
+test('properties: no unapproved inventory is exposed, and Alaa stays the contact', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/properties.html');
+  await expect(page.locator('h1')).toContainText('London homes');
+  await expect(page.locator('.property-grid .property-card')).toHaveCount(0);
+  await expect(page.locator('.property-empty')).toBeVisible();
+  await expect(page.locator('.property-filters select')).toHaveCount(3);
+  await expect(page.locator('.hd-nav a[href="properties.html"]')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('.tabbar a[href="properties.html"]')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('a[href="contact.html"]').first()).toHaveCount(1);
+  await expect(page.locator('script[src="assets/property.js"]')).toHaveCount(1);
+  expect(await page.locator('main').innerText()).not.toContain('Example listing');
 });
