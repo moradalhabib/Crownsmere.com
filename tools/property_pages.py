@@ -142,10 +142,10 @@ def build_properties(ctx):
     <div class="property-toolbar">
       <div><p class="eyebrow">Discover</p><h2 id="properties-title">The <em>collection.</em></h2>
         <p class="property-count" aria-live="polite" data-property-count>{count_text}</p></div>
-      {filters}
+{filters}
     </div>
     <div class="property-grid" data-property-grid>{cards}</div>
-    {empty}
+{empty}
     <p class="property-none" data-filter-empty hidden>No properties match those filters. Try a wider search or <a href="contact.html">ask Alaa directly</a>.</p>
   </div>
 </section>
