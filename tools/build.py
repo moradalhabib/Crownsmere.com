@@ -599,11 +599,11 @@ index_body = f'''
     </div>
     <div class="home-paths" data-reveal>
       <a class="home-path" href="properties.html" aria-label="Explore Crownsmere properties for sale">
-        <picture>{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="A London terrace of elegant white townhouses" width="1055" height="687" loading="lazy"></picture>
+        <picture>{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="A London terrace of elegant white townhouses" width="1055" height="687" loading="eager"></picture>
         <div class="home-path-content"><div><p class="eyebrow">01 / Buying in London</p><h3>For sale</h3><p>Find a place to call your own</p></div><span class="home-path-arrow" aria-hidden="true">&rarr;</span></div>
       </a>
       <a class="home-path" href="rent.html" aria-label="Explore Crownsmere rental services">
-        <picture>{sources("interior")}<img src="assets/img/interior.jpg" alt="A light-filled London sitting room with neutral furnishings" width="826" height="463" loading="lazy"></picture>
+        <picture>{sources("interior")}<img src="assets/img/interior.jpg" alt="A light-filled London sitting room with neutral furnishings" width="826" height="463" loading="eager"></picture>
         <div class="home-path-content"><div><p class="eyebrow">02 / Renting in London</p><h3>To rent</h3><p>Let your next chapter begin</p></div><span class="home-path-arrow" aria-hidden="true">&rarr;</span></div>
       </a>
     </div>
@@ -613,7 +613,7 @@ index_body = f'''
 
 <section class="home-editorial" aria-labelledby="home-personal-title">
   <div class="home-editorial-grid">
-    <div class="home-editorial-picture">{pic("colonnade", "London's period townhouse architecture beside mature trees", 563, 398)}</div>
+    <div class="home-editorial-picture">{pic("colonnade", "London's period townhouse architecture beside mature trees", 563, 398, lazy=False)}</div>
     <div class="home-editorial-content">
       <p class="eyebrow">Beyond the listing</p>
       <h2 id="home-personal-title">It starts with <em>a conversation.</em></h2>
