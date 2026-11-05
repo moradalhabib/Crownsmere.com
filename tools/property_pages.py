@@ -115,9 +115,9 @@ def build_properties(ctx):
     empty = '''<div class="property-empty">
       <figure class="property-empty-image"><img src="assets/img/interior.jpg" alt="Illustrative light-filled London living room; not a currently available property" width="826" height="463" loading="eager"></figure>
       <div class="property-empty-copy">
-        <p class="eyebrow">A private collection</p>
+        <p class="eyebrow">Crownsmere Estate · Private introductions</p>
         <h2>Every home begins <em>with a conversation.</em></h2>
-        <p>Our public collection is being prepared. While we confirm each opportunity, tell Alaa the area, style and lifestyle you have in mind.</p>
+        <p>Our public collection is being prepared. Tell Alaa about your preferred London area, architectural character and the kind of home you are seeking.</p>
         <a class="btn btn-primary" href="contact.html">Tell Alaa your brief</a>
         <p class="property-empty-note">No properties are publicly listed yet. Image is illustrative.</p>
       </div>
@@ -131,9 +131,9 @@ def build_properties(ctx):
     list_body = f'''
 <section class="property-index-hero">
   <div class="wrap property-index-intro">
-    <p class="eyebrow">Crownsmere collection</p>
-    <h1>London homes, <em>thoughtfully selected.</em></h1>
-    <p class="lede">Explore a carefully curated selection of properties for sale and rent. Every enquiry starts with Alaa Qadir, your personal point of contact.</p>
+    <p class="eyebrow">Private property · Crownsmere Estate</p>
+    <h1>London homes, <em>the Crownsmere way.</em></h1>
+    <p class="lede">A considered collection of London addresses for sale and rent. Every enquiry begins personally with Alaa Qadir before any introduction to the appointed agent.</p>
     <div class="btn-row">{btn("contact.html", "Ask Alaa about private opportunities", "ghost")}</div>
   </div>
 </section>
@@ -150,7 +150,7 @@ def build_properties(ctx):
   </div>
 </section>
 <section class="sec sec-alt property-guidance"><div class="wrap">
-  <p class="eyebrow">Personally handled</p><h2>One contact. <em>Every next step.</em></h2>
+  <p class="eyebrow">The Crownsmere introduction</p><h2>Personally considered. <em>Professionally connected.</em></h2>
   <div class="property-guidance-grid">
     <div><span>01</span><h3>Choose a home</h3><p>Browse the public collection or describe the property you have in mind.</p></div>
     <div><span>02</span><h3>Speak to Alaa</h3><p>Alaa reviews every enquiry personally, confirms your requirements and discusses an introduction.</p></div>
