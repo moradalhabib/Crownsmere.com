@@ -170,7 +170,11 @@ test('every link, section link and image on every page works', async ({page, req
   };
   for (const url of all) {
     await page.goto(url);
-    // Scroll through so lazy images load.
+    // Force offscreen lazy assets to request during exhaustive link/image QA.
+    // This tests the real URLs and actual successful decodes without changing
+    // production loading strategy or skipping any image.
+    await page.evaluate(() => document.querySelectorAll('img[loading="lazy"]').forEach(img => { img.loading = 'eager'; }));
+    // Scroll through the page to inspect resources and anchors.
     await page.evaluate(async () => {
       for (let y = 0; y < document.documentElement.scrollHeight; y += 500) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); }
     });
