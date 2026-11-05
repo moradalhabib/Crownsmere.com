@@ -287,6 +287,15 @@ h3 { font-weight: 400; }
 .cta .btn-row { margin-top:32px; }
 .cta .btn { min-width:180px; }
 
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .hd-in { gap: 14px; }
+  .hd-nav { gap: 12px; }
+  .hd-nav a { font-size: 11px; letter-spacing: .055em; }
+  .hd-mark { gap: 7px; }
+  .hd-mark img { height: 41px; }
+  .wm b { font-size: 14px; letter-spacing: .13em; }
+  .hd-in > .btn { font-size: 11px; padding-inline: 13px; }
+}
 @media (max-width: 999px) {
   .page-home .hero { min-height:650px; }
   .page-home .hero-in { padding-block:110px 90px; }
