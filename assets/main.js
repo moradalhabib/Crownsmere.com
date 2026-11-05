@@ -34,20 +34,20 @@
     var el = e.target;
     if (!tabbing || [hd, tabBar].some(function (x) { return x && x.contains(el); })) return;
     clearTimeout(focusTimer);
-    var seenY = -1, still = 0, waited = 0;
-    var check = function () {
-      still = window.scrollY === seenY ? still + 1 : 0;
-      seenY = window.scrollY;
-      if (still < 3 && (waited += 40) < 1500) { focusTimer = setTimeout(check, 40); return; }
-      if (document.activeElement !== el) return;
+    var attempts = 0;
+    var ensureVisible = function () {
+      if (document.activeElement !== el || !el.isConnected) return;
       var r = el.getBoundingClientRect();
-      var top = hd ? hd.offsetHeight : 0;
-      var bottom = tabBar && tabBar.getClientRects().length
-        ? Math.min(window.innerHeight, tabBar.getBoundingClientRect().top) : window.innerHeight;
-      if (r.top < top) window.scrollBy(0, r.top - top - 12);
-      else if (r.bottom > bottom) window.scrollBy(0, Math.min(r.bottom - bottom + 12, r.top - top - 12));
+      var topLimit = hd && hd.getClientRects().length ? hd.getBoundingClientRect().bottom + 14 : 14;
+      var bottomLimit = tabBar && tabBar.getClientRects().length
+        ? tabBar.getBoundingClientRect().top - 16 : window.innerHeight - 16;
+      var delta = r.top < topLimit ? r.top - topLimit
+        : r.bottom > bottomLimit ? r.bottom - bottomLimit : 0;
+      if (Math.abs(delta) > 1) window.scrollBy({top: delta, left: 0, behavior: "instant"});
+      // Some browsers do their own post-focus scroll; check again after it finishes.
+      if (++attempts < 6) focusTimer = setTimeout(ensureVisible, 45);
     };
-    focusTimer = setTimeout(check, 40);
+    requestAnimationFrame(ensureVisible);
   });
 
   /* ---------- Gentle reveal as sections come into view ---------- */
