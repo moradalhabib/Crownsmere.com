@@ -387,3 +387,120 @@ h3 { font-weight: 400; }
   .home-path img, .home-ways .tile { transition:none; }
   .home-path:hover img, .home-ways .tile:hover { transform:none; }
 }
+
+
+/* ==========================================================================
+   THE CROWNSMERE HOUSE STYLE
+   British estate character without faux royal claims, borrowed coats of arms,
+   loud metallic effects or replacing the approved Crownsmere identity.
+   ========================================================================== */
+:root {
+  --brand-midnight: #142438;
+  --brand-ivory: #f8f6f1;
+  --brand-brass: #a98b5e;
+  --brand-parchment: #ebe6db;
+}
+.hd { border-bottom:1px solid rgba(20,36,58,.14); }
+.hd-mark .wm b { letter-spacing:.24em; font-weight:560; }
+.hd-mark .wm small { letter-spacing:.015em; }
+.hd-nav a[aria-current]::after { background:var(--brand-brass); }
+.page-home .hero { position:relative; }
+.page-home .hero::before {
+  content:""; position:absolute; inset:22px; pointer-events:none; z-index:1;
+  border:1px solid rgba(240,218,181,.30);
+}
+.page-home .hero-in { position:relative; z-index:2; }
+.page-home .hero h1 { max-width:850px; line-height:.96; text-wrap:balance; }
+.crownsmere-hero-signature {
+  display:flex; align-items:center; width:max-content; max-width:100%;
+  gap:13px; color:#fff9ed; border-bottom:1px solid rgba(236,214,177,.53);
+  padding-bottom:18px; margin-bottom:21px;
+}
+.crownsmere-hero-signature picture { display:block; width:24px; flex:none; }
+.crownsmere-hero-signature img { width:24px; height:39px; object-fit:contain; }
+.crownsmere-hero-signature strong {
+  display:block; font:500 17px/1.05 var(--wordmark);
+  letter-spacing:.21em; color:#fff;
+}
+.crownsmere-hero-signature span {
+  display:block; margin-top:7px; font:600 10px/1.2 var(--sans);
+  letter-spacing:.27em; color:#f0dfc4;
+}
+.page-home .hero .eyebrow { letter-spacing:.13em; font-size:10px; margin-bottom:17px; }
+.crownsmere-hero-caption {
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  margin-top:32px; padding-top:16px;
+  border-top:1px solid rgba(242,229,210,.35);
+  max-width:680px;
+  font:600 10px/1.6 var(--sans); letter-spacing:.13em;
+  text-transform:uppercase; color:#f2e9d8;
+}
+.crownsmere-hero-caption span { color:#cbb187; }
+.home-overline .eyebrow,.page-hero .eyebrow {
+  letter-spacing:.18em;
+}
+.home-path { border:1px solid rgba(20,36,58,.08); }
+.home-path h3 { letter-spacing:-.032em; }
+.home-path .home-path-content .eyebrow { letter-spacing:.16em; }
+.home-editorial-grid { background:var(--brand-parchment); }
+.home-editorial-mark { font-size:27px; }
+.page-contact .enquiry-intro {
+  position:relative; overflow:hidden; isolation:isolate;
+  border-top:3px solid var(--brand-brass);
+}
+.page-contact .enquiry-intro::before {
+  content:""; position:absolute; right:-12px; bottom:-28px;
+  width:158px; height:245px; z-index:-1; opacity:.14;
+  background:url("img/monogram-sm.png") center / contain no-repeat;
+  pointer-events:none;
+}
+.page-contact .enquiry-intro .eyebrow { letter-spacing:.15em; }
+.page-contact .enquiry-intro h1 { line-height:1.02; }
+.page-hero h1 { text-wrap:balance; }
+.page-hero::after { filter:saturate(.86); }
+.property-index-hero { background:var(--brand-parchment); }
+.property-index-hero::after {
+  background:linear-gradient(90deg,var(--brand-parchment),rgba(235,230,219,0));
+}
+.property-index-intro h1 { max-width:790px; }
+.property-index-intro .eyebrow { letter-spacing:.20em; }
+.property-empty { background:#ede7dc; }
+.property-empty h2 { letter-spacing:-.024em; }
+.property-guidance-grid span { letter-spacing:.16em; color:var(--gold-ink); }
+.property-detail-heading h1 { font-weight:400; }
+
+/* A grand yet discreet wordmark closes every page without inventing heraldry. */
+.crownsmere-footer-masthead {
+  grid-column:1 / -1; margin:0; padding:36px 0 25px;
+  border-top:1px solid rgba(245,238,225,.25);
+  color:#f0eade; text-align:center; white-space:nowrap;
+  font:500 clamp(25px,7.5vw,100px)/1.08 var(--wordmark);
+  letter-spacing:clamp(.03em,.45vw,.12em);
+  max-width:100%; overflow:hidden;
+}
+.ft-in { row-gap:46px; }
+.ft-brand p { font-size:clamp(24px,2.5vw,32px); line-height:1.25; }
+.ft-nav a:hover { text-underline-offset:5px; }
+.cta .eyebrow { letter-spacing:.2em; }
+.cta h2 { letter-spacing:-.04em; }
+
+@media (max-width:699px) {
+  .hd-mark .wm b { letter-spacing:.15em; font-size:13px; }
+  .page-home .hero { min-height:720px; }
+  .page-home .hero-in { padding-block:70px 90px; }
+  .page-home .hero::before { inset:13px; border-color:rgba(240,218,181,.25); }
+  .page-home .hero h1 { font-size:clamp(57px,12.6vw,78px); line-height:.98; }
+  .page-home .hero .eyebrow { max-width:290px; margin-bottom:16px; }
+  .crownsmere-hero-signature { gap:9px; margin-bottom:15px; padding-bottom:13px; }
+  .crownsmere-hero-signature strong { font-size:14px; letter-spacing:.15em; }
+  .crownsmere-hero-signature span { font-size:9px; letter-spacing:.2em; }
+  .crownsmere-hero-signature picture,.crownsmere-hero-signature img { width:18px; }
+  .crownsmere-hero-signature img { height:30px; }
+  .crownsmere-hero-caption { margin-top:24px; gap:7px; font-size:9px; }
+  .page-contact .enquiry-intro::before { width:110px; height:170px; }
+  .crownsmere-footer-masthead { padding:27px 0 15px; font-size:clamp(25px,7vw,50px); letter-spacing:.055em; }
+  .property-index-intro h1 { font-size:clamp(47px,11.3vw,74px); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .crownsmere-hero-signature,.crownsmere-hero-caption { animation:none; }
+}
