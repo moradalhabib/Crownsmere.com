@@ -325,13 +325,14 @@ def footer(current, lang="en"):
   <div class="wrap ft-in">
     <div class="ft-brand">
       <a class="ft-mark" href="{link("index.html")}" aria-label="{BRAND}, home">{LOGO(lazy=True)}<span class="wm"><b>CROWNSMERE</b><small>Estate</small></span></a>
-      <p>A more personal London. Private property consultancy, by appointment.</p>
+      <p>A more personal London. Considered addresses, discreet introductions.</p>
       <a class="ft-mail" href="mailto:{EMAIL}">{EMAIL}</a>
     </div>
     <nav class="ft-nav" aria-label="Footer">
       <div><p class="ft-h"><a href="services.html">Services</a></p><ul>{services}</ul></div>
       <div><p class="ft-h">Crownsmere</p><ul>{more}</ul></div>
     </nav>
+    <p class="crownsmere-footer-masthead" aria-hidden="true">CROWNSMERE</p>
     <p class="ft-legal">&copy; <span data-year>2026</span> {BRAND} &middot; London, United Kingdom</p>
     {registration()}
   </div>
@@ -580,22 +581,27 @@ index_body = f'''
 <section class="hero" aria-labelledby="hero-title">
   <picture class="hero-media">{sources("townhouse")}<img src="assets/img/townhouse.jpg" alt="An elegant London stucco townhouse-lined street" width="1055" height="687" fetchpriority="high"></picture>
   <div class="wrap hero-in">
-    <p class="eyebrow">Crownsmere Estate · Prime London</p>
-    <h1 id="hero-title">London property, <em>beautifully personal.</em></h1>
-    <p class="hero-sub">For the home you imagine and the move you are planning. A more thoughtful way to discover London property, with Alaa Qadir as your first point of contact.</p>
+    <div class="crownsmere-hero-signature">
+      {LOGO()}
+      <div><strong>CROWNSMERE</strong><span>ESTATE · LONDON</span></div>
+    </div>
+    <p class="eyebrow">Prime London · A private property consultancy</p>
+    <h1 id="hero-title">London property, <em>with distinction.</em></h1>
+    <p class="hero-sub">Considered property introductions rooted in London, character and personal service. Speak to Alaa Qadir first; the appointed agent guides the transaction.</p>
     <div class="hero-actions">
-      {btn("properties.html", "Explore properties", "light")}
+      {btn("properties.html", "Explore the collection", "light")}
       {btn("contact.html", "Speak to Alaa", "ghost")}
     </div>
+    <p class="crownsmere-hero-caption">Considered addresses <span aria-hidden="true">·</span> Personal introductions <span aria-hidden="true">·</span> Prime London</p>
   </div>
 </section>
 
 <section class="home-discover" aria-labelledby="discover-title">
   <div class="wrap">
-    <div class="home-overline"><p class="eyebrow">A more personal London</p></div>
+    <div class="home-overline"><p class="eyebrow">The Crownsmere perspective</p></div>
     <div class="home-discover-intro" data-reveal>
-      <h2 id="discover-title">Every address has a story. <em>Find yours.</em></h2>
-      <p class="lede">Discover opportunities for sale or rent and tell Alaa what really matters. The right property journey begins with understanding you.</p>
+      <h2 id="discover-title">An address of character. <em>A personal beginning.</em></h2>
+      <p class="lede">A home is more than a listing. Explore London property with an eye for architecture, location and the life you want to build there.</p>
     </div>
     <div class="home-paths" data-reveal>
       <a class="home-path" href="properties.html" aria-label="Explore Crownsmere properties for sale">
@@ -615,9 +621,9 @@ index_body = f'''
   <div class="home-editorial-grid">
     <div class="home-editorial-picture">{pic("colonnade", "London's period townhouse architecture beside mature trees", 563, 398, lazy=False)}</div>
     <div class="home-editorial-content">
-      <p class="eyebrow">Beyond the listing</p>
-      <h2 id="home-personal-title">It starts with <em>a conversation.</em></h2>
-      <p class="lede">No crowded shortlist. No impersonal hand-offs. Alaa takes the time to understand your plans, then introduces you to the right property professionals when you are ready.</p>
+      <p class="eyebrow">The Crownsmere approach</p>
+      <h2 id="home-personal-title">Discreet by nature. <em>Personal by design.</em></h2>
+      <p class="lede">Crownsmere places personal attention before volume. Alaa listens, sources relevant opportunities and, with your agreement, introduces you to the estate agent responsible for the next steps.</p>
       <a class="more" href="about.html">Meet Alaa Qadir {ARROW}</a>
       <p class="home-editorial-mark">Alaa Qadir</p>
       <p class="home-editorial-copy">Senior Property Consultant · Crownsmere Estate</p>
@@ -629,15 +635,15 @@ index_body = f'''
   <div class="wrap">
     <div class="home-overline"><p class="eyebrow">Explore Crownsmere</p></div>
     <div class="sec-head" data-reveal>
-      <h2 id="help-title">Your next move, <em>beautifully considered.</em></h2>
-      <p class="lede">From your first London rental to a private sale, discover how Crownsmere can make the process more personal.</p>
+      <h2 id="help-title">Property, <em>thoughtfully introduced.</em></h2>
+      <p class="lede">Whether you are buying, renting or exploring private opportunities, there is one consistent point of contact and a considered next step.</p>
     </div>
     {tiles(HOME_TILES, label="Explore Crownsmere services")}
     <p class="home-areas" data-reveal>Our London focus: {", ".join(AREAS[:-1])} and {AREAS[-1]}. <a href="services.html#areas">Discover where we search</a>.</p>
   </div>
 </section>
 {testimonials()}
-{cta("The right move begins <em>with you.</em>")}'''
+{cta("Every great address begins <em>with a conversation.</em>")}'''
 page("index.html", f"{BRAND} | Buy, Sell & Rent London Property",
      "Personal property search, private sales, lettings and student rental help in prime London. Work directly with property consultant Alaa Qadir.",
      index_body)
