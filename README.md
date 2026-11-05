@@ -63,6 +63,17 @@ What only the owner can do, in order of impact:
 5. **Alaa's photograph** (`PORTRAIT`) and verified figures (`TRACK_RECORD`) on her profile, which strengthen the experience and expertise search engines look for.
 
 
+## November 2026 — Editorial Edition redesign
+
+Crownsmere's complete website visual language has been upgraded through Mobbin-informed research and custom implementation (not copied designs). This includes the architectural homepage cover, photographic buy/rent discovery, human-first Alaa profile, modular services, contact forms, bilingual student assistance, an improved property index, property details, and a dark editorial footer.
+
+- **Source of truth:** `tools/build.py` and `tools/property_pages.py` generate public HTML. `assets/editorial.css` is the final style layer for all pages. Never edit generated HTML alone.
+- **Design reference and QA guide:** `docs/mobbin-editorial-redesign-20261104.md`.
+- **Brand preserved:** existing Crownsmere logo, fonts, warm neutrals, navy and gold, and own illustrations/photography. No third-party image requests.
+- **No invented listings:** absent cleared property data, there are no public cards or misleading search filters.
+- **Privacy:** all property enquiry drafts are directed to Alaa; no onward transfer to a partner agent without separate agreement.
+- **Release:** full GitHub Actions/browser tests are required before merging, followed by live-site health checks.
+
 ## Property catalogue and Mobbin-led design
 The November 2026 development branch introduces a property catalogue and sitewide UI refinements.
 
