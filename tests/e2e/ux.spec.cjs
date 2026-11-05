@@ -211,7 +211,9 @@ test('home: premium editorial property discovery and mobile navigation work', as
   await expect(page.locator('.home-path')).toHaveCount(2);
   await expect(page.locator('.home-path[href="properties.html"]')).toContainText('For sale');
   await expect(page.locator('.home-path[href="rent.html"]')).toContainText('To rent');
-  await expect(page.locator('.home-editorial')).toContainText('It starts with');
+  await expect(page.locator('.home-editorial')).toContainText('Discreet by nature');
+  await expect(page.locator('.crownsmere-hero-signature')).toContainText('CROWNSMERE');
+  await expect(page.locator('.crownsmere-hero-signature img')).toHaveCount(1);
   await expect(page.locator('.home-disclaimer')).toContainText('illustrative');
   await expect(page.locator('.tabbar')).toBeInViewport();
   for (const el of await page.locator('.home-path img').all()) {
@@ -219,6 +221,17 @@ test('home: premium editorial property discovery and mobile navigation work', as
   }
   await tapBelowTheFold(page.locator('.tile[href="students.html"]'));
   await expect(page).toHaveURL(/students\.html/);
+});
+
+test('Crownsmere identity remains prominent and consistent sitewide', async ({page}) => {
+  for (const [url] of pages) {
+    await page.goto(url);
+    await expect(page.locator('.hd-mark .wm b')).toHaveText('CROWNSMERE');
+    await expect(page.locator('.crownsmere-footer-masthead')).toHaveText('CROWNSMERE');
+    await expect(page.locator('img[src="assets/img/monogram-sm.png"]').first()).toHaveCount(1);
+  }
+  await page.goto('/');
+  await expect(page.locator('.crownsmere-hero-caption')).toContainText('Prime London');
 });
 
 test('about: Alaa Qadir profile covers how she works, with nothing invented', async ({page}) => {
