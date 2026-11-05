@@ -305,6 +305,10 @@ h3 { font-weight: 400; }
   .property-index-hero::before { left:48%; }
   .property-empty-copy { padding:30px 30px 30px 0; }
 }
+@media (max-width: 999px) {
+  /* Keep the last footer action reachable above the fixed five-tab navigation. */
+  .ft { padding-bottom: calc(var(--tab-h) + 72px + env(safe-area-inset-bottom)); }
+}
 @media (max-width: 699px) {
   :root { --hd-h:64px; }
   .hd-mark img { height:40px; }
