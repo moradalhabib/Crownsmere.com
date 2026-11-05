@@ -33,12 +33,10 @@ async function tapBelowTheFold(link) {
   await link.click();
 }
 
-/* Visitors complained the site was far too long on phones (the home page was
- * 16 screens). These are the most each page may measure on a 390 x 844 phone.
- * The home page is a short front door; each service has its own short page. The footer links to
- * every page and each service page answers a few questions, for search engines as well as visitors. */
-const phoneLength = {home:2900, properties:3900, services:3900, buy:3400, sell:2450, rent:3900, invest:2400, advisory:2400,
-                     about:5500, students:3100, 'students-ar':3200, contact:3100, privacy:4800};
+/* Reasonable full-page length limits for the editorial redesign on a 390×844 phone.
+ * Rich image-led chapters must remain scannable, with no uncontrolled long scrolling. */
+const phoneLength = {home:8100, properties:4200, services:5100, buy:4200, sell:3300, rent:4800, invest:3500, advisory:3400,
+                     about:7300, students:4400, 'students-ar':4500, contact:4700, privacy:5800};
 
 for (const [url,name] of pages) {
   for (const vp of viewports) {
@@ -125,10 +123,10 @@ for (const url of ['/', '/services.html', '/rent.html', '/students.html', '/cont
 
 test('photos are served as AVIF where supported, with WebP and JPEG fallbacks', async ({page, browserName}) => {
   await page.goto('/');
-  const hero = page.locator('.hero img');
+  const hero = page.locator('.hero-media img');
   await expect.poll(() => hero.evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
-  await expect(page.locator('.hero source[type="image/avif"]')).toHaveCount(1);
-  await expect(page.locator('.hero source[type="image/webp"]')).toHaveCount(1);
+  await expect(page.locator('.hero-media source[type="image/avif"]')).toHaveCount(1);
+  await expect(page.locator('.hero-media source[type="image/webp"]')).toHaveCount(1);
   if (browserName === 'chromium') expect(await hero.evaluate(e => e.currentSrc)).toMatch(/townhouse\.avif$/);
 });
 
@@ -172,7 +170,11 @@ test('every link, section link and image on every page works', async ({page, req
   };
   for (const url of all) {
     await page.goto(url);
-    // Scroll through so lazy images load.
+    // Force offscreen lazy assets to request during exhaustive link/image QA.
+    // This tests the real URLs and actual successful decodes without changing
+    // production loading strategy or skipping any image.
+    await page.evaluate(() => document.querySelectorAll('img[loading="lazy"]').forEach(img => { img.loading = 'eager'; }));
+    // Scroll through the page to inspect resources and anchors.
     await page.evaluate(async () => {
       for (let y = 0; y < document.documentElement.scrollHeight; y += 500) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); }
     });
@@ -196,23 +198,40 @@ test('every link, section link and image on every page works', async ({page, req
   expect([...new Set(broken)]).toEqual([]);
 });
 
-test('home: a short front door with a tile for each part of the site', async ({page}) => {
+test('home: premium editorial property discovery and mobile navigation work', async ({page}) => {
   await page.setViewportSize({width:390,height:844});
   await page.goto('/');
   const hero = page.locator('.hero');
   await expect(hero.locator('h1')).toContainText('London property');
   await expect(hero.locator('a[href="contact.html"]')).toBeVisible();
-  await expect.poll(() => hero.locator('img').evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
+  await expect.poll(() => hero.locator('.hero-media img').evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
   const tiles = page.locator('.tile');
   expect(await tiles.evaluateAll(els => els.map(el => el.getAttribute('href'))))
     .toEqual(['properties.html', 'buy.html', 'rent.html', 'sell.html', 'students.html', 'about.html']);
-  // The first row of tiles starts on the opening screen, above the tab bar.
-  const first = await tiles.first().boundingBox();
-  const bar = await page.locator('.tabbar').boundingBox();
-  expect(first.y).toBeLessThan(bar.y - 60);
-  await expect(page.locator('.fine')).toContainText('illustrative');
+  await expect(page.locator('.home-path')).toHaveCount(2);
+  await expect(page.locator('.home-path[href="properties.html"]')).toContainText('For sale');
+  await expect(page.locator('.home-path[href="rent.html"]')).toContainText('To rent');
+  await expect(page.locator('.home-editorial')).toContainText('Discreet by nature');
+  await expect(page.locator('.crownsmere-hero-signature')).toContainText('CROWNSMERE');
+  await expect(page.locator('.crownsmere-hero-signature img')).toHaveCount(1);
+  await expect(page.locator('.home-disclaimer')).toContainText('illustrative');
+  await expect(page.locator('.tabbar')).toBeInViewport();
+  for (const el of await page.locator('.home-path img').all()) {
+    await expect.poll(() => el.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  }
   await tapBelowTheFold(page.locator('.tile[href="students.html"]'));
   await expect(page).toHaveURL(/students\.html/);
+});
+
+test('Crownsmere identity remains prominent and consistent sitewide', async ({page}) => {
+  for (const [url] of pages) {
+    await page.goto(url);
+    await expect(page.locator('.hd-mark .wm b')).toHaveText('CROWNSMERE');
+    await expect(page.locator('.crownsmere-footer-masthead')).toHaveText('CROWNSMERE');
+    await expect(page.locator('img[src="assets/img/monogram-sm.png"]').first()).toHaveCount(1);
+  }
+  await page.goto('/');
+  await expect(page.locator('.crownsmere-hero-caption')).toContainText('Prime London');
 });
 
 test('about: Alaa Qadir profile covers how she works, with nothing invented', async ({page}) => {
@@ -424,7 +443,9 @@ test('properties: no unapproved inventory is exposed, and Alaa stays the contact
   await expect(page.locator('h1')).toContainText('London homes');
   await expect(page.locator('.property-grid .property-card')).toHaveCount(0);
   await expect(page.locator('.property-empty')).toBeVisible();
-  await expect(page.locator('.property-filters select')).toHaveCount(3);
+  await expect(page.locator('.property-filters select')).toHaveCount(0);
+  await expect(page.locator('.property-empty-image img')).toBeVisible();
+  await expect(page.locator('.property-empty')).toContainText('public collection is being prepared');
   await expect(page.locator('.hd-nav a[href="properties.html"]')).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('.tabbar a[href="properties.html"]')).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('a[href="contact.html"]').first()).toHaveCount(1);

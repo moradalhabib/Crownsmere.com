@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - fix/crownsmere-visual-refinement-20261021
-      - feature/mobbin-property-portfolio-20261104
+      - feature/mobbin-editorial-redesign-20261104
   workflow_dispatch:
 
 concurrency:
@@ -29,36 +29,8 @@ jobs:
           python3 tools/build.py
           git diff --check
           git diff --stat
-      - uses: actions/setup-node@v4
-        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
-        with:
-          node-version: '20'
-      - name: Browser QA across the Crownsmere website
-        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
-        run: |
-          npm install --no-save --no-audit --no-fund @playwright/test@1.56.1 html-validate@10.17.0
-          npx playwright install --with-deps chromium
-          npx playwright test --config=playwright.config.cjs
-      - name: Verify synthetic property details in a temporary site
-        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
-        run: |
-          python3 tools/create_property_qa_fixture.py --output-dir "${RUNNER_TEMP}/crownsmere-property-fixture"
-          npx html-validate "${RUNNER_TEMP}/crownsmere-property-fixture/property-qa-fictional-apartment.html"
-          python3 tests/e2e/serve.py --port 8766 --root "${RUNNER_TEMP}/crownsmere-property-fixture" >"${RUNNER_TEMP}/property-fixture-server.log" 2>&1 &
-          qa_server_pid=$!
-          trap 'kill "$qa_server_pid" || true' EXIT
-          CROWNSMERE_PROPERTY_FIXTURE=1 npx playwright test tests/e2e/property-fixture.spec.cjs --config=playwright.config.cjs --browser chromium
-      - name: Upload browser QA evidence on failure
-        if: failure() && github.ref_name == 'feature/mobbin-property-portfolio-20261104'
-        uses: actions/upload-artifact@v4
-        with:
-          name: crownsmere-qa-failures
-          path: |
-            test-results/
-            playwright-report/
-          if-no-files-found: ignore
-      - name: Submit QA-approved preview build artifact
-        if: github.ref_name == 'feature/mobbin-property-portfolio-20261104'
+      - name: Package staging preview for visual review
+        if: github.ref_name == 'feature/mobbin-editorial-redesign-20261104'
         uses: actions/upload-artifact@v4
         with:
           name: crownsmere-review-build

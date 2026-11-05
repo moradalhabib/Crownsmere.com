@@ -1,0 +1,506 @@
+/* Crownsmere / Editorial Edition — Mobbin-informed whole-site redesign.
+   Original Crownsmere photography, branding and content only.
+   Responsive, progressive and no external requests. */
+:root {
+  --bg: #f8f6f1;
+  --bg-alt: #eeebe3;
+  --sand: #e9e4d9;
+  --card: #fffefa;
+  --ink: #14243a;
+  --ink-2: #495461;
+  --ink-3: #5d666d;
+  --gold: #a88959;
+  --gold-ink: #7b5c31;
+  --gold-light: #ead4ac;
+  --line: rgba(20, 36, 58, .12);
+  --line-strong: rgba(20, 36, 58, .24);
+  --max: 1280px;
+  --r: 4px;
+  --r-lg: 9px;
+  --section: 78px;
+  --hd-h: 78px;
+  --shadow: 0 15px 55px rgba(20,36,58,.06);
+}
+@media (max-width: 999px) { :root { --hd-h: 66px; --section: 62px; } }
+@media (max-width: 599px) { :root { --section: 56px; } }
+body { background: var(--bg); letter-spacing: -.005em; }
+h1,h2,h3 { letter-spacing: -.035em; }
+h1 { font-size: clamp(52px,7.1vw,108px); font-weight: 400; line-height: .96; }
+h2 { font-size: clamp(38px,4.1vw,67px); font-weight: 400; line-height: 1.03; }
+h3 { font-weight: 400; }
+.eyebrow { color: var(--gold-ink); letter-spacing: .18em; font-size: 11px; }
+.lede { max-width: 34em; line-height: 1.68; font-size: 18px; color: var(--ink-2); }
+.fine { font-size: 12px; }
+.wrap { max-width: calc(var(--max) + 2 * var(--gutter)); }
+.sec { padding-block: var(--section); }
+.sec-tight { padding-block: calc(var(--section)*.66); }
+.sec-alt { background: var(--bg-alt); }
+.sec-head { max-width: 840px; }
+.sec-head h2 { max-width: none; }
+.sec-head .lede { margin-top: 20px; }
+.btn {
+  border-radius: 3px;
+  min-height: 54px;
+  padding-inline: 27px;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .025em;
+  box-shadow: none;
+}
+.btn-primary { background: var(--ink); color: #fff; box-shadow: none; }
+.btn-primary:hover { background: #27405d; }
+.btn-ghost { background: transparent; }
+.btn-light { background: #fffefa; color: var(--ink); }
+.btn .ic-arrow { width: 17px; height: 17px; }
+.btn-row { gap: 11px; }
+
+/* Navigation: measured typography and a calm, uninterrupted brand signature. */
+.hd { background: rgba(248,246,241,.97); border-bottom: 1px solid var(--line); }
+.hd-in { gap: 28px; }
+.hd-mark { gap: 12px; }
+.hd-mark img { height: 48px; }
+.wm b { font-size: 17px; letter-spacing: .22em; }
+.wm small { color: var(--gold-ink); font-size: 15px; }
+.hd-nav a {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .10em;
+  font-weight: 620;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.hd-nav a[aria-current]::after { bottom: -11px; height: 2px; }
+.hd-in > .btn { font-size: 12px; min-height: 44px; letter-spacing: .05em; }
+@media (min-width:1000px) {
+  .hd-nav { gap: clamp(17px,2.1vw,30px); }
+  .hd-mark img { height: 48px; }
+}
+.tabbar { background: rgba(248,246,241,.98); box-shadow: 0 -7px 22px rgba(20,36,58,.06); }
+.tabbar a { font-size: 10px; font-weight: 600; letter-spacing: .018em; }
+
+/* Home hero: architecture is the protagonist, with legible editorial copy. */
+.page-home .hero {
+  min-height: min(780px,calc(100svh - var(--hd-h)));
+  background: var(--ink);
+  align-items: center;
+}
+.page-home .hero-media img { object-position: 60% 45%; }
+.page-home .hero::after {
+  background: linear-gradient(90deg, rgba(12,26,45,.93) 0%,
+  rgba(12,26,45,.89) 28%, rgba(12,26,45,.64) 54%,
+  rgba(12,26,45,.10) 100%);
+}
+.page-home .hero-in { padding-block: 125px 110px; }
+.page-home .hero h1 { max-width: 900px; color: #fff; font-size: clamp(64px,7.8vw,124px); }
+.page-home .hero h1 em { color: #e6ca9a; }
+.page-home .hero-sub { max-width: 490px; font-size: 18px; line-height: 1.7; margin-top: 27px; }
+.page-home .hero .eyebrow { color: #efdcbe; margin-bottom: 23px; }
+.page-home .hero-actions { margin-top: 33px; }
+.page-home .hero .btn-ghost { background: rgba(14,28,46,.24); border-color: rgba(255,255,255,.52); color: white; }
+.page-home .hero .btn-ghost:hover { background: rgba(255,255,255,.16); }
+
+/* Three asymmetrical editorial chapters on the home page. */
+.home-overline { display:flex; align-items:center; gap: 22px; margin-bottom: 20px; }
+.home-overline .eyebrow { margin:0; white-space:nowrap; }
+.home-overline::after { content:""; display:block; width:100%; height:1px; background:var(--line-strong); }
+.home-discover { padding-block: clamp(68px,8vw,118px); }
+.home-discover-intro { display:grid; grid-template-columns: 1.15fr .72fr; align-items:end; gap: 50px; margin-bottom: 44px; }
+.home-discover-intro h2 { max-width: 680px; }
+.home-discover-intro .lede { justify-self:end; margin-bottom:4px; max-width:380px; }
+.home-paths { display:grid; grid-template-columns: 1.14fr .86fr; gap:18px; }
+.home-path {
+  position: relative; min-height: 420px; overflow:hidden; display:flex; align-items:flex-end;
+  color:#fff; text-decoration:none; isolation:isolate; background:var(--ink);
+}
+.home-path img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2;
+  transition:transform .65s cubic-bezier(.2,.7,.2,1); }
+.home-path::before { content:""; position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(0deg,rgba(9,22,39,.82),rgba(9,22,39,.22) 62%,rgba(9,22,39,.05)); }
+.home-path:hover img { transform:scale(1.045); }
+.home-path-content { display:flex; justify-content:space-between; align-items:end; width:100%; padding:36px; gap:20px; }
+.home-path h3 { font: 400 clamp(39px,4vw,64px)/.97 var(--serif); color:#fff; margin:8px 0 14px; }
+.home-path p { font: 500 13px/1.5 var(--sans); letter-spacing:.08em; color:#e9edf1; text-transform:uppercase; }
+.home-path-arrow { display:grid; place-items:center; width:48px; height:48px; flex:none; border:1px solid #ffffffad; border-radius:100%; font-size:23px; }
+.home-path .eyebrow { color:#f0dcb4; }
+.home-disclaimer { font-size:12px; color:var(--ink-3); margin-top:18px; }
+
+.home-editorial { padding-block: 0; }
+.home-editorial-grid { display:grid; grid-template-columns: 1fr 1fr; min-height:580px; background:#e9e5d9; }
+.home-editorial-picture { position:relative; min-height:450px; overflow:hidden; }
+.home-editorial-picture img { width:100%; height:100%; position:absolute; inset:0; object-fit:cover; }
+.home-editorial-content { display:flex; flex-direction:column; justify-content:center; padding:clamp(40px,6.6vw,110px); }
+.home-editorial-content h2 { max-width:550px; }
+.home-editorial-content .lede { margin-top:24px; margin-bottom:30px; }
+.home-editorial-content .more { margin-top:0; width:max-content; }
+.home-editorial-mark { font:italic 500 22px/1 var(--serif); color:var(--gold-ink); margin-top:30px; }
+.home-editorial-copy { color:var(--ink-2); font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+.home-ways .sec-head { max-width:none; display:flex; align-items:end; justify-content:space-between; gap:38px; }
+.home-ways .sec-head h2 { max-width:650px; }
+.home-ways .sec-head .lede { max-width:380px; margin:0; }
+.home-ways .tiles { gap:13px; }
+.home-ways .tile {
+  background:var(--card); border-radius:3px;
+  border:1px solid var(--line); box-shadow:none; padding:30px;
+  min-height:180px; gap:9px;
+}
+.home-ways .tile:hover { border-color:var(--gold); transform:translateY(-2px); }
+.home-ways .tile-ic { width:25px; height:25px; margin-bottom:9px; }
+.home-ways .tile :is(h2,h3) { font-size:clamp(25px,2vw,34px); }
+.home-ways .tile p { max-width:28ch; font-size:13px; color:var(--ink-2); }
+.home-ways .tile-go { top:28px; right:24px; }
+.home-ways .home-areas { padding-top:18px; border-top:1px solid var(--line); max-width:100%; margin-top:24px; }
+.home-ways .home-areas a { white-space:nowrap; }
+
+/* All inner pages get an original split editorial cover without invented property listings. */
+.page-hero { position:relative; overflow:hidden; padding:76px 0 72px; background:var(--bg-alt); border-bottom:1px solid var(--line); }
+.page-hero .wrap { position:relative; z-index:1; }
+.page-hero::after { content:""; position:absolute; top:0; bottom:0; right:0; width:37%;
+  background:url("img/colonnade.webp") center / cover no-repeat; opacity:.96; }
+.page-hero::before { content:""; position:absolute; z-index:1; top:0; bottom:0; left:42%; right:35%;
+  background:linear-gradient(90deg,var(--bg-alt),rgba(238,235,227,0)); pointer-events:none; }
+.page-hero h1 { max-width: 62%; font-size:clamp(57px,6vw,90px); }
+.page-hero .lede { max-width:600px; padding-right:5%; font-size:17px; }
+.page-hero .eyebrow { margin-bottom:18px; }
+.page-hero .crumbs { margin-bottom: 14px; }
+.page-hero.notfound::after,.page-hero.notfound::before { display:none; }
+.page-hero.notfound h1 { max-width:860px; }
+.page-services .page-hero::after { background-image:url("img/door.webp"); }
+.page-buy .page-hero::after { background-image:url("img/townhouse.webp"); }
+.page-sell .page-hero::after { background-image:url("img/colonnade.webp"); }
+.page-rent .page-hero::after { background-image:url("img/interior.webp"); }
+.page-invest .page-hero::after { background-image:url("img/westminster.webp"); }
+.page-advisory .page-hero::after { background-image:url("img/door.webp"); }
+.page-privacy .page-hero::after { background-image:none; }
+.page-privacy .page-hero::before { display:none; }
+.page-privacy .page-hero h1 { max-width:100%; }
+
+/* Services: quiet modular hierarchy rather than repetitive app-like tiles. */
+.page-services .tiles { gap:18px; }
+.page-services .tile { background:var(--card); border-radius:3px; border-top:2px solid var(--gold); min-height:215px; padding:32px; }
+.page-services .tile:hover { box-shadow:0 16px 44px rgba(20,36,58,.08); }
+.page-services .tile :is(h2,h3) { font-size:35px; }
+.page-services .tile-ic { width:28px; height:28px; margin-bottom:18px; }
+.page-services .step-n, .steps .step-n { background:var(--card); }
+.svc-groups { gap:50px; }
+.svc-group { border-top:1px solid var(--gold); padding-top:24px; }
+.svc-group h2 { font-size:38px; }
+.callout { border-radius:5px; background:var(--bg-alt); box-shadow:none; border:1px solid var(--line-strong); }
+.tags li { border-radius:2px; padding:9px 15px; }
+
+/* Person-led About, preserving an architectural image rather than inventing Alaa's portrait. */
+.profile-hero { padding:90px 0 70px; background:#f3efe7; }
+.profile { grid-template-columns:1fr 0.82fr; gap:8vw; min-height:570px; }
+.profile-copy h1 { font-size:clamp(75px,10vw,146px); }
+.profile-copy .lede { max-width:520px; font-size:19px; }
+.profile-copy .tags { margin:29px 0; }
+.profile-media { aspect-ratio:4/5; border-radius:3px; box-shadow:25px 25px 0 #e7ddcc; }
+.profile-media img { object-position:center; }
+.story-text { max-width:calc(900px + 2 * var(--gutter)); }
+.story-text .lead { font-size:clamp(26px,3.1vw,41px); line-height:1.35; }
+.story-text p { line-height:1.85; }
+.cards-3 .card { background:var(--card); box-shadow:none; border:1px solid var(--line); border-radius:2px; }
+.cards-3 .card h3 { font-size:clamp(26px,2.6vw,36px); }
+.whos .who { border-radius:3px; box-shadow:none; border-top:1px solid var(--gold); }
+
+/* Dedicated welcome treatment for contacts and bilingual student rental requests. */
+.page-contact main { background:var(--bg); }
+.page-contact .enquiry { gap:46px 7%; }
+.page-contact .enquiry-intro { padding:55px 38px; background:var(--ink); color:#fff; }
+.page-contact .enquiry-intro h1 { color:#fff; font-size:clamp(56px,6vw,92px); }
+.page-contact .enquiry-intro h1 em { color:#e5c794; }
+.page-contact .enquiry-intro .eyebrow { color:var(--gold-light); }
+.page-contact .enquiry-intro .lede { color:#e1e6ec; }
+.page-contact .form-card { background:var(--card); box-shadow:none; border:1px solid var(--line); border-radius:4px; padding:38px; }
+.page-contact .enquiry-aside { padding-inline:38px; }
+.form-card :is(input:not([type="radio"],[type="checkbox"],[type="hidden"]),select,textarea) { border-radius:3px; background:#fff; }
+.form-card .step-title { font-size:34px; }
+.choice span { border-radius:3px; }
+.student-language-bar { padding-top:26px; }
+.stu { gap:34px 60px; padding-block:45px 90px; }
+.stu-intro h1 { font-size:clamp(55px,5.5vw,86px); }
+.stu-intro .lede { font-size:17px; }
+.stu-intro { padding:20px 0; }
+.student-application.form-card { border-radius:4px; box-shadow:none; border:1px solid var(--line); }
+.student-advice { border-radius:3px; border-top:3px solid var(--gold); }
+.lang-switch { border-radius:3px; padding:4px; }
+.lang-switch a[aria-current] { border-radius:2px; }
+
+/* Property discovery and detail, with a human consultant as primary CTA. */
+.property-index-hero { background:#eae7df; }
+.property-index-hero::before { content:""; position:absolute; inset:0 0 0 48%; background:url("img/interior.webp") center / cover no-repeat; }
+.property-index-hero::after { content:""; position:absolute; top:0; bottom:0; left:36%; right:35%;
+  width:auto; font:inherit; color:transparent; pointer-events:none;
+  background:linear-gradient(90deg,#eae7df,rgba(234,231,223,0)); }
+.property-index-intro { padding-block:clamp(85px,8vw,125px); }
+.property-index-intro h1 { max-width:660px; font-size:clamp(66px,7vw,106px); }
+.property-index-intro .lede { max-width:500px; }
+.property-index-intro .btn-row { margin-top:30px; }
+.property-toolbar { align-items:end; }
+.property-grid { gap:22px; }
+.property-card { border-radius:4px; box-shadow:none; }
+.property-card:hover { box-shadow:0 20px 44px rgba(20,36,58,.10); }
+.property-photo { aspect-ratio:1.3; }
+.property-body { padding:27px; }
+.property-body h3 { font-size:34px; }
+.property-pill { border-radius:3px; }
+.property-empty {
+  max-width:100%; display:grid; grid-template-columns:1fr 1fr;
+  align-items:center; text-align:left; gap:40px; margin:0; padding:0; border:0;
+  background:#efe8dc; border-radius:3px; overflow:hidden;
+}
+.property-empty-image { height:440px; margin:0; position:relative; }
+.property-empty-image img { width:100%; height:100%; object-fit:cover; }
+.property-empty-copy { max-width:590px; padding:45px 55px 45px 14px; }
+.property-empty .eyebrow { margin-bottom:15px; }
+.property-empty h2 { font-size:clamp(41px,4.2vw,66px); }
+.property-empty p { margin:19px 0 27px; max-width:480px; font-size:16px; }
+.property-empty .property-empty-note { font-size:12px; margin-top:18px; }
+.property-guidance-grid { gap:45px; }
+.property-guidance-grid > div { padding-top:30px; }
+.property-enquire { border-radius:4px; box-shadow:0 18px 52px rgba(20,36,58,.07); }
+.property-gallery-photo,.property-gallery-photo:first-child { border-radius:3px; }
+.property-detail-gallery { gap:12px; }
+.property-detail-heading h1 { max-width:800px; }
+
+/* Footer: timeless dark ink, strong actions and generous breathing room. */
+.ft { background:#142438; color:#f6f1e7; border-top:0; padding-bottom:28px; }
+.ft-skyline { display:none; }
+.ft-in { padding-top:clamp(60px,7vw,105px); gap:65px 75px; }
+.ft-mark { color:#f6f1e7; }
+.ft-mark .wm b { color:#f6f1e7; }
+.ft-mark .wm small { color:#e1bd7e; }
+.ft-brand p { font:400 24px/1.27 var(--serif); max-width:340px; color:#e7e0d5; margin-top:26px; }
+.ft-mail { display:inline-block; margin-top:22px; color:#f5e9d2; font-size:15px; }
+.ft-nav { gap:20px 95px; }
+.ft-h,.ft-nav .ft-h a { color:#e5c78e; }
+.ft-nav a,.ft-nav a[lang="ar"] { color:#e2e4e7; }
+.ft-nav a:hover,.ft-nav a:focus-visible { color:#fff; }
+.ft-legal { border-top:1px solid #ffffff2b; color:#d6d9dd; padding-top:24px; }
+.ft-reg { color:#c5cbd4; }
+.ft-reg a { color:#e0e3e7; }
+
+/* The closing conversation is a deliberate visual chapter. */
+.cta { background:#eae4d8; text-align:center; }
+.cta .wrap { max-width:calc(950px + 2 * var(--gutter)); }
+.cta h2 { max-width:850px; margin-inline:auto; }
+.cta .lede { max-width:540px; margin:23px auto 0; }
+.cta .btn-row { margin-top:32px; }
+.cta .btn { min-width:180px; }
+
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .hd-in { gap: 14px; }
+  .hd-nav { gap: 12px; }
+  .hd-nav a { font-size: 11px; letter-spacing: .055em; }
+  .hd-mark { gap: 7px; }
+  .hd-mark img { height: 41px; }
+  .wm b { font-size: 14px; letter-spacing: .13em; }
+  .hd-in > .btn { font-size: 11px; padding-inline: 13px; }
+}
+@media (max-width: 999px) {
+  .page-home .hero { min-height:650px; }
+  .page-home .hero-in { padding-block:110px 90px; }
+  .page-home .hero h1 { font-size:clamp(62px,9vw,90px); }
+  .page-home .hero::after { background:linear-gradient(90deg,rgba(12,26,45,.91),rgba(12,26,45,.55) 60%,rgba(12,26,45,.15)); }
+  .home-editorial-grid { grid-template-columns:1fr 1fr; }
+  .home-editorial-content { padding:40px; }
+  .home-path { min-height:360px; }
+  .home-path-content { padding:26px; }
+  .page-hero::after { width:33%; }
+  .page-hero::before { left:40%; right:29%; }
+  .page-hero h1 { max-width:68%; }
+  .profile-hero { padding:55px 0; }
+  .profile { grid-template-columns:1.1fr .9fr; gap:40px; min-height:0; }
+  .profile-copy h1 { font-size:75px; }
+  .property-index-hero::before { left:48%; }
+  .property-empty-copy { padding:30px 30px 30px 0; }
+}
+@media (max-width: 999px) {
+  /* Keep the last footer action reachable above the fixed five-tab navigation. */
+  .ft { padding-bottom: calc(var(--tab-h) + 72px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 699px) {
+  :root { --hd-h:64px; }
+  .hd-mark img { height:40px; }
+  .wm b { font-size:14px; }
+  .wm small { font-size:13px; }
+  h1 { font-size:clamp(48px,12vw,73px); }
+  h2 { font-size:clamp(36px,10vw,54px); }
+  .lede { font-size:16px; }
+  .page-home .hero { min-height:610px; }
+  .page-home .hero-in { padding-block:170px 72px; }
+  .page-home .hero h1 { font-size:clamp(57px,13vw,78px); line-height:.99; }
+  .page-home .hero-sub { font-size:15px; line-height:1.65; margin-top:23px; }
+  .page-home .hero::after { background:linear-gradient(0deg,rgba(12,26,45,.98) 0%,rgba(12,26,45,.83) 35%,rgba(12,26,45,.28) 100%); }
+  .page-home .hero-media img { object-position:72% center; }
+  .page-home .hero-actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .page-home .hero-actions .btn { width:auto; padding-inline:10px; font-size:12px; }
+  .home-discover { padding-block:55px; }
+  .home-discover-intro { display:block; margin-bottom:25px; }
+  .home-discover-intro .lede { margin:20px 0 0; }
+  .home-paths { grid-template-columns:1fr; gap:12px; }
+  .home-path { min-height:310px; }
+  .home-path-content { padding:25px; }
+  .home-path h3 { font-size:51px; }
+  .home-editorial-grid { grid-template-columns:1fr; }
+  .home-editorial-picture { min-height:340px; }
+  .home-editorial-content { padding:47px var(--gutter) 55px; }
+  .home-ways .sec-head { display:block; }
+  .home-ways .sec-head .lede { margin-top:20px; }
+  .home-ways .tiles { gap:10px; }
+  .home-ways .tile { padding:19px; min-height:160px; }
+  .home-ways .tile :is(h2,h3) { font-size:26px; }
+  .home-ways .tile-ic { margin-bottom:5px; }
+  .home-ways .tile-go { top:18px; right:14px; }
+  .page-hero { padding:43px 0 40px; }
+  .page-hero::after { width:100%; opacity:.17; filter:grayscale(.2); }
+  .page-hero::before { left:0; right:0; background:linear-gradient(90deg,var(--bg-alt),rgba(238,235,227,.83)); }
+  .page-hero h1 { max-width:100%; font-size:clamp(49px,12vw,72px); }
+  .page-hero .lede { max-width:540px; font-size:16px; }
+  .page-services .tile { min-height:178px; padding:21px 17px; }
+  .page-services .tile :is(h2,h3) { font-size:28px; }
+  .profile-hero { padding:47px 0 44px; }
+  .profile { grid-template-columns:1fr; gap:30px; }
+  .profile-copy h1 { font-size:clamp(75px,16vw,110px); }
+  .profile-copy .lede { font-size:17px; }
+  .profile-media { max-height:450px; aspect-ratio:1.25; box-shadow:none; }
+  .page-contact .enquiry { gap:22px; }
+  .page-contact .enquiry-intro { padding:35px 25px; }
+  .page-contact .enquiry-intro h1 { font-size:61px; }
+  .page-contact .enquiry-aside { padding:10px 3px; }
+  .page-contact .form-card { padding:25px 20px; }
+  .stu { padding-top:25px; }
+  .stu-intro h1 { font-size:clamp(54px,12vw,73px); }
+  .property-index-hero::before { left:30%; opacity:.22; }
+  .property-index-hero::after { left:0; right:0; background:linear-gradient(90deg,#eae7df,rgba(234,231,223,.75)); }
+  .property-index-intro { padding-block:56px; }
+  .property-index-intro h1 { max-width:560px; font-size:clamp(55px,12vw,77px); }
+  .property-empty { grid-template-columns:1fr; gap:0; }
+  .property-empty-image { height:285px; }
+  .property-empty-copy { padding:35px 26px 38px; }
+  .property-empty h2 { font-size:44px; }
+  .ft-in { padding-top:56px; gap:38px; }
+  .ft-brand p { font-size:23px; }
+  .ft-nav { gap:12px; }
+  .ft-legal { margin-top:4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-path img, .home-ways .tile { transition:none; }
+  .home-path:hover img, .home-ways .tile:hover { transform:none; }
+}
+
+
+/* ==========================================================================
+   THE CROWNSMERE HOUSE STYLE
+   British estate character without faux royal claims, borrowed coats of arms,
+   loud metallic effects or replacing the approved Crownsmere identity.
+   ========================================================================== */
+:root {
+  --brand-midnight: #142438;
+  --brand-ivory: #f8f6f1;
+  --brand-brass: #a98b5e;
+  --brand-parchment: #ebe6db;
+}
+.hd { border-bottom:1px solid rgba(20,36,58,.14); }
+.hd-mark .wm b { letter-spacing:.24em; font-weight:560; }
+.hd-mark .wm small { letter-spacing:.015em; }
+.hd-nav a[aria-current]::after { background:var(--brand-brass); }
+.page-home .hero { position:relative; }
+.page-home .hero::before {
+  content:""; position:absolute; inset:22px; pointer-events:none; z-index:1;
+  border:1px solid rgba(240,218,181,.30);
+}
+.page-home .hero-in { position:relative; z-index:2; }
+.page-home .hero h1 { max-width:850px; line-height:.96; text-wrap:balance; }
+.crownsmere-hero-signature {
+  display:flex; align-items:center; width:max-content; max-width:100%;
+  gap:13px; color:#fff9ed; border-bottom:1px solid rgba(236,214,177,.53);
+  padding-bottom:18px; margin-bottom:21px;
+}
+.crownsmere-hero-signature picture { display:block; width:24px; flex:none; }
+.crownsmere-hero-signature img { width:24px; height:39px; object-fit:contain; }
+.crownsmere-hero-signature strong {
+  display:block; font:500 17px/1.05 var(--wordmark);
+  letter-spacing:.21em; color:#fff;
+}
+.crownsmere-hero-signature span {
+  display:block; margin-top:7px; font:600 10px/1.2 var(--sans);
+  letter-spacing:.27em; color:#f0dfc4;
+}
+.page-home .hero .eyebrow { letter-spacing:.13em; font-size:10px; margin-bottom:17px; }
+.crownsmere-hero-caption {
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  margin-top:32px; padding-top:16px;
+  border-top:1px solid rgba(242,229,210,.35);
+  max-width:680px;
+  font:600 10px/1.6 var(--sans); letter-spacing:.13em;
+  text-transform:uppercase; color:#f2e9d8;
+}
+.crownsmere-hero-caption span { color:#cbb187; }
+.home-overline .eyebrow,.page-hero .eyebrow {
+  letter-spacing:.18em;
+}
+.home-path { border:1px solid rgba(20,36,58,.08); }
+.home-path h3 { letter-spacing:-.032em; }
+.home-path .home-path-content .eyebrow { letter-spacing:.16em; }
+.home-editorial-grid { background:var(--brand-parchment); }
+.home-editorial-mark { font-size:27px; }
+.page-contact .enquiry-intro {
+  position:relative; overflow:hidden; isolation:isolate;
+  border-top:3px solid var(--brand-brass);
+}
+.page-contact .enquiry-intro::before {
+  content:""; position:absolute; right:-12px; bottom:-28px;
+  width:158px; height:245px; z-index:-1; opacity:.14;
+  background:url("img/monogram-sm.png") center / contain no-repeat;
+  pointer-events:none;
+}
+.page-contact .enquiry-intro .eyebrow { letter-spacing:.15em; }
+.page-contact .enquiry-intro h1 { line-height:1.02; }
+.page-hero h1 { text-wrap:balance; }
+.page-hero::after { filter:saturate(.86); }
+.property-index-hero { background:var(--brand-parchment); }
+.property-index-hero::after {
+  background:linear-gradient(90deg,var(--brand-parchment),rgba(235,230,219,0));
+}
+.property-index-intro h1 { max-width:790px; }
+.property-index-intro .eyebrow { letter-spacing:.20em; }
+.property-empty { background:#ede7dc; }
+.property-empty h2 { letter-spacing:-.024em; }
+.property-guidance-grid span { letter-spacing:.16em; color:var(--gold-ink); }
+.property-detail-heading h1 { font-weight:400; }
+
+/* A grand yet discreet wordmark closes every page without inventing heraldry. */
+.crownsmere-footer-masthead {
+  grid-column:1 / -1; margin:0; padding:36px 0 25px;
+  border-top:1px solid rgba(245,238,225,.25);
+  color:#f0eade; text-align:center; white-space:nowrap;
+  font:500 clamp(25px,7.5vw,100px)/1.08 var(--wordmark);
+  letter-spacing:clamp(.03em,.45vw,.12em);
+  max-width:100%; overflow:hidden;
+}
+.ft-in { row-gap:46px; }
+.ft-brand p { font-size:clamp(24px,2.5vw,32px); line-height:1.25; }
+.ft-nav a:hover { text-underline-offset:5px; }
+.cta .eyebrow { letter-spacing:.2em; }
+.cta h2 { letter-spacing:-.04em; }
+
+@media (max-width:699px) {
+  .hd-mark .wm b { letter-spacing:.15em; font-size:13px; }
+  .page-home .hero { min-height:720px; }
+  .page-home .hero-in { padding-block:70px 90px; }
+  .page-home .hero::before { inset:13px; border-color:rgba(240,218,181,.25); }
+  .page-home .hero h1 { font-size:clamp(57px,12.6vw,78px); line-height:.98; }
+  .page-home .hero .eyebrow { max-width:290px; margin-bottom:16px; }
+  .crownsmere-hero-signature { gap:9px; margin-bottom:15px; padding-bottom:13px; }
+  .crownsmere-hero-signature strong { font-size:14px; letter-spacing:.15em; }
+  .crownsmere-hero-signature span { font-size:9px; letter-spacing:.2em; }
+  .crownsmere-hero-signature picture,.crownsmere-hero-signature img { width:18px; }
+  .crownsmere-hero-signature img { height:30px; }
+  .crownsmere-hero-caption { margin-top:24px; gap:7px; font-size:9px; }
+  .page-contact .enquiry-intro::before { width:110px; height:170px; }
+  .crownsmere-footer-masthead { padding:27px 0 15px; font-size:clamp(25px,7vw,50px); letter-spacing:.055em; }
+  .property-index-intro h1 { font-size:clamp(47px,11.3vw,74px); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .crownsmere-hero-signature,.crownsmere-hero-caption { animation:none; }
+}

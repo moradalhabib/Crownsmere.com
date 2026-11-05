@@ -8,6 +8,7 @@ on:
       - fix/student-language-header-overlap-20261021
       - improve/crownsmere-ux-mobile-20261021
       - feature/mobbin-property-portfolio-20261104
+      - feature/mobbin-editorial-redesign-20261104
   pull_request:
     paths:
       - '*.html'
