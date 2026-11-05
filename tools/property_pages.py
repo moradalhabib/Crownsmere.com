@@ -113,7 +113,7 @@ def build_properties(ctx):
 
     cards = "".join(property_card(row) for row in active)
     empty = '''<div class="property-empty">
-      <figure class="property-empty-image"><img src="assets/img/interior.jpg" alt="Illustrative light-filled London living room; not a currently available property" width="826" height="463" loading="lazy"></figure>
+      <figure class="property-empty-image"><img src="assets/img/interior.jpg" alt="Illustrative light-filled London living room; not a currently available property" width="826" height="463" loading="eager"></figure>
       <div class="property-empty-copy">
         <p class="eyebrow">A private collection</p>
         <h2>Every home begins <em>with a conversation.</em></h2>
