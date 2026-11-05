@@ -123,10 +123,10 @@ for (const url of ['/', '/services.html', '/rent.html', '/students.html', '/cont
 
 test('photos are served as AVIF where supported, with WebP and JPEG fallbacks', async ({page, browserName}) => {
   await page.goto('/');
-  const hero = page.locator('.hero img');
+  const hero = page.locator('.hero-media img');
   await expect.poll(() => hero.evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
-  await expect(page.locator('.hero source[type="image/avif"]')).toHaveCount(1);
-  await expect(page.locator('.hero source[type="image/webp"]')).toHaveCount(1);
+  await expect(page.locator('.hero-media source[type="image/avif"]')).toHaveCount(1);
+  await expect(page.locator('.hero-media source[type="image/webp"]')).toHaveCount(1);
   if (browserName === 'chromium') expect(await hero.evaluate(e => e.currentSrc)).toMatch(/townhouse\.avif$/);
 });
 
@@ -204,7 +204,7 @@ test('home: premium editorial property discovery and mobile navigation work', as
   const hero = page.locator('.hero');
   await expect(hero.locator('h1')).toContainText('London property');
   await expect(hero.locator('a[href="contact.html"]')).toBeVisible();
-  await expect.poll(() => hero.locator('img').evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
+  await expect.poll(() => hero.locator('.hero-media img').evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
   const tiles = page.locator('.tile');
   expect(await tiles.evaluateAll(els => els.map(el => el.getAttribute('href'))))
     .toEqual(['properties.html', 'buy.html', 'rent.html', 'sell.html', 'students.html', 'about.html']);
